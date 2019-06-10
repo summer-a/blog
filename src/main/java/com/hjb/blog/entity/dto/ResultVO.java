@@ -1,7 +1,7 @@
 package com.hjb.blog.entity.dto;
 
 /**
- * @author h1525
+ * @author 胡江斌
  * @version 1.0
  * @title: ResultVO
  * @projectName blog

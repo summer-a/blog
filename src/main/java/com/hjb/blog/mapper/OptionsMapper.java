@@ -1,7 +1,7 @@
 package com.hjb.blog.mapper;
 
 import com.hjb.blog.entity.normal.Options;
-import tk.mybatis.mapper.common.Mapper;
+import tk.mapper.BaseMapper;
 
-public interface OptionsMapper extends Mapper<Options> {
+public interface OptionsMapper extends BaseMapper<Options> {
 }

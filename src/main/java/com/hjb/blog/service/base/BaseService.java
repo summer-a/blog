@@ -6,7 +6,7 @@ import tk.mybatis.mapper.entity.Example;
 import java.util.List;
 
 /**
- * @author h1525
+ * @author 胡江斌
  * @version 1.0
  * @title: BaseService
  * @projectName blog

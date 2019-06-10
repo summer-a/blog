@@ -1,10 +1,11 @@
 package com.hjb.blog.entity.normal;
 
+import com.hjb.blog.entity.base.BaseEntity;
+
 import javax.persistence.*;
-import java.util.Date;
 
 @Table(name = "article_content")
-public class ArticleContent {
+public class ArticleContent extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
@@ -15,17 +16,6 @@ public class ArticleContent {
     @Column(name = "article_id")
     private Integer articleId;
 
-    /**
-     * 更新时间
-     */
-    @Column(name = "update_time")
-    private Date updateTime;
-
-    /**
-     * 创建时间
-     */
-    @Column(name = "create_time")
-    private Date createTime;
 
     /**
      * @return id
@@ -59,39 +49,4 @@ public class ArticleContent {
         this.articleId = articleId;
     }
 
-    /**
-     * 获取更新时间
-     *
-     * @return update_time - 更新时间
-     */
-    public Date getUpdateTime() {
-        return updateTime;
-    }
-
-    /**
-     * 设置更新时间
-     *
-     * @param updateTime 更新时间
-     */
-    public void setUpdateTime(Date updateTime) {
-        this.updateTime = updateTime;
-    }
-
-    /**
-     * 获取创建时间
-     *
-     * @return create_time - 创建时间
-     */
-    public Date getCreateTime() {
-        return createTime;
-    }
-
-    /**
-     * 设置创建时间
-     *
-     * @param createTime 创建时间
-     */
-    public void setCreateTime(Date createTime) {
-        this.createTime = createTime;
-    }
 }

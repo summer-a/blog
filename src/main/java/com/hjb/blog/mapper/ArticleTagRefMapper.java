@@ -2,7 +2,7 @@ package com.hjb.blog.mapper;
 
 
 import com.hjb.blog.entity.normal.ArticleTagRef;
-import tk.mybatis.mapper.common.Mapper;
+import tk.mapper.BaseMapper;
 
-public interface ArticleTagRefMapper extends Mapper<ArticleTagRef> {
+public interface ArticleTagRefMapper extends BaseMapper<ArticleTagRef> {
 }

@@ -1,10 +1,11 @@
 package com.hjb.blog.entity.normal;
 
+import com.hjb.blog.entity.base.BaseEntity;
+
 import javax.persistence.*;
-import java.util.Date;
 
 @Table(name = "article_tag_ref")
-public class ArticleTagRef {
+public class ArticleTagRef extends BaseEntity {
     /**
      * 文章id
      */
@@ -21,18 +22,6 @@ public class ArticleTagRef {
 
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
-
-    /**
-     * 创建时间
-     */
-    @Column(name = "create_time")
-    private Date createTime;
-
-    /**
-     * 最后更新时间
-     */
-    @Column(name = "update_time")
-    private Date updateTime;
 
     /**
      * 获取文章id
@@ -84,39 +73,4 @@ public class ArticleTagRef {
         this.id = id;
     }
 
-    /**
-     * 获取创建时间
-     *
-     * @return create_time - 创建时间
-     */
-    public Date getCreateTime() {
-        return createTime;
-    }
-
-    /**
-     * 设置创建时间
-     *
-     * @param createTime 创建时间
-     */
-    public void setCreateTime(Date createTime) {
-        this.createTime = createTime;
-    }
-
-    /**
-     * 获取最后更新时间
-     *
-     * @return update_time - 最后更新时间
-     */
-    public Date getUpdateTime() {
-        return updateTime;
-    }
-
-    /**
-     * 设置最后更新时间
-     *
-     * @param updateTime 最后更新时间
-     */
-    public void setUpdateTime(Date updateTime) {
-        this.updateTime = updateTime;
-    }
 }

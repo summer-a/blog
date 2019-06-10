@@ -6,13 +6,13 @@ import com.hjb.blog.entity.base.BaseEntity;
 import com.hjb.blog.service.base.BaseService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
-import tk.mybatis.mapper.common.Mapper;
+import tk.mapper.BaseMapper;
 import tk.mybatis.mapper.entity.Example;
 
 import java.util.List;
 
 /**
- * @author h1525
+ * @author 胡江斌
  * @version 1.0
  * @title: BaseServiceImpl
  * @projectName blog
@@ -22,7 +22,7 @@ import java.util.List;
 public class BaseServiceImpl<T extends BaseEntity> implements BaseService<T> {
 
     @Autowired
-    private Mapper<T> mapper;
+    private BaseMapper<T> mapper;
 
     @Transactional(readOnly = false, rollbackFor = RuntimeException.class)
     @Override

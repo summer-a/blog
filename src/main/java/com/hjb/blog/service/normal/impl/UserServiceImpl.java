@@ -6,10 +6,10 @@ import com.hjb.blog.service.normal.UserService;
 import org.springframework.stereotype.Service;
 
 /**
- * @author h1525
+ * @author 胡江斌
  * @version 1.0
  * @title: UserServiceImpl
- * @projectName demo1
+ * @projectName blog
  * @description: TODO
  * @date 2019/6/9 10:09
  */

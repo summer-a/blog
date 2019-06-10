@@ -1,7 +1,7 @@
 package com.hjb.blog.mapper;
 
 import com.hjb.blog.entity.normal.ArticleCategoryRef;
-import tk.mybatis.mapper.common.Mapper;
+import tk.mapper.BaseMapper;
 
-public interface ArticleCategoryRefMapper extends Mapper<ArticleCategoryRef> {
+public interface ArticleCategoryRefMapper extends BaseMapper<ArticleCategoryRef> {
 }

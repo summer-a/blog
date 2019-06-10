@@ -1,7 +1,7 @@
 package com.hjb.blog.mapper;
 
 import com.hjb.blog.entity.normal.ArticleContent;
-import tk.mybatis.mapper.common.Mapper;
+import tk.mapper.BaseMapper;
 
-public interface ArticleContentMapper extends Mapper<ArticleContent> {
+public interface ArticleContentMapper extends BaseMapper<ArticleContent> {
 }

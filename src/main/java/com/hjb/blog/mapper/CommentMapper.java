@@ -1,7 +1,7 @@
 package com.hjb.blog.mapper;
 
 import com.hjb.blog.entity.normal.Comment;
-import tk.mybatis.mapper.common.Mapper;
+import tk.mapper.BaseMapper;
 
-public interface CommentMapper extends Mapper<Comment> {
+public interface CommentMapper extends BaseMapper<Comment> {
 }

@@ -1,12 +1,13 @@
 package com.hjb.blog.entity.normal;
 
+import com.hjb.blog.entity.base.BaseEntity;
+
 import javax.persistence.Column;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import java.util.Date;
 
-public class Comment {
+public class Comment extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
@@ -76,18 +77,6 @@ public class Comment {
      */
     @Column(name = "comment_role")
     private Integer commentRole;
-
-    /**
-     * 创建时间
-     */
-    @Column(name = "create_time")
-    private Date createTime;
-
-    /**
-     * 最后更新时间
-     */
-    @Column(name = "update_time")
-    private Date updateTime;
 
     /**
      * @return id
@@ -301,39 +290,4 @@ public class Comment {
         this.commentRole = commentRole;
     }
 
-    /**
-     * 获取创建时间
-     *
-     * @return create_time - 创建时间
-     */
-    public Date getCreateTime() {
-        return createTime;
-    }
-
-    /**
-     * 设置创建时间
-     *
-     * @param createTime 创建时间
-     */
-    public void setCreateTime(Date createTime) {
-        this.createTime = createTime;
-    }
-
-    /**
-     * 获取最后更新时间
-     *
-     * @return update_time - 最后更新时间
-     */
-    public Date getUpdateTime() {
-        return updateTime;
-    }
-
-    /**
-     * 设置最后更新时间
-     *
-     * @param updateTime 最后更新时间
-     */
-    public void setUpdateTime(Date updateTime) {
-        this.updateTime = updateTime;
-    }
 }

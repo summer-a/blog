@@ -1,7 +1,7 @@
 package com.hjb.blog.mapper;
 
 import com.hjb.blog.entity.normal.Tag;
-import tk.mybatis.mapper.common.Mapper;
+import tk.mapper.BaseMapper;
 
-public interface TagMapper extends Mapper<Tag> {
+public interface TagMapper extends BaseMapper<Tag> {
 }

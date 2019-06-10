@@ -6,7 +6,7 @@ import java.io.Serializable;
 import java.util.Date;
 
 /**
- * @author h1525
+ * @author 胡江斌
  * @version 1.0
  * @title: BaseEntity
  * @projectName blog
