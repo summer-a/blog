@@ -2,6 +2,7 @@ package com.hjb.blog.service.base.impl;
 
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
+import com.hjb.blog.entity.base.BaseEntity;
 import com.hjb.blog.service.base.BaseService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
@@ -18,7 +19,7 @@ import java.util.List;
  * @description: TODO
  * @date 2019/6/8 10:42
  */
-public class BaseServiceImpl<T> implements BaseService<T> {
+public class BaseServiceImpl<T extends BaseEntity> implements BaseService<T> {
 
     @Autowired
     private Mapper<T> mapper;

@@ -6,7 +6,7 @@ import tk.mybatis.spring.annotation.MapperScan;
 
 
 @SpringBootApplication
-@MapperScan(basePackages = "tk.mapper", properties = "mappers=tk.mybatis.mapper.common.Mapper")
+@MapperScan(basePackages = "com.hjb.blog.mapper", properties = "mappers=tk.mybatis.mapper.common.Mapper")
 public class BlogApplication {
 
     public static void main(String[] args) {

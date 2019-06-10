@@ -1,4 +1,4 @@
-package tk.mapper;
+package com.hjb.blog.mapper;
 
 
 import com.hjb.blog.entity.normal.ArticleTagRef;

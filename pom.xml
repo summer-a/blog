@@ -75,11 +75,13 @@
         </dependency>
         <!-- pagehelper 依赖 结束 -->
 
+        <!-- json 依赖 -->
         <dependency>
             <groupId>com.alibaba</groupId>
             <artifactId>fastjson</artifactId>
             <version>${fastjson.version}</version>
         </dependency>
+        <!-- json 依赖 结束 -->
 
     </dependencies>
 
