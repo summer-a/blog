@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+</head>
+<body>
+<!-- 顶层条 -->
+<div th:fragment="head">
+
+    <!-- 顶部条 start -->
+    <header id="masthead" class="site-header">
+        <!--顶部菜单 start-->
+        <nav id="top-header">
+            <div class="top-nav">
+                <div class="user-login">
+                    <a href="/admin">进入后台</a>
+                </div>
+                <div class="menu-topmenu-container">
+                    <ul id="menu-topmenu" class="top-menu">
+                        <li class="chat-to-me">
+                            <a th:href="@{'http://wpa.qq.com/msgrd?V=3&amp;uin=' + ${option.optionAboutsiteQq} + '&amp;Site=QQ&amp;Menu=yes'}">
+                                <i class="fa-paperclip fa"></i>
+                                <span class="font-text">联系站长</span>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+        <!--顶部菜单 end-->
+
+        <!--主要菜单 satrt-->
+        <div id="menu-box">
+            <div id="top-menu">
+                <span class="nav-search">
+                    <i class="fa fa-search"></i>
+                </span>
+                <div class="logo-site"><h1 class="site-title">
+                    <a href="/" title="驰游云校">驰游云校</a>
+                </h1>
+                    <p class="site-description">校园里的小帮手</p>
+                </div><!-- .logo-site -->
+                <div id="site-nav-wrap">
+                    <div id="sidr-close">
+                        <a href="#sidr-close" class="toggle-sidr-close">×</a>
+                    </div>
+                    <nav id="site-nav" class="main-nav">
+                        <a href="#sidr-main" id="navigation-toggle" class="bars">
+                            <i class="fa fa-bars"></i>
+                        </a>
+                        <div class="menu-pcmenu-container">
+                            <ul id="menu-pcmenu" class="down-menu nav-menu sf-js-enabled sf-arrows">
+
+                                <li>
+                                    <a href="/">
+                                        <i class="fa-home fa"></i>
+                                        <span class="font-text">首页</span>
+                                    </a>
+                                </li>
+
+                                <!-- menu -->
+                                <li th:each="category : ${session.categories}">
+                                    <a th:href="@{'/category/' + ${category.parentCategory.id}}">
+                                        <i th:class="${category.parentCategory.categoryIcon}"></i>
+                                        <span class="font-text" th:text="${category.parentCategory.categoryName}"></span>
+                                    </a>
+                                    <ul class="sub-menu">
+                                        <li th:each="child : ${category.childCategory}">
+                                            <a th:href="@{'/category/' + ${child.id}}" th:text="${child.categoryName}" target="_blank"></a>
+                                        </li>
+                                    </ul>
+                                </li>
+                                <!-- end -->
+                                <li>
+                                    <a href="/">
+                                        <i class="fa fa-comment"></i>
+                                        <span class="font-text">留言板&nbsp;</span>
+                                    </a>
+                                </li>
+
+                            </ul>
+                        </div>
+                    </nav>
+                </div>
+                <div class="clear"></div>
+            </div><!-- #top-menu -->
+        </div><!-- #menu-box -->
+    </header>
+    <!-- 顶部条 end -->
+
+    <!-- 搜索框 start -->
+    <div id="search-main">
+        <div class="searchbar">
+            <form method="get" id="searchform" action="/search" accept-charset="UTF-8">
+        <span>
+            <input type="text" value="" name="keywords" id="s" placeholder="输入搜索内容" required="">
+            <button type="submit" id="searchsubmit">搜索</button>
+        </span>
+            </form>
+        </div>
+        <div class="clear"></div>
+    </div>
+    <!-- 搜索框 end -->
+
+    <!-- 导航栏 start -->
+    <nav class="breadcrumb">
+        <div class="bull"><i class="fa fa-volume-up"></i></div>
+        <div id="scrolldiv">
+            <div class="scrolltext">
+                <ul style="margin-top: 0px;">
+                    <li th:each="notice : ${notices}" class="scrolltext-title">
+                        <a th:href="@{'/notice/' + ${notice.id}}" th:text="${notice.noticeTitle}" rel="bookmark"></a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+    <!-- 导航栏 end -->
+</div>
+</body>
+</html>

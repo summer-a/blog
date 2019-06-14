@@ -1,0 +1,86 @@
+<!DOCTYPE>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/web/thymeleaf/layout">
+<head>
+    <title>驰游云校</title>
+    <meta charset="UTF-8">
+    <!-- 通用meta信息 -->
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta http-equiv="Cache-Control" content="max-age=72000"/>
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <!-- 上述3个meta标签*必须*放在最前面，任何其他内容都*必须*跟随其后！ -->
+    <meta name="applicable-device" content="pc,mobile">
+    <meta name="MobileOptimized" content="width"/>
+    <meta name="HandheldFriendly" content="true"/>
+    <link rel="shortcut icon" th:href="@{/img/logo.png}"/>
+    <!-- 通用css -->
+    <link rel="stylesheet" th:href="@{/css/style.css}"/>
+    <link rel="stylesheet" th:href="@{/plugin/font-awesome/css/font-awesome.min.css}"/>
+    <!-- 引入看板娘css -->
+    <link rel="stylesheet" th:href="@{/plugin/live2d/css/live2d.css}"/>
+    <!-- 用户扩展 -->
+    <th:block layout:fragment="link-extend"></th:block>
+</head>
+<body>
+    <div id="page" class="site" style="transform: none;">
+        <!-- 头部 -->
+        <th:block th:include="Home/Model/header::head"></th:block>
+        <div id="content" class="site-content" style="transform: none;">
+            <!-- 主体左边区域 -->
+            <th:block layout:fragment="index-left"></th:block>
+
+            <!-- 主体右边区域 -->
+            <th:block layout:fragment="index-right"></th:block>
+
+            <!-- 看板娘 -->
+            <div id="landlord">
+                <div class="message" style="opacity:0"></div>
+                <canvas id="live2d" width="280" height="250" class="live2d"></canvas>
+                <!-- 工具栏 -->
+                <div class="waifu-tool">
+                    <span class="fa fa-home"></span>
+                    <span class="fa fa-mobile"></span>
+                    <span class="fa fa-street-view"></span>
+                    <span class="fa fa-camera"></span>
+                    <span class="fa fa-close"></span>
+                </div>
+            </div>
+        </div>
+        <div class="clear"></div>
+
+        <th:block th:replace="Home/Model/footer::footer"></th:block>
+    </div>
+
+    <script th:src="@{/js/jquery.min.js}"></script>
+    <script th:src="@{/js/superfish.js}"></script>
+    <script th:src="@{/js/sticky.js}"></script>
+    <script th:src="@{/js/script.js}"></script>
+    <script th:src="@{/plugin/layui/layui.all.js}"></script>
+
+    <!-- 二维码 -->
+    <script type="text/javascript" th:src="@{/js/qrcode.min.js}"></script>
+
+    <!-- 看板娘js -->
+    <script type="text/javascript">
+        var message_Path = '/plugin/live2d/'
+        var home_Path = 'http://localhost:8080/'
+    </script>
+    <script type="text/javascript" th:src="@{/plugin/live2d/js/live2d.js}"></script>
+    <script type="text/javascript" th:src="@{/plugin/live2d/js/message.js}"></script>
+    <script type="text/javascript">
+        var modelId = modelStorageGetItem('modelId');
+        var modelTexturesId = modelStorageGetItem('modelTexturesId');
+        if (modelId != null && modelTexturesId != null) {
+            loadModel(modelId, modelTexturesId);
+        } else {
+            loadlive2d("live2d", "/plugin/live2d/model/tia/model.json");
+        }
+    </script>
+
+    <!-- 扩展 -->
+    <th:block layout:fragment="script-extend"></th:block>
+
+</body>
+</html>

@@ -2,10 +2,8 @@ package com.hjb.blog.entity.normal;
 
 import com.hjb.blog.entity.base.BaseEntity;
 
-import javax.persistence.Column;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import javax.persistence.*;
+import java.util.List;
 
 public class Article extends BaseEntity {
     @Id
@@ -71,6 +69,15 @@ public class Article extends BaseEntity {
      */
     @Column(name = "article_content")
     private String articleContent;
+
+    @Transient
+    private User user;
+
+    @Transient
+    private List<Tag> tagList;
+
+    @Transient
+    private List<Category> categoryList;
 
     /**
      * @return id
@@ -265,5 +272,29 @@ public class Article extends BaseEntity {
      */
     public void setArticleContent(String articleContent) {
         this.articleContent = articleContent;
+    }
+
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
+    }
+
+    public List<Tag> getTagList() {
+        return tagList;
+    }
+
+    public void setTagList(List<Tag> tagList) {
+        this.tagList = tagList;
+    }
+
+    public List<Category> getCategoryList() {
+        return categoryList;
+    }
+
+    public void setCategoryList(List<Category> categoryList) {
+        this.categoryList = categoryList;
     }
 }

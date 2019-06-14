@@ -42,6 +42,18 @@ public class Category extends BaseEntity {
     @Column(name = "category_icon")
     private String categoryIcon;
 
+
+    public Category() {}
+
+    public Category(Integer id, String categoryName) {
+        this.id = id;
+        this.categoryName = categoryName;
+    }
+
+    public static Category getDefault() {
+        return new Category(-1, "未分类");
+    }
+
     /**
      * @return id
      */

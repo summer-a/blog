@@ -5,10 +5,12 @@ import com.github.pagehelper.PageInfo;
 import com.hjb.blog.entity.base.BaseEntity;
 import com.hjb.blog.service.base.BaseService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import tk.mapper.BaseMapper;
 import tk.mybatis.mapper.entity.Example;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 /**
@@ -16,9 +18,10 @@ import java.util.List;
  * @version 1.0
  * @title: BaseServiceImpl
  * @projectName blog
- * @description: TODO
+ * @description: TODO 基本Mapper
  * @date 2019/6/8 10:42
  */
+@Transactional(readOnly = true, rollbackFor = RuntimeException.class)
 public class BaseServiceImpl<T extends BaseEntity> implements BaseService<T> {
 
     @Autowired
@@ -27,21 +30,35 @@ public class BaseServiceImpl<T extends BaseEntity> implements BaseService<T> {
     @Transactional(readOnly = false, rollbackFor = RuntimeException.class)
     @Override
     public int insert(T t) {
-        /*t.setCreateTime(new Date());
-        t.setUpdateTime(new Date());*/
+        t.setCreateTime(LocalDateTime.now());
+        t.setUpdateTime(LocalDateTime.now());
         return mapper.insert(t);
     }
 
     @Transactional(readOnly = false, rollbackFor = RuntimeException.class)
     @Override
+    public int insertSelective(T t) {
+        t.setCreateTime(LocalDateTime.now());
+        t.setUpdateTime(LocalDateTime.now());
+        return mapper.insertSelective(t);
+    }
+
+    @Transactional(readOnly = false, rollbackFor = RuntimeException.class)
+    @Override
     public int delete(T t) {
-        return mapper.deleteByPrimaryKey(t);
+        return mapper.delete(t);
+    }
+
+    @Transactional(readOnly = false, rollbackFor = RuntimeException.class)
+    @Override
+    public int deleteByPrimaryKey(Integer id) {
+        return mapper.deleteByPrimaryKey(id);
     }
 
     @Transactional(readOnly = false, rollbackFor = RuntimeException.class)
     @Override
     public int update(T t) {
-        /*t.setUpdateTime(new Date());*/
+        t.setUpdateTime(LocalDateTime.now());
         return mapper.updateByPrimaryKeySelective(t);
     }
 

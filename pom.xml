@@ -21,6 +21,9 @@
         <tk.mybatis.version>2.0.2</tk.mybatis.version>
         <pagehelper.version>1.2.5</pagehelper.version>
         <fastjson.version>1.2.46</fastjson.version>
+        <nekohtml.version>1.9.22</nekohtml.version>
+        <thymeleaf-layout.version>2.3.0</thymeleaf-layout.version>
+        <thymeleaf-java8time.version>3.0.0.RELEASE</thymeleaf-java8time.version>
     </properties>
 
     <dependencies>
@@ -43,7 +46,37 @@
             <artifactId>spring-boot-starter-test</artifactId>
             <scope>test</scope>
         </dependency>
+        <!--<dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-devtools</artifactId>
+            <optional>true</optional>
+        </dependency>-->
         <!-- Spring 依赖 结束 -->
+
+        <!-- thymeleaf 依赖 -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-thymeleaf</artifactId>
+        </dependency>
+            <!-- html非严格支持 -->
+        <dependency>
+            <groupId>net.sourceforge.nekohtml</groupId>
+            <artifactId>nekohtml</artifactId>
+            <version>${nekohtml.version}</version>
+        </dependency>
+            <!-- layout支持 -->
+        <dependency>
+            <groupId>nz.net.ultraq.thymeleaf</groupId>
+            <artifactId>thymeleaf-layout-dialect</artifactId>
+            <version>${thymeleaf-layout.version}</version>
+        </dependency>
+            <!-- thymeleaf java8时间支持 -->
+        <dependency>
+            <groupId>org.thymeleaf.extras</groupId>
+            <artifactId>thymeleaf-extras-java8time</artifactId>
+            <version>${thymeleaf-java8time.version}</version>
+        </dependency>
+        <!-- thymeleaf 依赖 结束 -->
 
         <!-- 数据源 依赖 -->
         <dependency>

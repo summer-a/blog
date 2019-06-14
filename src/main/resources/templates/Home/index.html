@@ -1,0 +1,189 @@
+<!DOCTYPE html >
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/web/thymeleaf/layout"
+      layout:decorator="Home/Model/template">
+
+<head>
+    <title>驰游云校</title>
+</head>
+<body>
+<th:block layout:fragment="index-left">
+    <!-- 左侧区域 start -->
+    <div th:fragment="left" id="primary" class="content-area a">
+        <main id="main" class="site-main" role="main">
+            <th:block th:each="article : ${articles.list}">
+                <article class="post type-post">
+                    <figure class="thumbnail">
+                        <a th:href="@{'/article/' + ${article.id}}">
+                            <img width="280" height="210"
+                                 th:src="@{'/img/thumbnail/random/img_' + ${article.id} + '.jpg'}"
+                                 class="attachment-content size-content wp-post-image"
+                                 th:alt="${article.articleTitle}">
+                        </a>
+                        <span class="cat">
+                            <a th:href="@{'/category/' + ${article.categoryList[#lists.size(article.categoryList) - 1].id}}"
+                               th:text="${article.categoryList[#lists.size(article.categoryList) - 1].categoryName}">
+                            </a>
+                        </span>
+                    </figure>
+
+                    <header class="entry-header link-effect">
+                        <h2 class="entry-title">
+                            <a th:href="@{'/article/' + ${article.id}}" th:text="${article.articleTitle}" rel="bookmark">
+                            </a>
+                        </h2>
+                    </header>
+
+                    <div class="entry-content">
+                        <div class="archive-content" th:text="${article.articleSummary}">
+                        </div>
+                        <span class="title-l"></span>
+                        <span class="entry-meta">
+                                <span class="date" th:text="${#temporals.format(article.createTime, 'yyyy年MM月dd日')}">
+                                </span>
+                                &nbsp;&nbsp;
+                                <span class="views">
+                                    <i class="fa fa-eye"></i>
+                                    <th:block th:text="${article.articleViewCount}"></th:block>
+                                </span>
+                                <span class="comment">
+                                    &nbsp;&nbsp;
+                                    <a th:href="@{'/article/' + ${article.id} + '#comments'}" rel="external nofollow">
+                                        <i class="fa fa-comment-o"></i>
+                                        <th:block th:text="${article.articleCommentCount}"></th:block>
+                                    </a>
+                                </span>
+                            </span>
+                        <div class="clear"></div>
+                    </div>
+
+                    <span class="entry-more">
+                            <a th:href="'/article/' + ${article.id}" rel="bookmark">
+                                阅读全文
+                            </a>
+                        </span>
+                </article>
+            </th:block>
+        </main>
+
+        <!-- 分页 start -->
+        <nav class="navigation pagination" role="navigation">
+            <div id="nav-links"></div>
+                <!--<c:choose>
+                    <c:when test="${pageInfo.pages <= 3 }">
+                        <c:set var="begin" value="1"/>
+                        <c:set var="end" value="${pageInfo.pages }"/>
+                    </c:when>
+                    <c:otherwise>
+                        <c:set var="begin" value="${pageInfo.pageNum-1 }"/>
+                        <c:set var="end" value="${pageInfo.pageNum + 2}"/>
+                        <c:if test="${begin < 2 }">
+                            <c:set var="begin" value="1"/>
+                            <c:set var="end" value="3"/>
+                        </c:if>
+                        <c:if test="${end > pageInfo.pages }">
+                            <c:set var="begin" value="${pageInfo.pages-2}"/>
+                            <c:set var="end" value="${pageInfo.pages }"/>
+                        </c:if>
+                    </c:otherwise>
+                </c:choose>
+                <%&#45;&#45;上一页 &#45;&#45;%>
+                <c:choose>
+                    <c:when test="${pageInfo.pageNum eq 1 }">
+                        <%&#45;&#45;当前页为第一页，隐藏上一页按钮&#45;&#45;%>
+                    </c:when>
+                    <c:otherwise>
+                        <a class="page-numbers" href="${pageUrlPrefix}=${pageInfo.pageNum-1}">
+                            <span class="fa fa-angle-left"></span>
+                        </a>
+                    </c:otherwise>
+                </c:choose>
+                <%&#45;&#45;显示第一页的页码&#45;&#45;%>
+                <c:if test="${begin >= 2 }">
+                    <a class="page-numbers" href="${pageUrlPrefix}=1">1</a>
+                </c:if>
+                <%&#45;&#45;显示点点点&#45;&#45;%>
+                <c:if test="${begin  > 2 }">
+                    <span class="page-numbers dots">...</span>
+                </c:if>
+                <%&#45;&#45;打印 页码&#45;&#45;%>
+                <c:forEach begin="${begin }" end="${end }" var="i">
+                    <c:choose>
+                        <c:when test="${i eq pageInfo.pageNum }">
+                            <a class="page-numbers current">${i}</a>
+                        </c:when>
+                        <c:otherwise>
+                            <a class="page-numbers" href="${pageUrlPrefix}=${i}">${i}</a>
+                        </c:otherwise>
+                    </c:choose>
+                </c:forEach>
+                <%&#45;&#45; 显示点点点 &#45;&#45;%>
+                <c:if test="${end < pageInfo.pages-1}">
+                    <span class="page-numbers dots">...</span>
+                </c:if>
+                <%&#45;&#45; 显示最后一页的数字 &#45;&#45;%>
+                <c:if test="${end < pageInfo.pages }">
+                    <a href="${pageUrlPrefix}=${pageInfo.pages}">${pageInfo.pages}</a>
+                </c:if>
+                <%&#45;&#45;下一页 &#45;&#45;%>
+                <c:choose>
+                    <c:when test="${pageInfo.pageNum eq pageInfo.pages }">
+                        <%&#45;&#45;到了尾页隐藏，下一页按钮&#45;&#45;%>
+                    </c:when>
+                    <c:otherwise>
+                        <a class="page-numbers" href="${pageUrlPrefix}=${pageInfo.pageNum+1}">
+                            <span class="fa fa-angle-right"></span>
+                        </a>
+                    </c:otherwise>
+                </c:choose>-->
+
+        </nav>
+        <!-- 分页 end-->
+
+    </div>
+</th:block>
+
+<th:block layout:fragment="index-right">
+    <th:block th:replace="Home/Model/right::right-index"></th:block>
+</th:block>
+
+<!-- 扩展js -->
+<th:block layout:fragment="script-extend">
+    <script th:inline="javascript">
+        <!-- 分页 -->
+        /*<![CDATA[*/
+        var pages = /*[[${articles.pageSize}]]*/ 1;
+        var curr = /*[[${articles.pageNum}]]*/ 1;
+        var size = /*[[${articles.total}]]*/ 5;
+
+        layui.use(['layer','laypage'], function(){
+            var laypage = layui.laypage,layer = layui.layer;
+            laypage.render({
+                elem: 'nav-links'
+                ,limit: pages
+                ,curr: curr
+                ,count: size
+                ,jump: function(obj, first) {
+                    var currPage = obj.curr;
+                    if (!first) {
+                        location.href = '/index?startPage=' + currPage;
+                    }
+                }
+            });
+        })
+
+        $(function() {
+            <!-- 初始化看板娘位置,居中于右侧栏目下 -->
+            $("#landlord").css("left", $("#sidebar")[0].offsetLeft + 14.5);
+            $("#landlord").css("bottom", "0px");
+            <!-- 自动调整位置 -->
+            $(window).resize(function() {
+                $("#landlord").css("left", $("#sidebar")[0].offsetLeft + 14.5);
+            })
+        })
+
+        /*]]>*/
+    </script>
+</th:block>
+</body>
+</html>

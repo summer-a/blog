@@ -4,6 +4,7 @@ import com.hjb.blog.entity.normal.User;
 import com.hjb.blog.service.base.BaseService;
 
 /**
+ * 用户服务
  * @author 胡江斌
  * @version 1.0
  * @title: UserService

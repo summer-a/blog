@@ -20,5 +20,5 @@ server:
   servlet:
     context-path: /
 mybatis:
-  type-aliases-package: com.example1.demo1.entity
+  type-aliases-package: com.hjb.blog.entity
   mapper-locations: classpath:mapper/*.xml

@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>驰游云校</title>
+</head>
+<body>
+<!--页脚 start-->
+<footer th:fragment="footer" id="colophon" class="site-footer" role="contentinfo">
+    <div class="site-info">
+        <p style="text-align: center;">Copyright © 2019
+            <a href="/" target="_blank" rel="noopener noreferrer" th:text="${option.optionSiteTitle}"></a>
+            All rights reserved.
+            <!--<a target="_blank" href="/map" >
+                <span class="font-text">站点地图</span>
+            </a>-->
+            <!--<p style="font-size: 12px;">UI源于&nbsp;言曌博客</p>-->
+        </p>
+    </div>
+</footer>
+<!--页脚 end-->
+</body>
+</html>

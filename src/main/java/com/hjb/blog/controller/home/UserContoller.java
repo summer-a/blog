@@ -1,8 +1,13 @@
-package com.hjb.blog.controller;
+package com.hjb.blog.controller.home;
 
+import com.hjb.blog.entity.normal.User;
+import com.hjb.blog.service.normal.UserService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.List;
 
 /**
  * @author 胡江斌
@@ -15,11 +20,8 @@ import org.springframework.web.bind.annotation.RestController;
 @Controller
 public class UserContoller {
 
+    @Autowired
+    private UserService userService;
 
-    @RequestMapping("/")
-    public String hello() {
-        System.out.println("okkkk");
-        return "index";
-    }
 
 }
