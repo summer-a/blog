@@ -65,9 +65,9 @@ public class Article extends BaseEntity {
     private String articleSummary;
 
     /**
-     * 文章内容
+     * 文章内容放在另一张表
      */
-    @Column(name = "article_content")
+    @Transient
     private String articleContent;
 
     @Transient
@@ -256,23 +256,6 @@ public class Article extends BaseEntity {
         this.articleSummary = articleSummary;
     }
 
-    /**
-     * 获取文章内容
-     *
-     * @return article_content - 文章内容
-     */
-    public String getArticleContent() {
-        return articleContent;
-    }
-
-    /**
-     * 设置文章内容
-     *
-     * @param articleContent 文章内容
-     */
-    public void setArticleContent(String articleContent) {
-        this.articleContent = articleContent;
-    }
 
     public User getUser() {
         return user;
@@ -294,7 +277,35 @@ public class Article extends BaseEntity {
         return categoryList;
     }
 
+    public String getArticleContent() {
+        return articleContent;
+    }
+
+    public void setArticleContent(String articleContent) {
+        this.articleContent = articleContent;
+    }
+
     public void setCategoryList(List<Category> categoryList) {
         this.categoryList = categoryList;
+    }
+
+    @Override
+    public String toString() {
+        return "Article{" +
+                "id=" + id +
+                ", articleUserId=" + articleUserId +
+                ", articleTitle='" + articleTitle + '\'' +
+                ", articleViewCount=" + articleViewCount +
+                ", articleCommentCount=" + articleCommentCount +
+                ", articleLikeCount=" + articleLikeCount +
+                ", articleIsComment=" + articleIsComment +
+                ", articleStatus=" + articleStatus +
+                ", articleOrder=" + articleOrder +
+                ", articleSummary='" + articleSummary + '\'' +
+                ", articleContent='" + articleContent + '\'' +
+                ", user=" + user +
+                ", tagList=" + tagList +
+                ", categoryList=" + categoryList +
+                '}';
     }
 }

@@ -11,5 +11,5 @@ import tk.mybatis.mapper.common.MySqlMapper;
  * @description: TODO 基础mapper，不能被扫描到，BlogApplication中只扫描com.hjb.blog.mapper
  * @date 2019/6/9 10:14
  */
-public interface BaseMapper<T> extends Mapper<T>, MySqlMapper<T> {
+public interface MyMapper<T> extends Mapper<T>, MySqlMapper<T> {
 }

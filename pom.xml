@@ -124,6 +124,10 @@
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
+                <configuration>
+                    <!-- 指定主函数入口 -->
+                    <mainClass>com.hjb.blog.BlogApplication</mainClass>
+                </configuration>
             </plugin>
 
             <!-- mybatis逆向工程插件 -->

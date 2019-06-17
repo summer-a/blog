@@ -6,11 +6,9 @@ import com.hjb.blog.entity.enums.NoticeStatus;
 import com.hjb.blog.entity.normal.Article;
 import com.hjb.blog.entity.normal.Comment;
 import com.hjb.blog.entity.normal.Notice;
-import com.hjb.blog.entity.normal.Options;
 import com.hjb.blog.service.normal.ArticleService;
 import com.hjb.blog.service.normal.CommentService;
 import com.hjb.blog.service.normal.NoticeService;
-import com.hjb.blog.service.normal.OptionsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -40,9 +38,6 @@ public class IndexController {
     private NoticeService noticeService;
 
     @Autowired
-    private OptionsService optionsService;
-
-    @Autowired
     private CommentService commentService;
 
     /**
@@ -66,16 +61,13 @@ public class IndexController {
         PageInfo<Article> articles = articleService.page(startPage, pageSize, article);
         model.addAttribute("articles", articles);
 
+        // 获取通知
         Notice notice = new Notice();
         notice.setNoticeStatus(NoticeStatus.NORMAL.getValue());
         List<Notice> notices = noticeService.select(notice);
         model.addAttribute("notices", notices);
 
-        Options option = new Options();
-        option.setOptionStatus(1);
-        Options op = optionsService.selectOne(option);
-        model.addAttribute("option", op);
-
+        // 获取网站统计数据
         Map<String, String> siteBasicStatistics = new HashMap<>(5);
         siteBasicStatistics.put("commentCount", commentService.selectCount(new Comment()) + "");
 
@@ -83,4 +75,5 @@ public class IndexController {
 
         return "Home/index";
     }
+
 }

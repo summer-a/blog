@@ -1,7 +1,7 @@
 package com.hjb.blog.mapper;
 
 import com.hjb.blog.entity.normal.ArticleCategoryRef;
-import tk.mapper.BaseMapper;
+import tk.mapper.MyMapper;
 
-public interface ArticleCategoryRefMapper extends BaseMapper<ArticleCategoryRef> {
+public interface ArticleCategoryRefMapper extends MyMapper<ArticleCategoryRef> {
 }

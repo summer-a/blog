@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hjb.blog.mapper.CategoryMapper">
+
+    <resultMap id="articleCategorysMap" type="com.hjb.blog.entity.normal.Category">
+        <id column="id" property="id"/>
+        <result column="category_pid" property="categoryPid"/>
+        <result column="category_name" property="categoryName"/>
+        <result column="category_description" property="categoryDescription"/>
+        <result column="category_order" property="categoryOrder"/>
+        <result column="category_icon" property="categoryIcon"/>
+        <result column="update_time" property="updateTime"/>
+        <result column="create_time" property="createTime"/>
+    </resultMap>
+
+    <select id="selectArticleCategorysByArticleId" resultMap="articleCategorysMap">
+        SELECT
+            c.id,
+            c.category_pid,
+            c.category_name,
+            c.category_description,
+            c.category_order,
+            c.category_icon,
+            c.update_time,
+            c.create_time
+        FROM
+            category c,
+            article_category_ref a
+        WHERE
+            a.article_id = #{id}
+            AND a.category_id = c.id
+        ORDER BY
+            c.category_pid ASC
+    </select>
+
+</mapper>

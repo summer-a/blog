@@ -9,8 +9,12 @@
             "text": ["要和站长聊聊么？"]
         },
         {
-            "selector": ".fa-home,.site-title,#menu-pcmenu:eq(0)",
+            "selector": ".fa-home,.site-title,#menu-pcmenu .home",
             "text": ["点这里可以回到首页！"]
+        },
+        {
+            "selector": ".fa-music,#jp_container_N",
+            "text": ["想要来点音乐吗？"]
         },
         {
             "selector": ".fa-mobile",

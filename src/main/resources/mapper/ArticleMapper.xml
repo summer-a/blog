@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.hjb.blog.mapper.CategoryMapper">
+<mapper namespace="com.hjb.blog.mapper.ArticleMapper">
 
     <resultMap id="articleCategorysMap" type="com.hjb.blog.entity.normal.Category">
         <id column="id" property="id"/>
@@ -8,7 +8,7 @@
         <result column="category_name" property="categoryName"/>
     </resultMap>
 
-    <select id="selectArticleCategorysByArticleId" resultMap="articleCategorysMap">
+    <select id="selectOneForFullArticle" resultMap="articleCategorysMap">
         SELECT
             c.id,
             c.category_pid,
@@ -21,5 +21,69 @@
             AND a.category_id = c.id
         ORDER BY
             c.category_pid ASC
+    </select>
+
+    <resultMap id="fullArticleMap" type="com.hjb.blog.entity.normal.Article">
+        <id property="id" column="id"/>
+        <result property="articleUserId" column="article_user_id"/>
+        <result property="articleTitle" column="article_title"/>
+        <result property="articleViewCount" column="article_view_count"/>
+        <result property="articleCommentCount" column="article_comment_count"/>
+        <result property="articleLikeCount" column="article_like_count"/>
+        <result property="articleIsComment" column="article_is_comment"/>
+        <result property="articleStatus" column="article_status"/>
+        <result property="articleOrder" column="article_order"/>
+        <result property="articleSummary" column="article_summary"/>
+        <result property="articleContent" column="article_content"/>
+    </resultMap>
+
+    <select id="selectFullArticle" resultMap="fullArticleMap" parameterType="com.hjb.blog.entity.normal.Article">
+        SELECT
+          a.id,
+          a.article_user_id,
+          a.article_title,
+          a.article_view_count,
+          a.article_comment_count,
+          a.article_like_count,
+          a.article_is_comment,
+          a.article_status,
+          a.article_order,
+          a.article_summary,
+          ac.article_content
+        FROM
+          article a,
+          article_content ac
+        WHERE
+          a.id = ac.article_id
+        <if test="article.id != null">
+            AND a.id = #{article.id}
+        </if>
+        <if test="article.articleUserId != null">
+            AND a.article_user_id = #{article.articleUserId}
+        </if>
+        <if test="article.articleTitle != null">
+            AND a.article_title = #{article.articleTitle}
+        </if>
+        <if test="article.articleViewCount != null">
+            AND a.article_view_count = #{article.articleViewCount}
+        </if>
+        <if test="article.articleCommentCount != null">
+            AND a.article_comment_count = #{article.articleCommentCount}
+        </if>
+        <if test="article.articleLikeCount != null">
+            AND a.article_like_count = #{article.articleLikeCount}
+        </if>
+        <if test="article.articleIsComment != null">
+            AND a.article_is_comment = #{article.articleIsComment}
+        </if>
+        <if test="article.articleStatus != null">
+            AND a.article_status = #{article.articleStatus}
+        </if>
+        <if test="article.articleOrder != null">
+            AND a.article_order = #{article.articleOrder}
+        </if>
+        <if test="article.articleSummary != null">
+            AND a.article_summary = #{article.articleSummary}
+        </if>
     </select>
 </mapper>

@@ -32,11 +32,11 @@
             <div class="feed-about">
                 <div class="about-main">
                     <div class="about-img">
-                        <img th:src="@{${option.optionAboutsiteAvatar}}"
+                        <img th:src="@{${session.option.optionAboutsiteAvatar}}"
                              alt="QR Code">
                     </div>
-                    <!--<div class="about-name" th:text="${option.optionAboutsiteTitle}"></div>-->
-                    <div class="about-the" th:utext="${option.optionAboutsiteContent}">
+                    <!--<div class="about-name" th:text="${session.option.optionAboutsiteTitle}"></div>-->
+                    <div class="about-the" th:utext="${session.option.optionAboutsiteContent}">
 
                     </div>
                 </div>
@@ -46,26 +46,26 @@
                         <a title="微信" id="weixin_btn" rel="external nofollow">
                             <i class="fa fa-weixin"> </i>
                             <div id="weixin_code" class="hide" >
-                                <img th:src="@{${option.optionAboutsiteWechat}}" alt="">
+                                <img th:src="@{${session.option.optionAboutsiteWechat}}" alt="">
                             </div>
                         </a>
                     </li>
                     <li class="tqq">
                         <a target="blank" rel="external nofollow"
-                           th:href="@{'http://wpa.qq.com/msgrd?V=3&amp;uin=' + ${option.optionAboutsiteQq} + '&amp;Site=QQ&amp;Menu=yes'}"
+                           th:href="@{'http://wpa.qq.com/msgrd?V=3&amp;uin=' + ${session.option.optionAboutsiteQq} + '&amp;Site=QQ&amp;Menu=yes'}"
                            title="QQ在线">
                             <i class="fa fa-qq"></i>
                         </a>
                     </li>
                     <li class="tsina">
                         <a title=""
-                           th:href="@{'http://weibo.com/' + ${option.optionAboutsiteWeibo}}"
+                           th:href="@{'http://weibo.com/' + ${session.option.optionAboutsiteWeibo}}"
                            target="_blank" rel="external nofollow">
                             <i class="fa fa-weibo"></i>
                         </a>
                     </li>
                     <li class="feed">
-                        <a title="" th:href="@{'https://github.com/' + ${option.optionAboutsiteGithub}}" target="_blank"
+                        <a title="" th:href="@{'https://github.com/' + ${session.option.optionAboutsiteGithub}}" target="_blank"
                            rel="external nofollow">
                             <i class="fa fa-github"></i>
                         </a>

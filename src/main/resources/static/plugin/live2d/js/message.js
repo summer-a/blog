@@ -116,6 +116,23 @@ $('.waifu-tool .fa-mobile').click(function() {
     qrcode.makeCode(location.href)
 })
 
+$('.waifu-tool .fa-music').click(function () {
+    // 显示界面
+    if (!fold) {
+        $(".jp-video").animate({
+            left: 0
+        }, 350, function() {
+            slideOut($("#btnfold"));
+        });
+    }
+    // var playList = myPlaylist.playlist;
+    // 随机播放
+    myPlaylist.play(Math.floor(Math.random() * myPlaylist.playlist.length));
+
+    updateTitle();
+})
+
+
 $('.waifu-tool .fa-street-view').click(function() {
     // 获取在线材质
     loadRandTextures()

@@ -6,6 +6,7 @@ import javax.persistence.*;
 
 @Table(name = "article_content")
 public class ArticleContent extends BaseEntity {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
@@ -15,6 +16,12 @@ public class ArticleContent extends BaseEntity {
      */
     @Column(name = "article_id")
     private Integer articleId;
+
+    /**
+     * 文章内容
+     */
+    @Column(name = "article_content")
+    private String articleContent;
 
 
     /**
@@ -49,4 +56,21 @@ public class ArticleContent extends BaseEntity {
         this.articleId = articleId;
     }
 
+
+    public String getArticleContent() {
+        return articleContent;
+    }
+
+    public void setArticleContent(String articleContent) {
+        this.articleContent = articleContent;
+    }
+
+    @Override
+    public String toString() {
+        return "ArticleContent{" +
+                "id=" + id +
+                ", articleId=" + articleId +
+                ", articleContent='" + articleContent + '\'' +
+                '}';
+    }
 }

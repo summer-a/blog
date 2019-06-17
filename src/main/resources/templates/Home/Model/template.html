@@ -20,6 +20,9 @@
     <link rel="stylesheet" th:href="@{/plugin/font-awesome/css/font-awesome.min.css}"/>
     <!-- 引入看板娘css -->
     <link rel="stylesheet" th:href="@{/plugin/live2d/css/live2d.css}"/>
+    <!-- 音乐插件 -->
+    <link rel="stylesheet" th:href="@{/plugin/music/css/player.css}"/>
+
     <!-- 用户扩展 -->
     <th:block layout:fragment="link-extend"></th:block>
 </head>
@@ -27,6 +30,23 @@
     <div id="page" class="site" style="transform: none;">
         <!-- 头部 -->
         <th:block th:include="Home/Model/header::head"></th:block>
+
+        <!-- 导航栏 start -->
+        <th:block layout:fragment="breadcrumb">
+            <nav class="breadcrumb">
+                <div class="bull"><i class="fa fa-volume-up"></i></div>
+                <div id="scrolldiv">
+                    <div class="scrolltext">
+                        <ul style="margin-top: 0px;">
+                            <li th:each="notice : ${notices}" class="scrolltext-title">
+                                <a th:href="@{'/notice/' + ${notice.id}}" th:text="${notice.noticeTitle}" rel="bookmark"></a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </nav>
+        </th:block>
+        <!-- 导航栏 end -->
         <div id="content" class="site-content" style="transform: none;">
             <!-- 主体左边区域 -->
             <th:block layout:fragment="index-left"></th:block>
@@ -42,11 +62,15 @@
                 <div class="waifu-tool">
                     <span class="fa fa-home"></span>
                     <span class="fa fa-mobile"></span>
+                    <span class="fa fa-music"></span>
                     <span class="fa fa-street-view"></span>
                     <span class="fa fa-camera"></span>
                     <span class="fa fa-close"></span>
                 </div>
             </div>
+
+            <!-- 音乐 -->
+            <th:block th:replace="Home/Model/music::music"></th:block>
         </div>
         <div class="clear"></div>
 
@@ -58,6 +82,28 @@
     <script th:src="@{/js/sticky.js}"></script>
     <script th:src="@{/js/script.js}"></script>
     <script th:src="@{/plugin/layui/layui.all.js}"></script>
+
+    <!-- music -->
+    <script th:inline="javascript">
+        <!-- 初始化 -->
+        /*<![CDATA[*/
+        var musicList = /*[[${session.musics}]]*/ [{
+            title: "默",
+            artist: "那英",
+            mp3: "http://music.163.com/song/media/outer/url?id=31473269.mp3 ",
+            poster: "http://p1.music.126.net/OCGt5ln0lPPtPbVJ3VEKtA==/109951163020570422.jpg?param=130y130"
+        }, {
+            title: "Fire",
+            artist: "Said The Sky",
+            mp3: "http://music.163.com/song/media/outer/url?id=435289279.mp3",
+            poster: "http://p1.music.126.net/tg2zke_mrqwuOPlEIEUjGg==/18294773975127592.jpg?param=130y130"
+        }];
+        /*]]>*/
+    </script>
+    <script th:src="@{/plugin/music/js/player.js}"></script>
+    <script th:src="@{/plugin/music/js/playlist.js}"></script>
+    <script th:src="@{/plugin/music/js/player_database.js}"></script>
+
 
     <!-- 二维码 -->
     <script type="text/javascript" th:src="@{/js/qrcode.min.js}"></script>
@@ -77,6 +123,16 @@
         } else {
             loadlive2d("live2d", "/plugin/live2d/model/tia/model.json");
         }
+
+        $(function() {
+            <!-- 初始化看板娘位置,居中于右侧栏目下 -->
+            $("#landlord").css("left", $("#sidebar")[0].offsetLeft + 14.5);
+            $("#landlord").css("bottom", "0px");
+            <!-- 自动调整位置 -->
+            $(window).resize(function() {
+                $("#landlord").css("left", $("#sidebar")[0].offsetLeft + 14.5);
+            })
+        })
     </script>
 
     <!-- 扩展 -->

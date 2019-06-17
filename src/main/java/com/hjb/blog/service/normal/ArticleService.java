@@ -3,6 +3,8 @@ package com.hjb.blog.service.normal;
 import com.hjb.blog.entity.normal.Article;
 import com.hjb.blog.service.base.BaseService;
 
+import java.util.List;
+
 /**
  * 文章服务
  * @author 胡江斌
@@ -14,4 +16,15 @@ import com.hjb.blog.service.base.BaseService;
  */
 public interface ArticleService extends BaseService<Article> {
 
+    /**
+     * 查询一个完整的文章信息
+     * @return
+     */
+    Article selectOneForFullArticle(Integer id);
+
+    /**
+     * 查询完整的文章信息列表
+     * @return
+     */
+    List<Article> selectListForFullArticle(Article article);
 }
