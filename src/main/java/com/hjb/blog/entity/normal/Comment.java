@@ -78,6 +78,9 @@ public class Comment extends BaseEntity {
     @Column(name = "comment_role")
     private Integer commentRole;
 
+    @Column(name = "comment_status")
+    private Boolean commentStatus;
+
     /**
      * @return id
      */
@@ -290,4 +293,11 @@ public class Comment extends BaseEntity {
         this.commentRole = commentRole;
     }
 
+    public Boolean getCommentStatus() {
+        return commentStatus;
+    }
+
+    public void setCommentStatus(Boolean commentStatus) {
+        this.commentStatus = commentStatus;
+    }
 }

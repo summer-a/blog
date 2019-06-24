@@ -3,16 +3,17 @@ package com.hjb.blog.service.normal.impl;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.hjb.blog.entity.enums.ArticleStatus;
+import com.hjb.blog.entity.enums.OrderField;
 import com.hjb.blog.entity.normal.Article;
 import com.hjb.blog.entity.normal.Category;
-import com.hjb.blog.mapper.ArticleContentMapper;
-import com.hjb.blog.mapper.ArticleMapper;
-import com.hjb.blog.mapper.CategoryMapper;
+import com.hjb.blog.entity.normal.Tag;
+import com.hjb.blog.mapper.*;
 import com.hjb.blog.service.base.impl.BaseServiceImpl;
 import com.hjb.blog.service.normal.ArticleService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
+import tk.mybatis.mapper.entity.Example;
 
 import javax.annotation.Resource;
 import java.util.ArrayList;
@@ -35,12 +36,27 @@ public class ArticleServiceImpl extends BaseServiceImpl<Article> implements Arti
     @Resource
     private CategoryMapper categoryMapper;
 
+    @Resource
+    private ArticleTagRefMapper articleTagRefMapper;
+
+    @Resource
+    private ArticleCategoryRefMapper articleCategoryRefMapper;
+
     @Transactional(readOnly = true, rollbackFor = RuntimeException.class)
     @Override
-    public PageInfo<Article> page(int pageNum, int pageSize, Article article) {
+    public PageInfo<Article> page(int pageNum, int pageSize, Article article, OrderField orderField) {
         PageHelper.startPage(pageNum, pageSize);
 
-        List<Article> articleList = articleMapper.select(article);
+        Example articleExample = new Example(Article.class);
+        articleExample.createCriteria().andEqualTo(article);
+        if (orderField.getOrderType().equals(OrderField.OrderStatus.ASC)) {
+            articleExample.orderBy(orderField.getOrderField()).asc();
+        } else if (orderField.getOrderType().equals(OrderField.OrderStatus.DESC)) {
+            articleExample.orderBy(orderField.getOrderField()).desc();
+        }
+
+        List<Article> articleList = articleMapper.selectByExample(articleExample);
+//        List<Article> articleList = articleMapper.select(article);
 
         for (Article a : articleList) {
             List<Category> categories = categoryMapper.selectArticleCategorysByArticleId(a.getId());
@@ -64,13 +80,6 @@ public class ArticleServiceImpl extends BaseServiceImpl<Article> implements Arti
     @Transactional(readOnly = true, rollbackFor = RuntimeException.class)
     @Override
     public Article selectOneForFullArticle(Integer id) {
-        /*Article article = articleMapper.selectByPrimaryKey(id);
-        ArticleContent articleContent = new ArticleContent();
-        articleContent.setArticleId(id);
-        List<ArticleContent> articleContents = articleContentMapper.select(articleContent);
-        if (!CollectionUtils.isEmpty(articleContents)) {
-            article.setArticleContent(articleContents.get(0).getArticleContent());
-        }*/
         Article article = new Article();
         article.setId(id);
         article.setArticleStatus(ArticleStatus.PUBLISH.getValue());
@@ -81,7 +90,7 @@ public class ArticleServiceImpl extends BaseServiceImpl<Article> implements Arti
             art.setCategoryList(categoryMapper.selectArticleCategorysByArticleId(art.getId()));
 
             // 设置标签
-            // ...
+            art.setTagList(articleTagRefMapper.selectTagByArticleId(id));
             return art;
         }
         return null;
@@ -98,5 +107,36 @@ public class ArticleServiceImpl extends BaseServiceImpl<Article> implements Arti
     public List<Article> selectListForFullArticle(Article article) {
         List<Article> articleList = articleMapper.selectFullArticle(article);
         return articleList;
+    }
+
+    /**
+     * 更新评论数
+     *
+     * @param articleId 文章id
+     * @return
+     */
+    @Override
+    @Transactional(readOnly = false, rollbackFor = RuntimeException.class)
+    public boolean updateCommentCount(Integer articleId) {
+        return articleMapper.updateCommentCount(articleId);
+    }
+
+    /**
+     * 根据类型id分页文章
+     *
+     * @param pageNum    页码
+     * @param pageSize   每页数量
+     * @param categoryId 分类id
+     * @param status 文章状态
+     * @return
+     */
+    @Override
+    @Transactional(readOnly = false, rollbackFor = RuntimeException.class)
+    public PageInfo<Article> pageArticleByCategoryId(int pageNum, int pageSize, Integer categoryId, ArticleStatus status) {
+        PageHelper.startPage(pageNum, pageSize);
+        List<Article> articleList = articleMapper.selectArticleByCategoryId(categoryId, status.getValue());
+        PageInfo<Article> articlePageInfo = new PageInfo<>(articleList);
+
+        return articlePageInfo;
     }
 }

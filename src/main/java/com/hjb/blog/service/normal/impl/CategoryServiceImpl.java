@@ -6,6 +6,7 @@ import com.hjb.blog.mapper.CategoryMapper;
 import com.hjb.blog.service.base.impl.BaseServiceImpl;
 import com.hjb.blog.service.normal.CategoryService;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
 import javax.annotation.Resource;
@@ -35,6 +36,7 @@ public class CategoryServiceImpl extends BaseServiceImpl<Category> implements Ca
      * @param category 条件
      * @return
      */
+    @Transactional(readOnly = true, rollbackFor = RuntimeException.class)
     @Override
     public List<LayerMenuDTO<Category>> selectCategoryToLayerMenu(Category category) {
         List<Category> categories = categoryMapper.selectAll();

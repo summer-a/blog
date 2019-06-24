@@ -1,6 +1,7 @@
 package com.hjb.blog.service.base;
 
 import com.github.pagehelper.PageInfo;
+import com.hjb.blog.entity.enums.OrderField;
 import tk.mybatis.mapper.entity.Example;
 
 import java.util.List;
@@ -83,9 +84,10 @@ public interface BaseService<T> {
      * @param pageNum 页码
      * @param pageSize 每页数量
      * @param t 实体类
+     * @param orderBy 排序对象
      * @return
      */
-    PageInfo<T> page(int pageNum, int pageSize, T t);
+    PageInfo<T> page(int pageNum, int pageSize, T t, OrderField orderBy);
 
     /**
      * 查询数据数量

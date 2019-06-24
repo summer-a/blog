@@ -1061,7 +1061,7 @@ a, button, input {
 
 .searchbar {
     width: 90%;
-    margin: 10px auto 0;
+    margin: 0 auto;
 }
 
 .searchbar span input {
@@ -7568,6 +7568,7 @@ body {
 .message img{
     margin:0px auto;
 }
+
 /* 全局100%高度 */
 html,body{
     height: 100%;

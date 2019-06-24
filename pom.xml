@@ -58,19 +58,19 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-thymeleaf</artifactId>
         </dependency>
-            <!-- html非严格支持 -->
+        <!-- html非严格支持 -->
         <dependency>
             <groupId>net.sourceforge.nekohtml</groupId>
             <artifactId>nekohtml</artifactId>
             <version>${nekohtml.version}</version>
         </dependency>
-            <!-- layout支持 -->
+        <!-- layout支持 -->
         <dependency>
             <groupId>nz.net.ultraq.thymeleaf</groupId>
             <artifactId>thymeleaf-layout-dialect</artifactId>
             <version>${thymeleaf-layout.version}</version>
         </dependency>
-            <!-- thymeleaf java8时间支持 -->
+        <!-- thymeleaf java8时间支持 -->
         <dependency>
             <groupId>org.thymeleaf.extras</groupId>
             <artifactId>thymeleaf-extras-java8time</artifactId>
@@ -115,6 +115,13 @@
             <version>${fastjson.version}</version>
         </dependency>
         <!-- json 依赖 结束 -->
+
+        <!-- 健康状态监控 -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-actuator</artifactId>
+        </dependency>
+        <!-- 健康状态监控 end -->
 
     </dependencies>
 

@@ -59,19 +59,19 @@
 
                                 <!-- menu -->
                                 <li th:each="category : ${session.categories}">
-                                    <a th:href="@{'/article/detail/' + ${category.parentCategory.id}}">
+                                    <a th:href="@{'/category/' + ${category.parentCategory.id}}">
                                         <i th:class="${category.parentCategory.categoryIcon}"></i>
                                         <span class="font-text" th:text="${category.parentCategory.categoryName}"></span>
                                     </a>
                                     <ul class="sub-menu">
                                         <li th:each="child : ${category.childCategory}">
-                                            <a th:href="@{'/article/detail/' + ${child.id}}" th:text="${child.categoryName}" target="_blank"></a>
+                                            <a th:href="@{'/category/' + ${child.id}}" th:text="${child.categoryName}" target="_blank"></a>
                                         </li>
                                     </ul>
                                 </li>
 
                                 <li th:each="menu : ${session.menus}">
-                                    <a th:href="@{${menu.menuUrl}}">
+                                    <a th:hrbef="@{${menu.menuUrl}}">
                                         <i th:class="${menu.menuIcon}"></i>
                                         <span class="font-text" th:text="${menu.menuName}">留言板&nbsp;</span>
                                     </a>

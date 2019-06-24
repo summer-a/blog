@@ -34,3 +34,7 @@ mvnw
 
 ### test ###
 /test/
+
+### log ###
+.log
+.gz

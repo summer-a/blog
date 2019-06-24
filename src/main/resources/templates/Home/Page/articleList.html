@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/web/thymeleaf/layout"
+      layout:decorator="Home/Model/template">
+<head>
+    <meta charset="UTF-8">
+    <title th:text="${nav.name}">分类</title>
+</head>
+<body>
+<!--面包屑导航 start-->
+<th:block layout:fragment="breadcrumb">
+    <nav class="breadcrumb">
+        <a class="crumbs" href="/">
+            <i class="fa fa-home"></i>首页
+        </a>
+        <th:block th:if="${nav != null}">
+            <i class="fa fa-angle-right"></i>
+            <a th:href="@{${nav.url}}" th:text="${nav.name}">
+                分类
+            </a>
+        </th:block>
+        <th:block th:if="${nav == null}">
+            <i class="fa fa-angle-right"></i>
+            未分类
+        </th:block>
+        <i class="fa fa-angle-right"></i>正文
+    </nav>
+</th:block>
+<!--面包屑导航 end-->
+
+
+<th:block layout:fragment="index-left">
+    <!--博客主体-左侧正文 start-->
+    <div id="primary" class="content-area">
+        <main id="main" class="site-main">
+            <!--文章列表-start-->
+            <th:block th:if="${pageInfo != null}">
+                <th:block th:each="article : ${pageInfo.list}">
+                    <article class="post">
+                        <figure class="thumbnail">
+                            <a th:href="@{'/article/detail/' + ${article.id}}">
+                                <img width="280" height="210"
+                                     th:src="@{'/img/thumbnail/random/img_' + ${article.id % session.images_quantity} + '.jpg'}"
+                                     src="/img/thumbnail/random/img_${a.articleId%15}.jpg"
+                                     class="attachment-content size-content wp-post-image"
+                                     th:alt="${article.articleTitle}"
+                                     alt="${a.articleTitle}">
+                            </a>
+                            <span class="cat">
+                                <a th:href="@{${nav.url}}" th:text="${nav.name}"></a>
+                            </span>
+                        </figure>
+
+                        <header class="entry-header">
+                            <h2 class="entry-title">
+                                <a th:href="@{'/article/detail/' + ${article.id}}"
+                                   th:text="${article.articleTitle}" href="/article/detail/1"
+                                   rel="bookmark">
+                                    文章标题
+                                </a>
+                            </h2>
+                        </header>
+
+                        <div class="entry-content">
+                            <div class="archive-content"
+                                 th:text="${(article.articleSummary == null ? '' : article.articleSummary) + '...'}">
+                                文章摘要
+                            </div>
+                            <span class="title-l"></span>
+                            <span class="entry-meta">
+                            <span class="date"
+                                  th:text="${#temporals.format(article.createTime, 'yyyy年MM月dd日') + '&nbsp;&nbsp;'}">
+                                2019年6月1日&nbsp;&nbsp;
+                            </span>
+                            <span class="views">
+                                <i class="fa fa-eye"></i>
+                                <th:block th:text="${article.articleViewCount} + '查看数'">
+                                    ${a.articleViewCount} views
+                                </th:block>
+                            </span>
+                            <span class="comment">&nbsp;&nbsp;
+                                <a th:href="@{'/article/detail/' + ${article.id} + '#comments'}"
+                                   rel="external nofollow">
+                                  <i class="fa fa-comment-o"></i>
+                                    <th:block th:if="${article.articleCommentCount == 0}">
+                                        发表评论
+                                    </th:block>
+                                    <th:block th:if="${article.articleCommentCount != 0}"
+                                              th:text="${article.articleCommentCount}">
+                                    </th:block>
+                                </a>
+                            </span>
+                        </span>
+                            <div class="clear"></div>
+                        </div>
+                        <span class="entry-more">
+                            <a href="/article/1" th:href="@{'/article/detail/' + ${article.id}}" rel="bookmark">阅读全文</a>
+                        </span>
+                    </article>
+                </th:block>
+                <th:block th:if="${pageInfo.list.size() == 0}">
+                    <section class="no-results not-found">
+                        <div class="post">
+                            <p>该分类目前还没有文章！</p>
+                            <br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
+                        </div>
+                    </section>
+                </th:block>
+            </th:block>
+
+            <th:block th:if="${pageInfo == null}">
+                <section class="no-results not-found">
+                    <div class="post">
+                        <p>该分类不存在</p>
+                        <br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
+                    </div>
+                </section>
+            </th:block>
+            <!--文章列表-end-->
+        </main>
+
+        <!-- 分页 start -->
+        <nav class="navigation pagination" role="navigation">
+            <div id="nav-links"></div>
+        </nav>
+        <!-- 分页 end-->
+
+    </div>
+    <!-- 博客主体-左侧正文 end-->
+</th:block>
+
+<th:block layout:fragment="index-right">
+    <th:block th:replace="Home/Model/right::sidebar-list"></th:block>
+</th:block>
+
+<!-- 扩展js -->
+<th:block layout:fragment="script-extend">
+    <script th:inline="javascript">
+        <!-- 分页 -->
+        /*<![CDATA[*/
+        var pages = /*[[${pageInfo.pageSize}]]*/ 1;
+        var curr = /*[[${pageInfo.pageNum}]]*/ 1;
+        var size = /*[[${pageInfo.total}]]*/ 5;
+        var url = /*[[${nav.url}]]*/ 1;
+
+        layui.use(['layer','laypage'], function(){
+            var laypage = layui.laypage,layer = layui.layer;
+            laypage.render({
+                elem: 'nav-links'
+                ,limit: pages
+                ,curr: curr
+                ,count: size
+                ,jump: function(obj, first) {
+                    var currPage = obj.curr;
+                    if (!first) {
+                        location.href = url + '/' + currPage;
+                    }
+                }
+            });
+        })
+
+        /*]]>*/
+    </script>
+</th:block>
+</body>
+</html>

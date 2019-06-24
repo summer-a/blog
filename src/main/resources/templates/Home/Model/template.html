@@ -78,6 +78,7 @@
     </div>
 
     <script th:src="@{/js/jquery.min.js}"></script>
+    <script th:src="@{/js/jquery.cookie.js}"></script>
     <script th:src="@{/js/superfish.js}"></script>
     <script th:src="@{/js/sticky.js}"></script>
     <script th:src="@{/js/script.js}"></script>
@@ -131,8 +132,36 @@
             <!-- 自动调整位置 -->
             $(window).resize(function() {
                 $("#landlord").css("left", $("#sidebar")[0].offsetLeft + 14.5);
+                <!-- 调整右侧模块是否显示 -->
+                hideElement($("#sidebar .widget"), 100);
             })
+            $(window).scroll(function() {
+                hideElement($("#sidebar .widget"), 100);
+                if ($(document).scrollTop() >= 30) {
+                    // 菜单悬浮
+                    $("#menu-box").css("position", "fixed").css("top", "0px");
+                } else {
+                    $("#menu-box").css("position", "relative");
+                }
+            })
+
         })
+
+        /**
+         * 超过高度隐藏
+         */
+        function hideElement(sidebar, height) {
+            // i从1开始，排除关于本站
+            for (var i = 1;i < sidebar.length; i++) {
+                var bottom = Math.abs($("#sidebar .widget").eq(i).offset().top - $("#landlord").offset().top);
+                if (bottom <= height) {
+                    sidebar.eq(i).css("opacity", 0);
+                } else {
+                    sidebar.eq(i).css("opacity", 1);
+                }
+            }
+        }
+
     </script>
 
     <!-- 扩展 -->

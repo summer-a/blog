@@ -22,4 +22,18 @@ public interface ArticleMapper extends MyMapper<Article> {
      */
     Article selectOneForFullArticle(Integer id);
 
+    /**
+     * 更新评论数
+     * @param articleId 文章id
+     * @return
+     */
+    boolean updateCommentCount(Integer articleId);
+
+    /**
+     * 根据类型id查询文章列表
+     * @param categoryId 分类id
+     * @param status 状态
+     * @return
+     */
+    List<Article> selectArticleByCategoryId(@Param("categoryId") Integer categoryId, @Param("status") Integer status);
 }

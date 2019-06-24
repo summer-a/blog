@@ -322,7 +322,7 @@ function increaseViewCount(articleId) {
 
 
 //点赞+1
-function increaseLikeCount() {
+function increaseLikeCount(articleId) {
     if ($.cookie("likeId") != articleId || $.cookie("likeId") == null) {
         $.ajax({
             async: false,
@@ -331,7 +331,7 @@ function increaseLikeCount() {
             dataType: 'json',
             contentType: 'application/json',
             success: function (data) {
-                $(".count").html(data);
+                $(".count").html(parseInt($(".count").html()) + 1);
                 $.cookie(
                     "likeId",
                     articleId,//需要cookie写入的业务
@@ -352,11 +352,16 @@ function increaseLikeCount() {
 $("#comment_form").submit(function () {
     $.ajax({
         async: false,
-        type: "POST",
-        url: '/comment',
-        contentType: "application/x-www-form-urlencoded; charset=utf-8",
+        type: "post",
+        url: '/comment/submit',
+        //contentType: "application/x-www-form-urlencoded; charset=utf-8",
         data: $("#comment_form").serialize(),
         success: function () {
+            layui.use('layer', function() {
+                var layer = layui.layer;
+                layer.msg('评论成功');
+                location.reload()
+            })
         },
         error: function () {
         }

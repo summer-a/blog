@@ -24,11 +24,10 @@
             c.update_time,
             c.create_time
         FROM
-            category c,
-            article_category_ref a
+            category c left join article_category_ref a
+        ON a.category_id = c.id
         WHERE
             a.article_id = #{id}
-            AND a.category_id = c.id
         ORDER BY
             c.category_pid ASC
     </select>

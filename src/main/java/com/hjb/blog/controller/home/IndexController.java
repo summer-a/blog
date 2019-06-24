@@ -3,12 +3,15 @@ package com.hjb.blog.controller.home;
 import com.github.pagehelper.PageInfo;
 import com.hjb.blog.entity.enums.ArticleStatus;
 import com.hjb.blog.entity.enums.NoticeStatus;
+import com.hjb.blog.entity.enums.OrderField;
 import com.hjb.blog.entity.normal.Article;
 import com.hjb.blog.entity.normal.Comment;
 import com.hjb.blog.entity.normal.Notice;
+import com.hjb.blog.entity.normal.Tag;
 import com.hjb.blog.service.normal.ArticleService;
 import com.hjb.blog.service.normal.CommentService;
 import com.hjb.blog.service.normal.NoticeService;
+import com.hjb.blog.service.normal.TagService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -40,6 +43,9 @@ public class IndexController {
     @Autowired
     private CommentService commentService;
 
+    @Autowired
+    private TagService tagService;
+
     /**
      * 首页
      * @param model model
@@ -58,7 +64,7 @@ public class IndexController {
         article.setArticleStatus(ArticleStatus.PUBLISH.getValue());
 
         // 获取文章列表
-        PageInfo<Article> articles = articleService.page(startPage, pageSize, article);
+        PageInfo<Article> articles = articleService.page(startPage, pageSize, article, OrderField.orderByDesc("updateTime"));
         model.addAttribute("articles", articles);
 
         // 获取通知
@@ -70,8 +76,17 @@ public class IndexController {
         // 获取网站统计数据
         Map<String, String> siteBasicStatistics = new HashMap<>(5);
         siteBasicStatistics.put("commentCount", commentService.selectCount(new Comment()) + "");
-
         model.addAttribute("siteBasicStatistics", siteBasicStatistics);
+
+        // 获取热评文章前10
+        Article t = new Article();
+        t.setArticleStatus(ArticleStatus.PUBLISH.getValue());
+        PageInfo<Article> hotComments = articleService.page(1, 10, t, OrderField.orderByDesc("articleCommentCount"));
+        model.addAttribute("hotCommentArticles", hotComments.getList());
+
+        //标签列表显示
+        List<Tag> allTagList = tagService.selectAll();
+        model.addAttribute("tags", allTagList);
 
         return "Home/index";
     }

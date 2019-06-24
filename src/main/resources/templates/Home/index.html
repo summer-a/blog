@@ -14,9 +14,9 @@
             <th:block th:each="article : ${articles.list}">
                 <article class="post type-post">
                     <figure class="thumbnail">
-                        <a th:href="@{'/article/' + ${article.id}}">
+                        <a th:href="@{'/article/detail/' + ${article.id}}">
                             <img width="280" height="210"
-                                 th:src="@{'/img/thumbnail/random/img_' + ${article.id} + '.jpg'}"
+                                 th:src="@{'/img/thumbnail/random/img_' + ${article.id % session.images_quantity} + '.jpg'}"
                                  class="attachment-content size-content wp-post-image"
                                  th:alt="${article.articleTitle}">
                         </a>
@@ -29,7 +29,7 @@
 
                     <header class="entry-header link-effect">
                         <h2 class="entry-title">
-                            <a th:href="@{'/article/' + ${article.id}}" th:text="${article.articleTitle}" rel="bookmark">
+                            <a th:href="@{'/article/detail/' + ${article.id}}" th:text="${article.articleTitle}" rel="bookmark">
                             </a>
                         </h2>
                     </header>
@@ -48,7 +48,7 @@
                                 </span>
                                 <span class="comment">
                                     &nbsp;&nbsp;
-                                    <a th:href="@{'/article/' + ${article.id} + '#comments'}" rel="external nofollow">
+                                    <a th:href="@{'/article/detail/' + ${article.id} + '#comments'}" rel="external nofollow">
                                         <i class="fa fa-comment-o"></i>
                                         <th:block th:text="${article.articleCommentCount}"></th:block>
                                     </a>
@@ -58,7 +58,7 @@
                     </div>
 
                     <span class="entry-more">
-                            <a th:href="'/article/' + ${article.id}" rel="bookmark">
+                            <a th:href="'/article/detail/' + ${article.id}" rel="bookmark">
                                 阅读全文
                             </a>
                         </span>
@@ -76,7 +76,7 @@
 </th:block>
 
 <th:block layout:fragment="index-right">
-    <th:block th:replace="Home/Model/right::right-index"></th:block>
+    <th:block th:replace="Home/Model/right::sidebar-index"></th:block>
 </th:block>
 
 <!-- 扩展js -->

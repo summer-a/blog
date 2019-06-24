@@ -9,12 +9,17 @@ import com.hjb.blog.service.normal.CategoryService;
 import com.hjb.blog.service.normal.MenuService;
 import com.hjb.blog.service.normal.MusicService;
 import com.hjb.blog.service.normal.OptionsService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.List;
 
 /**
@@ -39,6 +44,10 @@ public class CommonResourceHandler extends HandlerInterceptorAdapter {
 
     @Autowired
     private OptionsService optionsService;
+
+    private static Logger log = LoggerFactory.getLogger(CommonResourceHandler.class);
+
+    private LocalDateTime beginTime;
 
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
@@ -67,6 +76,25 @@ public class CommonResourceHandler extends HandlerInterceptorAdapter {
         List<Music> musics = musicService.select(music);
         session.setAttribute("musics", musics);
 
+        // 随机图片数量
+        session.setAttribute("images_quantity", 15);
+
+        beginTime = LocalDateTime.now();
+
         return true;
+    }
+
+    /**
+     * This implementation is empty.
+     *
+     * @param request
+     * @param response
+     * @param handler
+     * @param modelAndView
+     */
+    @Override
+    public void postHandle(HttpServletRequest request, HttpServletResponse response, Object handler, ModelAndView modelAndView) throws Exception {
+        String path = request.getServletPath();
+        log.info("[{}]执行的时间是：{}秒", path, Duration.between(beginTime, LocalDateTime.now()).toMillis() / 1000.0);
     }
 }

@@ -91,9 +91,9 @@ re.toString = function() {
     return '';
 };
 
-$(document).on('copy', function (){
+/*$(document).on('copy', function (){
     showMessage('你都复制了些什么呀，转载要记得加上出处哦~~', 5000);
-});
+});*/
 
 $('.waifu-tool .fa-home').click(function(){
     window.location = '/'
@@ -149,7 +149,7 @@ $('.waifu-tool .fa-close').click(function(){
     sessionStorage.setItem('waifu-dsiplay','none');
     showMessage('愿你有一天能与重要的人重逢',2000);
     $('#landlord').animate({bottom:'-400px'},50)
-    window.setTimeout(function(){$('#landlord').hide();},300);
+    window.setTimeout(function(){$('#landlord').css("opacity", 0);},300);
 });
 
 function initTips(){

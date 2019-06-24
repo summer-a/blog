@@ -16,9 +16,28 @@ spring:
     servlet:
       content-type: text/html
 server:
-  port: 8080
+  port: 8089
   servlet:
     context-path: /
 mybatis:
   type-aliases-package: com.hjb.blog.entity
   mapper-locations: classpath:mapper/*.xml
+logging:
+  #path: /
+  #file: school-blog.log
+  level:
+    com:
+      hjb:
+        blog:
+          mapper: info
+
+management:
+  health:
+    db:
+      enabled: true
+    defaults:
+      enabled: true
+    diskspace:
+      enabled: true
+      path: /
+      threshold: 0

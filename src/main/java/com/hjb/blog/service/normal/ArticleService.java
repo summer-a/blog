@@ -1,5 +1,7 @@
 package com.hjb.blog.service.normal;
 
+import com.github.pagehelper.PageInfo;
+import com.hjb.blog.entity.enums.ArticleStatus;
 import com.hjb.blog.entity.normal.Article;
 import com.hjb.blog.service.base.BaseService;
 
@@ -27,4 +29,21 @@ public interface ArticleService extends BaseService<Article> {
      * @return
      */
     List<Article> selectListForFullArticle(Article article);
+
+    /**
+     * 更新评论数
+     * @param articleId 文章id
+     * @return
+     */
+    boolean updateCommentCount(Integer articleId);
+
+    /**
+     * 根据类型id分页文章
+     * @param pageNum 页码
+     * @param pageSize 每页数量
+     * @param categoryId 分类id
+     * @param status 文章状态
+     * @return
+     */
+    PageInfo<Article> pageArticleByCategoryId(int pageNum, int pageSize, Integer categoryId, ArticleStatus status);
 }

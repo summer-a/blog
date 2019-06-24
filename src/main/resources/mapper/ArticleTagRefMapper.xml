@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hjb.blog.mapper.ArticleTagRefMapper">
+
+    <resultMap id="tagMap" type="com.hjb.blog.entity.normal.Tag">
+        <id property="id" column="id"/>
+        <result property="tagName" column="tag_name"/>
+        <result property="tagDescription" column="tag_description"/>
+        <result property="createTime" column="create_time"/>
+        <result property="updateTime" column="update_time"/>
+    </resultMap>
+
+    <select id="selectTagByArticleId" resultMap="tagMap" parameterType="java.lang.Integer">
+        select
+            t.id,
+            t.tag_name,
+            t.tag_description,
+            t.create_time,
+            t.update_time
+        from tag t left join article_tag_ref atr on (t.id = atr.tag_id)
+        where
+          atr.article_id = #{id}
+    </select>
+
+</mapper>

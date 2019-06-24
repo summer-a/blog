@@ -109,9 +109,11 @@ function move() {
 	return false;
 };
 
-// 页面加载时的动画
+// 隐藏页面加载时的动画
 var fold = true;
-$(".jp-video").animate({
+$(".jp-video").css("left", "-480px");
+slideIn($(".jp-video"));
+/*$(".jp-video").animate({
 	left: 0
 }, "slow", function() {
 	slideOut($(this));
@@ -119,8 +121,8 @@ $(".jp-video").animate({
 	left: "-480px"
 }, 350, function() {
 	slideIn($(this));
-});
-$("#btnfold").mouseover(function() {
+});*/
+$("#btnfold").click(function() {
 	if (fold) {
 		$(".jp-video").animate({
 			left: "-480px"

@@ -3,6 +3,7 @@ package com.hjb.blog.service.base.impl;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.hjb.blog.entity.base.BaseEntity;
+import com.hjb.blog.entity.enums.OrderField;
 import com.hjb.blog.service.base.BaseService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
@@ -82,9 +83,19 @@ public class BaseServiceImpl<T extends BaseEntity> implements BaseService<T> {
     }
 
     @Override
-    public PageInfo<T> page(int pageNum, int pageSize, T t) {
+    public PageInfo<T> page(int pageNum, int pageSize, T t, OrderField orderField) {
         PageHelper.startPage(pageNum, pageSize);
-        List<T> list = mapper.select(t);
+
+        Example example = new Example(t.getClass());
+        if (orderField.getOrderType().equals(OrderField.OrderStatus.ASC)) {
+            example.orderBy(orderField.getOrderField()).asc();
+        } else if (orderField.getOrderType().equals(OrderField.OrderStatus.DESC)) {
+            example.orderBy(orderField.getOrderField()).desc();
+        }
+
+        example.createCriteria().andEqualTo(t);
+        List<T> list = mapper.selectByExample(example);
+//        List<T> list = mapper.select(t);
         PageInfo<T> pageInfo = new PageInfo<>(list);
         return pageInfo;
     }
