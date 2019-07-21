@@ -22,7 +22,6 @@
     <link rel="stylesheet" th:href="@{/plugin/live2d/css/live2d.css}"/>
     <!-- 音乐插件 -->
     <link rel="stylesheet" th:href="@{/plugin/music/css/player.css}"/>
-
     <!-- 用户扩展 -->
     <th:block layout:fragment="link-extend"></th:block>
 </head>
@@ -126,25 +125,30 @@
         }
 
         $(function() {
-            <!-- 初始化看板娘位置,居中于右侧栏目下 -->
-            $("#landlord").css("left", $("#sidebar")[0].offsetLeft + 14.5);
-            $("#landlord").css("bottom", "0px");
-            <!-- 自动调整位置 -->
-            $(window).resize(function() {
+            // 有侧边栏则放侧边栏下面，没有则放右边
+            if ($("#sidebar").length > 0) {
+                <!-- 初始化看板娘位置,居中于右侧栏目下 -->
                 $("#landlord").css("left", $("#sidebar")[0].offsetLeft + 14.5);
-                <!-- 调整右侧模块是否显示 -->
-                hideElement($("#sidebar .widget"), 100);
-            })
-            $(window).scroll(function() {
-                hideElement($("#sidebar .widget"), 100);
-                if ($(document).scrollTop() >= 30) {
-                    // 菜单悬浮
-                    $("#menu-box").css("position", "fixed").css("top", "0px");
-                } else {
-                    $("#menu-box").css("position", "relative");
-                }
-            })
-
+                $("#landlord").css("bottom", "0px");
+                <!-- 自动调整位置 -->
+                $(window).resize(function () {
+                    $("#landlord").css("left", $("#sidebar")[0].offsetLeft + 14.5);
+                    <!-- 调整右侧模块是否显示 -->
+                    hideElement($("#sidebar .widget"), 100);
+                })
+                $(window).scroll(function () {
+                    hideElement($("#sidebar .widget"), 100);
+                    if ($(document).scrollTop() >= 30) {
+                        // 菜单悬浮
+                        $("#menu-box").css("position", "fixed").css("top", "0px");
+                    } else {
+                        $("#menu-box").css("position", "relative");
+                    }
+                })
+            } else {
+                $("#landlord").css("right", "5%");
+                $("#landlord").css("bottom", "0px");
+            }
         })
 
         /**

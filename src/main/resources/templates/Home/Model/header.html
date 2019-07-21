@@ -71,7 +71,7 @@
                                 </li>
 
                                 <li th:each="menu : ${session.menus}">
-                                    <a th:hrbef="@{${menu.menuUrl}}">
+                                    <a th:href="@{${menu.menuUrl}}">
                                         <i th:class="${menu.menuIcon}"></i>
                                         <span class="font-text" th:text="${menu.menuName}">留言板&nbsp;</span>
                                     </a>

@@ -1,6 +1,9 @@
 package com.hjb.blog.entity.base;
 
 import javax.persistence.Column;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 
@@ -15,6 +18,10 @@ import java.time.LocalDateTime;
  */
 public class BaseEntity implements Serializable {
 
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Integer id;
+
     /**
      * 更新时间
      */
@@ -26,6 +33,21 @@ public class BaseEntity implements Serializable {
      */
     @Column(name = "create_time")
     private LocalDateTime createTime;
+
+
+    /**
+     * @return id
+     */
+    public Integer getId() {
+        return id;
+    }
+
+    /**
+     * @param id
+     */
+    public void setId(Integer id) {
+        this.id = id;
+    }
 
     /**
      * 获取更新时间

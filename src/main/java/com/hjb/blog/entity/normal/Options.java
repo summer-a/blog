@@ -8,9 +8,6 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 
 public class Options extends BaseEntity {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
 
     /**
      * 简介标题
@@ -89,20 +86,6 @@ public class Options extends BaseEntity {
      */
     @Column(name = "option_status")
     private Integer optionStatus;
-
-    /**
-     * @return id
-     */
-    public Integer getId() {
-        return id;
-    }
-
-    /**
-     * @param id
-     */
-    public void setId(Integer id) {
-        this.id = id;
-    }
 
     /**
      * 获取简介标题

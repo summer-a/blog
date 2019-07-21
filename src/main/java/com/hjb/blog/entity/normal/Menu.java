@@ -17,10 +17,6 @@ import javax.persistence.Id;
  */
 public class Menu extends BaseEntity {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
-
     @Column(name = "menu_name")
     private String menuName;
 
@@ -35,14 +31,6 @@ public class Menu extends BaseEntity {
 
     @Column(name = "menu_status")
     private Boolean menuStatus;
-
-    public Integer getId() {
-        return id;
-    }
-
-    public void setId(Integer id) {
-        this.id = id;
-    }
 
     public String getMenuName() {
         return menuName;
@@ -87,7 +75,7 @@ public class Menu extends BaseEntity {
     @Override
     public String toString() {
         return "Menu{" +
-                "id=" + id +
+                "id=" + super.getId() +
                 ", menuName='" + menuName + '\'' +
                 ", menuUrl='" + menuUrl + '\'' +
                 ", menuIcon='" + menuIcon + '\'' +

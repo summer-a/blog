@@ -34,6 +34,7 @@ mvnw
 
 ### test ###
 /test/
+/test/*
 
 ### log ###
 .log

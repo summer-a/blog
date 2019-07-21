@@ -8,9 +8,6 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 
 public class Notice extends BaseEntity {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
 
     /**
      * 通知标题
@@ -35,21 +32,6 @@ public class Notice extends BaseEntity {
      */
     @Column(name = "notice_order")
     private Integer noticeOrder;
-
-
-    /**
-     * @return id
-     */
-    public Integer getId() {
-        return id;
-    }
-
-    /**
-     * @param id
-     */
-    public void setId(Integer id) {
-        this.id = id;
-    }
 
     /**
      * 获取通知标题

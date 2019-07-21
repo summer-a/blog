@@ -9,9 +9,6 @@ import javax.persistence.Id;
 import java.util.Date;
 
 public class User extends BaseEntity {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
 
     /**
      * 用户名
@@ -66,20 +63,6 @@ public class User extends BaseEntity {
      */
     @Column(name = "user_last_login_time")
     private Date userLastLoginTime;
-
-    /**
-     * @return id
-     */
-    public Integer getId() {
-        return id;
-    }
-
-    /**
-     * @param id
-     */
-    public void setId(Integer id) {
-        this.id = id;
-    }
 
     /**
      * 获取用户名

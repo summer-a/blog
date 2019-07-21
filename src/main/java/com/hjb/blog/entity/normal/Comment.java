@@ -8,9 +8,6 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 
 public class Comment extends BaseEntity {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
 
     /**
      * 评论的父对象
@@ -81,19 +78,6 @@ public class Comment extends BaseEntity {
     @Column(name = "comment_status")
     private Boolean commentStatus;
 
-    /**
-     * @return id
-     */
-    public Integer getId() {
-        return id;
-    }
-
-    /**
-     * @param id
-     */
-    public void setId(Integer id) {
-        this.id = id;
-    }
 
     /**
      * 获取评论的父对象

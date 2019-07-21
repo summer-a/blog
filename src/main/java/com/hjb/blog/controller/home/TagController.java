@@ -7,14 +7,12 @@ import com.hjb.blog.entity.enums.OrderField;
 import com.hjb.blog.entity.normal.Article;
 import com.hjb.blog.entity.normal.Tag;
 import com.hjb.blog.service.normal.ArticleService;
-import com.hjb.blog.service.normal.CategoryService;
 import com.hjb.blog.service.normal.TagService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
 
 import javax.annotation.Resource;
 import java.util.List;
@@ -35,9 +33,6 @@ public class TagController {
 
     @Resource
     private TagService tagService;
-
-    @Resource
-    private CategoryService categoryService;
 
     @Resource
     private ArticleService articleService;

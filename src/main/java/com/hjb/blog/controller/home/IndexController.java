@@ -12,6 +12,7 @@ import com.hjb.blog.service.normal.ArticleService;
 import com.hjb.blog.service.normal.CommentService;
 import com.hjb.blog.service.normal.NoticeService;
 import com.hjb.blog.service.normal.TagService;
+import com.hjb.blog.util.CoolqUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -91,4 +92,12 @@ public class IndexController {
         return "Home/index";
     }
 
+    /**
+     * 跳转到职教账号登录页
+     * @return
+     */
+    @RequestMapping(value = "/jvtc/page/login", method = RequestMethod.GET)
+    public String jvtcLoginPage() {
+        return "Home/Page/jvtcLogin";
+    }
 }

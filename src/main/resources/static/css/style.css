@@ -10,7 +10,7 @@ html, body, div, span, applet, object, iframe, h1, h2, h3, h4, h5, h6, p, blockq
     margin: 0;
     outline: 0;
     padding: 0;
-    vertical-align: baseline;
+    /*vertical-align: baseline;*/
 }
 
 html {
@@ -7567,6 +7567,10 @@ body {
 
 .message img{
     margin:0px auto;
+}
+
+.font-text{
+    cursor: pointer;
 }
 
 /* 全局100%高度 */

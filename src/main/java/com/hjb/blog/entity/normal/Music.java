@@ -17,10 +17,6 @@ import javax.persistence.Id;
  */
 public class Music extends BaseEntity {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
-
     @Column(name = "title")
     private String title;
 
@@ -47,13 +43,6 @@ public class Music extends BaseEntity {
         this.status = status;
     }
 
-    public Integer getId() {
-        return id;
-    }
-
-    public void setId(Integer id) {
-        this.id = id;
-    }
 
     public String getTitle() {
         return title;
@@ -98,7 +87,7 @@ public class Music extends BaseEntity {
     @Override
     public String toString() {
         return "Music{" +
-                "id=" + id +
+                "id=" + super.getId() +
                 ", title='" + title + '\'' +
                 ", artist='" + artist + '\'' +
                 ", mp3='" + mp3 + '\'' +

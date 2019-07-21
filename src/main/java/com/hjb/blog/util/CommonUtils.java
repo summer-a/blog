@@ -1,8 +1,13 @@
 package com.hjb.blog.util;
 
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.support.PropertiesLoaderUtils;
+
 import javax.servlet.http.HttpServletRequest;
+import java.io.IOException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.Properties;
 
 /**
  * 通用工具
@@ -78,5 +83,26 @@ public class CommonUtils {
             }
         }
         return ipAddress;
+    }
+
+    /**
+     * 获取配置文件的配置
+     * @param path 配置文件路径
+     * @return
+     */
+    public static Properties getProperties(String path) {
+        ClassPathResource classPathResource = new ClassPathResource(path);
+        try {
+            return PropertiesLoaderUtils.loadProperties(classPathResource);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    public static void main(String[] args) {
+        Properties properties = getProperties("jdbc.properties");
+        String property = properties.getProperty("jdbc.username");
+        System.out.println(property);
     }
 }

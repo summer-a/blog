@@ -24,6 +24,10 @@
         <nekohtml.version>1.9.22</nekohtml.version>
         <thymeleaf-layout.version>2.3.0</thymeleaf-layout.version>
         <thymeleaf-java8time.version>3.0.0.RELEASE</thymeleaf-java8time.version>
+        <hutool-all.version>3.2.1</hutool-all.version>
+        <nutz.version>1.r.63</nutz.version>
+        <webmagic.version>0.7.3</webmagic.version>
+        <okhttp.version>3.13.1</okhttp.version>
     </properties>
 
     <dependencies>
@@ -51,6 +55,13 @@
             <artifactId>spring-boot-devtools</artifactId>
             <optional>true</optional>
         </dependency>-->
+
+        <!-- redis start -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-redis</artifactId>
+        </dependency>
+        <!-- redis start -->
         <!-- Spring 依赖 结束 -->
 
         <!-- thymeleaf 依赖 -->
@@ -122,6 +133,43 @@
             <artifactId>spring-boot-starter-actuator</artifactId>
         </dependency>
         <!-- 健康状态监控 end -->
+
+        <!-- 酷Q机器人 相关jar start -->
+        <dependency>
+            <groupId>com.xiaoleilu</groupId>
+            <artifactId>hutool-all</artifactId>
+            <version>${hutool-all.version}</version>
+        </dependency>
+        <!-- 酷Q机器人 end -->
+
+        <!-- quartz start -->
+        <dependency>
+            <groupId>org.nutz</groupId>
+            <artifactId>nutz</artifactId>
+            <version>${nutz.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.nutz</groupId>
+            <artifactId>nutz-integration-quartz</artifactId>
+            <version>${nutz.version}</version>
+        </dependency>
+        <!-- quartz end -->
+
+        <!-- 爬虫 start -->
+        <dependency>
+            <groupId>us.codecraft</groupId>
+            <artifactId>webmagic-extension</artifactId>
+            <version>${webmagic.version}</version>
+        </dependency>
+        <!-- 爬虫 end -->
+
+        <!-- okhttp start -->
+        <dependency>
+            <groupId>com.squareup.okhttp3</groupId>
+            <artifactId>okhttp</artifactId>
+            <version>${okhttp.version}</version>
+        </dependency>
+        <!-- okhttp end -->
 
     </dependencies>
 

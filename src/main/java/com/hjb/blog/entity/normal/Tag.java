@@ -8,9 +8,6 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 
 public class Tag extends BaseEntity {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
 
     /**
      * 标签名
@@ -23,20 +20,6 @@ public class Tag extends BaseEntity {
      */
     @Column(name = "tag_description")
     private String tagDescription;
-
-    /**
-     * @return id
-     */
-    public Integer getId() {
-        return id;
-    }
-
-    /**
-     * @param id
-     */
-    public void setId(Integer id) {
-        this.id = id;
-    }
 
     /**
      * 获取标签名

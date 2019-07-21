@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>机器人管理</title>
+    <link rel="stylesheet" th:href="@{/plugin/layui/css/layui.css}"/>
+    <style type="text/css">
+        html,body {
+            height: 100%;
+        }
+        .layui-container {
+            margin: 50px auto;
+        }
+    </style>
+</head>
+<body>
+<div class="layui-container">
+    <form class="layui-form layui-form-pane" id="robotForm" method="post">
+        <th:block th:if="${robot_info != null && robot_info.id != null}">
+            <input type="hidden" name="id" th:value="${robot_info.id}"/>
+        </th:block>
+        <div class="layui-form-item">
+            <label class="layui-form-label">机器人名</label>
+            <div class="layui-input-block">
+                <input th:value="${robot_info} == null ? null : ${robot_info.robotName}" type="text" name="robotName" autocomplete="off" placeholder="请输入机器人名" class="layui-input" lay-verify="required"/>
+            </div>
+        </div>
+        <div class="layui-form-item" pane="">
+            <label class="layui-form-label">类型</label>
+            <div class="layui-input-block">
+            <th:block th:if="${robot_info == null}">
+                <input type="radio" name="type" value="QQ" title="QQ号" checked="true">
+                <input type="radio" name="type" value="QUN" title="群号">
+                <input type="radio" name="type" value="GROUP" title="讨论组">
+            </th:block>
+            <th:block th:if="${robot_info != null}">
+                <input th:field="*{robot_info.type}" type="radio" name="type" value="QQ" title="QQ号" checked="true">
+                <input th:field="*{robot_info.type}" type="radio" name="type" value="QUN" title="群号">
+                <input th:field="*{robot_info.type}" type="radio" name="type" value="GROUP" title="讨论组">
+            </th:block>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">目标号码</label>
+            <div class="layui-input-block">
+                <input th:value="*{robot_info} == null ? null : *{robot_info.target}" type="text" name="target" autocomplete="off" placeholder="请输入接受消息对象的号码" class="layui-input" lay-verify="required|number"/>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <div class="layui-inline">
+                <label class="layui-form-label">早上提醒</label>
+                <div class="layui-input-block">
+                    <input th:value="*{robot_info} == null ? null : *{robot_info.remindAm}" type="text" name="remindAm" id="date_am" autocomplete="off" class="layui-input" disabled placeholder="默认提醒时间：7：10"/>
+                </div>
+            </div>
+            <div class="layui-inline">
+                <label class="layui-form-label">中午提醒</label>
+                <div class="layui-input-block">
+                    <input th:value="*{robot_info} == null ? null : *{robot_info.remindPm}" type="text" name="remindPm" id="date_pm" autocomplete="off" class="layui-input" disabled placeholder="默认提醒时间：13：00"/>
+                </div>
+            </div>
+            <div class="layui-inline">
+                <label class="layui-form-label">晚上提醒</label>
+                <div class="layui-input-block">
+                    <input th:value="*{robot_info} == null ? null : *{robot_info.remindEve}" type="text" name="remindEve" id="date_eve" autocomplete="off" class="layui-input" disabled placeholder="默认提醒时间：18：20"/>
+                </div>
+            </div>
+        </div>
+        <div class="layui-form-item" pane="">
+            <label class="layui-form-label">启用</label>
+            <div class="layui-input-block">
+                <th:block th:if="${robot_info == null}">
+                    <input type="checkbox" checked="true" lay-skin="switch" title="启用" lay-filter="switchStatus">
+                    <input type="hidden" value="1" name='status'/>
+                </th:block>
+                <th:block th:if="${robot_info != null}">
+                    <input type="checkbox" th:value="${robot_info.status}" th:checked="${robot_info.status == 1 ? true : false}" lay-skin="switch" title="启用" lay-filter="switchStatus">
+                    <input type="hidden" th:value="${robot_info.status}" name='status'/>
+                </th:block>
+            </div>
+        </div>
+
+        <div class="layui-form-item" align="right">
+            <button class="layui-btn" id="cancel" lay-filter="cancel">取消</button>
+            <button class="layui-btn" id="save" lay-filter="save" lay-submit="">保存</button>
+        </div>
+    </form>
+</div>
+
+<script th:src="@{/plugin/layui/layui.js}"></script>
+<script th:src="@{/plugin/layui/lay/modules/form.js}"></script>
+<script th:src="@{/plugin/layui/lay/modules/laydate.js}"></script>
+<script th:src="@{/plugin/layui/lay/modules/jquery.js}"></script>
+<script type="text/javascript">
+    layui.use(['form', 'laydate'], function() {
+        var form = layui.form, laydate = layui.laydate,$ = layui.jquery;
+        laydate.render({
+            elem: '#date_am' // 早
+            ,type: 'time'
+            ,format: 'HH:mm'
+        });
+        laydate.render({
+            elem: '#date_pm' // 中
+            ,type: 'time'
+            ,format: 'HH:mm'
+        });
+        laydate.render({
+            elem: '#date_eve' // 晚
+            ,type: 'time'
+            ,format: 'HH:mm'
+        });
+        form.on('submit(save)', function() {
+            return false;
+        })
+        form.on('switch(switchStatus)', function(data){
+            $("input[name='status']").val(this.checked ? 1:0);
+        });
+        $(document).on('click', '#save', function(){
+            //
+            $.ajax({
+                url: '/timetable/addOrUpdateRobot',
+                data: $('#robotForm').serialize(),
+                type: 'post',
+                dataType: 'json',
+                success: function(data) {
+                    if (data.code == 200) {
+                        parent.location.reload(true)
+                    } else if (data.code == 401) {
+                        parent.location.href = "/jvtc/page/login";
+                    } else {
+                        layer.msg(data.msg)
+                    }
+                }
+            })
+            return false;
+        })
+        $(document).on('click','#cancel', function(){
+            // 关闭当前页面
+            var index = parent.layer.getFrameIndex(window.name); //先得到当前iframe层的索引
+            parent.layer.close(index); //再执行关闭
+            return false;
+        })
+    })
+</script>
+</body>
+</html>

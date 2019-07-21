@@ -8,9 +8,6 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 
 public class Category extends BaseEntity {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
 
     /**
      * 父id
@@ -46,7 +43,7 @@ public class Category extends BaseEntity {
     public Category() {}
 
     public Category(Integer id, String categoryName) {
-        this.id = id;
+        super.setId(id);
         this.categoryName = categoryName;
     }
 
@@ -54,19 +51,6 @@ public class Category extends BaseEntity {
         return new Category(-1, "未分类");
     }
 
-    /**
-     * @return id
-     */
-    public Integer getId() {
-        return id;
-    }
-
-    /**
-     * @param id
-     */
-    public void setId(Integer id) {
-        this.id = id;
-    }
 
     /**
      * 获取父id

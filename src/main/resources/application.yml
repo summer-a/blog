@@ -2,6 +2,7 @@ spring:
   datasource:
     druid:
       driver-class-name: com.mysql.jdbc.Driver
+      #url: jdbc:mysql://120.77.215.148:3309/hjb_blog?useSSL=false&characterEncoding=utf-8&serverTimezone=UTC
       url: jdbc:mysql://localhost:3306/hjb_blog?useSSL=false&characterEncoding=utf-8&serverTimezone=UTC
       username: root
       password: Hjb88619973.
@@ -15,6 +16,16 @@ spring:
     encoding: utf-8
     servlet:
       content-type: text/html
+  redis:
+    lettuce:
+      pool:
+        max-active: 8
+        max-idle: 8
+        max-wait: -1ms
+        min-idle: 0
+    port: 6336
+    host: 120.77.215.148
+    password: 88619973
 server:
   port: 8089
   servlet:
@@ -29,7 +40,7 @@ logging:
     com:
       hjb:
         blog:
-          mapper: info
+          mapper: debug
 
 management:
   health:

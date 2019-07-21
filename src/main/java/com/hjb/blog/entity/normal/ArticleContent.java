@@ -7,10 +7,6 @@ import javax.persistence.*;
 @Table(name = "article_content")
 public class ArticleContent extends BaseEntity {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
-
     /**
      * 文章id
      */
@@ -22,21 +18,6 @@ public class ArticleContent extends BaseEntity {
      */
     @Column(name = "article_content")
     private String articleContent;
-
-
-    /**
-     * @return id
-     */
-    public Integer getId() {
-        return id;
-    }
-
-    /**
-     * @param id
-     */
-    public void setId(Integer id) {
-        this.id = id;
-    }
 
     /**
      * 获取文章id
@@ -68,7 +49,7 @@ public class ArticleContent extends BaseEntity {
     @Override
     public String toString() {
         return "ArticleContent{" +
-                "id=" + id +
+                "id=" + super.getId() +
                 ", articleId=" + articleId +
                 ", articleContent='" + articleContent + '\'' +
                 '}';

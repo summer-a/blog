@@ -5,7 +5,9 @@
 .jp-audio button::-moz-focus-inner, .jp-audio-stream button::-moz-focus-inner, .jp-video button::-moz-focus-inner {
     border: 0
 }
-
+.jp-video {
+    background-color: rgba(57, 36, 89, 0.9);
+}
 .jp-audio-stream, .jp-video {
     width: 480px;
     height: 94px;
@@ -272,7 +274,7 @@
 }
 
 .jp-type-playlist .jp-details, .jp-type-single .jp-details {
-    border-top: 0
+    border-top: 0;
 }
 
 .jp-details .jp-title {
@@ -340,7 +342,7 @@ div.jp-type-playlist div.jp-playlist a.jp-playlist-item-remove {
 }
 
 div.jp-type-playlist div.jp-playlist a.jp-playlist-item-remove:hover {
-    color: #5c4169
+    color: #5c4169;
 }
 
 span.jp-artist {
@@ -402,7 +404,7 @@ html, body, header, nav, footer, div, ul, ol, li, p, form, input, a, span, em, i
     margin: 0;
     padding: 0;
     list-style: none;
-    border: 0
+    border: 0;
 }
 
 .jp-video .scrollBar {

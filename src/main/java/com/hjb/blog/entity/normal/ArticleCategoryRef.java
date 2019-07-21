@@ -9,19 +9,14 @@ public class ArticleCategoryRef extends BaseEntity {
     /**
      * 文章id
      */
-    @Id
     @Column(name = "article_id")
     private Integer articleId;
 
     /**
      * 类型id
      */
-    @Id
     @Column(name = "category_id")
     private Integer categoryId;
-
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
 
     /**
      * 获取文章id
@@ -59,18 +54,5 @@ public class ArticleCategoryRef extends BaseEntity {
         this.categoryId = categoryId;
     }
 
-    /**
-     * @return id
-     */
-    public Integer getId() {
-        return id;
-    }
-
-    /**
-     * @param id
-     */
-    public void setId(Integer id) {
-        this.id = id;
-    }
 
 }

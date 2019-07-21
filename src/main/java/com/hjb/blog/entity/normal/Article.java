@@ -6,9 +6,6 @@ import javax.persistence.*;
 import java.util.List;
 
 public class Article extends BaseEntity {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
 
     /**
      * 文章对应用户id
@@ -78,20 +75,6 @@ public class Article extends BaseEntity {
 
     @Transient
     private List<Category> categoryList;
-
-    /**
-     * @return id
-     */
-    public Integer getId() {
-        return id;
-    }
-
-    /**
-     * @param id
-     */
-    public void setId(Integer id) {
-        this.id = id;
-    }
 
     /**
      * 获取文章对应用户id
@@ -292,7 +275,7 @@ public class Article extends BaseEntity {
     @Override
     public String toString() {
         return "Article{" +
-                "id=" + id +
+                "id=" + super.getId() +
                 ", articleUserId=" + articleUserId +
                 ", articleTitle='" + articleTitle + '\'' +
                 ", articleViewCount=" + articleViewCount +

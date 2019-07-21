@@ -9,19 +9,14 @@ public class ArticleTagRef extends BaseEntity {
     /**
      * 文章id
      */
-    @Id
     @Column(name = "article_id")
     private Integer articleId;
 
     /**
      * 标签id
      */
-    @Id
     @Column(name = "tag_id")
     private Integer tagId;
-
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
 
     /**
      * 获取文章id
@@ -57,20 +52,6 @@ public class ArticleTagRef extends BaseEntity {
      */
     public void setTagId(Integer tagId) {
         this.tagId = tagId;
-    }
-
-    /**
-     * @return id
-     */
-    public Integer getId() {
-        return id;
-    }
-
-    /**
-     * @param id
-     */
-    public void setId(Integer id) {
-        this.id = id;
     }
 
 }

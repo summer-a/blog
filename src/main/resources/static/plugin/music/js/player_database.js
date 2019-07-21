@@ -142,13 +142,13 @@ function slideOut(obj) {
 	$("#btnfold").attr({
 		"title": "点击收缩"
 	});
-	obj.find("span").css({
+	obj.find("span").not(".jp-artist").css({
 		"transform": "rotate(180deg)"
 	});
-	obj.find("span").css({
+	obj.find("span").not(".jp-artist").css({
 		"MozTransform": "rotate(180deg) translateX(2px)"
 	});
-	obj.find("span").css({
+	obj.find("span").not(".jp-artist").css({
 		"WebkitTransform": "rotate(180deg)"
 	});
 	fold = true;
@@ -158,13 +158,13 @@ function slideIn(obj) {
 	$("#btnfold").attr({
 		"title": "点击展开"
 	});
-	obj.find("span").css({
+	obj.find("span").not(".jp-artist").css({
 		"transform": "rotate(0deg)"
 	});
-	obj.find("span").css({
+	obj.find("span").not(".jp-artist").css({
 		"MozTransform": "rotate(0deg) translateX(-2px)"
 	});
-	obj.find("span").css({
+	obj.find("span").not(".jp-artist").css({
 		"WebkitTransform": "rotate(0deg)"
 	});
 	fold = false;
