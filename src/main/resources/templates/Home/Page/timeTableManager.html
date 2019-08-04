@@ -128,12 +128,12 @@
                         var edit = layer.open({
                             type: 2,
                             title: '编辑',
-                            area: ['500px', '90%'],
-                            maxmin: false,
+                            area: ['500px', '530px'],
+                            maxmin: true,
                             anim: 5,
                             content: ['/timetable/addOrEditPage?id=' + data.id, 'no'] //iframe的url，no代表不显示滚动条
                         })
-                        layer.full(edit)
+                        // layer.full(edit)
                     } else if (event === 'del') {
                         layer.confirm('确定删除“' + data.robotName + '”吗？', {
                             btn: ['确定','取消'] //按钮
@@ -169,12 +169,12 @@
                     var add = layer.open({
                         type: 2,
                         title: '添加',
-                        area: ['500px', '90%'],
-                        maxmin: false,
+                        area: ['500px', '530px'],
+                        maxmin: true,
                         anim: 5,
                         content: ['/timetable/addOrEditPage', 'no']
                     })
-                    layer.full(add)
+                    // layer.full(add)
                 }
             })
 

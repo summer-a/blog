@@ -131,7 +131,7 @@ public class TimeTableController {
             robotService.insertSelective(robot);
             TimeTableTask timeTableTask = new TimeTableTask(robot.getRemindAm(), robot.getRemindPm(), robot.getRemindEve());
             List<UserRobotDTO> userRobots = jvtcUserService.selectUserRobotList();
-            timeTableTask.startByList(userRobots, "暂无");
+            timeTableTask.startByList(userRobots);
 
         }
         return ResultVO.ok();

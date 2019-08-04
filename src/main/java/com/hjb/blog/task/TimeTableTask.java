@@ -1,22 +1,21 @@
 package com.hjb.blog.task;
 
-import com.hjb.blog.config.WebAppConfigurer;
 import com.hjb.blog.entity.dto.UserRobotDTO;
 import com.hjb.blog.entity.enums.QQType;
 import com.hjb.blog.entity.normal.JvtcUser;
 import com.hjb.blog.entity.normal.Robot;
 import com.hjb.blog.entity.timetable.MessageInfo;
 import com.hjb.blog.entity.timetable.TimeTablePerTime;
-import com.hjb.blog.service.normal.JvtcUserService;
 import com.hjb.blog.util.JvtcLoginUtils;
-import com.hjb.blog.util.SpringUtils;
 import com.hjb.blog.util.TimeTableUtils;
+import com.hjb.blog.util.YmlUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 import us.codecraft.webmagic.selector.Html;
 
@@ -32,6 +31,7 @@ import java.util.concurrent.TimeUnit;
  *
  * @author h1525
  */
+@Component
 public class TimeTableTask {
 
     /**
@@ -101,9 +101,8 @@ public class TimeTableTask {
      * 组团发送
      *
      * @param userRobots
-     * @param timeTableUrl
      */
-    public void startByList(List<UserRobotDTO> userRobots, String timeTableUrl) {
+    public void startByList(List<UserRobotDTO> userRobots) {
 
         // 每天执行
         int now = LocalTime.now().toSecondOfDay();
@@ -126,7 +125,7 @@ public class TimeTableTask {
             // 拿到所有有效用户的课表, 根据班级从缓存获取
             for (UserRobotDTO userRobot : userRobots) {
                 JvtcUser juser = userRobot.getJvtcUser();
-                Html timeTable = JvtcLoginUtils.getTimeTable(today, juser.getUsername(), juser.getPassword(), juser.getCookie());
+                Html timeTable = JvtcLoginUtils.getTimeTable(today, juser);
                 // 转成对象(一天)
                 List<TimeTablePerTime> courseOfDay = htmlToBeen(timeTable, LocalDate.now().getDayOfWeek().getValue());
 
@@ -141,6 +140,7 @@ public class TimeTableTask {
                     Optional<TimeTablePerTime> t6 = courseOfDay.stream().filter(f -> f.getNo() == 6).findFirst();
                     // 天气，延迟一秒
 //                Map<String, String> weather = WeatherUtils.getJiuJiangTodayWeather();
+                    String timeTableUrl = YmlUtils.get("host.tableUrl", "http://kb.chiyouyun.com/") + userRobot.getJvtcUser().getClazz();
                     // 早
                     if (t1.isPresent() || t2.isPresent()) {
                         String tableText = createTableText(t1, t2, timeTableUrl);

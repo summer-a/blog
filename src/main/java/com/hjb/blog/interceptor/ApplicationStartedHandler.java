@@ -3,6 +3,7 @@ package com.hjb.blog.interceptor;
 import com.hjb.blog.entity.dto.UserRobotDTO;
 import com.hjb.blog.service.normal.JvtcUserService;
 import com.hjb.blog.task.TimeTableTask;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.stereotype.Component;
@@ -30,6 +31,6 @@ public class ApplicationStartedHandler implements ApplicationRunner {
 
         List<UserRobotDTO> userRobotList = jvtcUserService.selectUserRobotList();
         TimeTableTask timeTableTask = new TimeTableTask();
-        timeTableTask.startByList(userRobotList, "x");
+        timeTableTask.startByList(userRobotList);
     }
 }

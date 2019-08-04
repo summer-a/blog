@@ -40,19 +40,9 @@
                     <div class="single-content" th:utext="${article.articleContent}">
                         文章内容
                     </div>
-                    <div class="s-weixin">
-                        <ul class="weimg1">
-                            <li><strong>微信</strong></li>
-                            <li>赶快加我聊天吧</li>
-                            <li><img src="/img/weixin.jpg"></li>
-                        </ul>
-                        <ul class="weimg2">
-                            <li><strong>博客交流群</strong></li>
-                            <li>海纳百川，大家来水</li>
-                            <li><img src="/img/qqGroup.png" alt="weinxin"></li>
-                        </ul>
-                        <div class="clear"></div>
-                    </div>
+                    <!-- 联系方式 -->
+                    <div th:replace="Home/Model/link::link"></div>
+
                     <div class="clear"></div>
                     <div id="social">
                         <div class="social-main">
@@ -100,14 +90,12 @@
 
                     <footer class="single-footer">
                         <ul class="single-meta">
-                            <c:if test="${sessionScope.user!=null}">
-                                <li class="edit-link">
-                                    <a target="_blank" class="post-edit-link"
-                                       href="/admin/article/edit/${article.articleId}">编辑</a>
-                                </li>
-                            </c:if>
+                            <li class="edit-link">
+                                <a target="_blank" class="post-edit-link"
+                                   href="#">编辑</a>
+                            </li>
                             <li class="comment">
-                                <a href="/article/detail/${article.articleId}#comments"
+                                <a href="#comments"
                                    rel="external nofollow">
                                     <i class="fa fa-comment-o"></i>
                                     <i class="comment-count" th:text="${comments.size()}">10</i>
@@ -165,7 +153,7 @@
                     </h3>
                     <form id="comment_form" method="post" onsubmit="return false;">
                         <div class="user_avatar" th:if="${session.user != null}">
-                            <img alt="言曌"
+                            <img alt="头像"
                                  th:src="${session.user.userAvatar}"
                                  class="avatar avatar-64 photo" height="64" width="64">
                             <th:block th:text="${session.user.userNickname}">登录者：xxx</th:block>

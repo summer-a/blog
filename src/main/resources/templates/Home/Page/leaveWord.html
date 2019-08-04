@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/web/thymeleaf/layout"
+      layout:decorator="Home/Model/template">
+<head>
+    <meta charset="UTF-8">
+    <title>留言板</title>
+</head>
+<body>
+
+<th:block layout:fragment="breadcrumb">
+    <nav class="breadcrumb">
+        <a class="crumbs" href="/">
+            <i class="fa fa-home"></i>首页
+        </a>
+        <i class="fa fa-angle-right"></i>
+        <span>留言板</span>
+    </nav>
+</th:block>
+
+<!-- 主体左边区域 -->
+<th:block layout:fragment="index-left">
+
+    <!-- 留言 start-->
+    <div class="scroll-comments"></div>
+    <div id="comments" class="comments-area">
+        <div id="respond" class="comment-respond">
+            <h3 id="reply-title" class="comment-reply-title"><span id="reply-title-word">发表留言</span>
+                <a rel="nofollow" id="cancel-comment-reply-link"
+                   href="/article/detail/${article.articleId}#respond"
+                   style="">取消回复</a>
+            </h3>
+            <form id="ly_form" method="post" onsubmit="return false;">
+                <p class="comment-form-comment">
+                    <textarea id="comment" name="commentContent" rows="4" tabindex="1" required></textarea>
+                </p>
+                <div id="comment-author-info" style="width:100%;">
+                    <th:block th:if="${session.user == null}">
+                        <input type="hidden" name="commentRole" value="0">
+                        <p class="comment-form-author">
+                            <label for="author_name">
+                                昵称<span class="required">*</span>
+                            </label>
+                            <input type="text" name="commentAuthorName" id="author_name" class="" value=""
+                                   tabindex="2" required>
+                        </p>
+                        <p class="comment-form-email">
+                            <label for="author_email">
+                                邮箱<span class="required">*</span>
+                            </label>
+                            <input type="email" name="commentAuthorEmail" id="author_email" class="" value=""
+                                   tabindex="3" required>
+                        </p>
+                        <p class="comment-form-email">
+                            <label for="author_code">
+                                <image src="/img/imgcode.png" th:onclick="this.src='/img/imgcode.png?' + new Date()"></image>
+                            </label>
+                            <input type="email" name="commentAuthorEmail" id="author_code" class="" value=""
+                                   tabindex="4" required>
+                        </p>
+                    </th:block>
+                </div>
+                <div class="clear"></div>
+                <p class="form-submit">
+                    <input id="submit" name="submit" type="submit" tabindex="5" value="提交留言" style="width:100%;">
+                    <input type="hidden" name="commentPid" id="comment_pid" value="0">
+                </p>
+            </form>
+            <div th:replace="Home/Model/link::link"></div>
+        </div>
+
+        <ol class="comment-list">
+            <th:block th:each="item,cstat : ${leaveWords.list}">
+                <li class="comment">
+                    <div th:id="'div-comment-' + ${item.id}" class="comment-body">
+                        <div class="comment-author vcard">
+                            <img class="avatar" th:src="@{${item.avatar}}" alt="avatar"
+                                 style="display: block;">
+                            <strong th:text="${item.nickName}">作者昵称</strong>
+                            <th:block th:if="${item.role == 1}">
+                                <i class="fa fa-black-tie" style="color: #c40000;"></i>
+                                <span class=""
+                                      style="margin-top: 2px!important;color: #c40000;font-size: 13px;;"><b>博主</b></span>
+                            </th:block>
+                            <span class="comment-meta commentmetadata">
+                                <span class="ua-info" style="display: inline;">
+                                    <br>
+                                    <span class="comment-aux">
+                                        <th:block
+                                                th:text="${#temporals.format(item.createTime, 'yyyy年MM月dd日 HH:mm:ss')} + '&nbsp;'">
+                                            yyyy年MM月dd日 HH:mm:ss
+                                        </th:block>
+                                        <th:block th:if="${session.user != null}">
+                                            <a href="javascript:void(0)"
+                                               th:onclick="'deleteComment(' + ${item.id} + ')'">删除</a>
+                                            <a class="comment-edit-link"
+                                               th:href="@{'/admin/comment/edit/' + ${item.id}}"
+                                               target="_blank">编辑</a>
+                                        </th:block>
+                                        <span class="floor" th:text="'&nbsp;' + ${cstat.index + 1} + '楼'"> &nbsp;${floor}楼 </span>
+                                    </span>
+                                </span>
+                            </span>
+                            <p>
+                                <th:block th:text="${item.content}">
+                                    评论内容
+                                </th:block>
+                            </p>
+                        </div>
+                    </div>
+                </li>
+            </th:block>
+        </ol>
+    </div>
+    <!-- 留言 end-->
+
+</th:block>
+<th:block layout:fragment="script-extend">
+    <script type="text/javascript">
+        // ajax提交留言信息
+        $("#ly_form").submit(function () {
+            $.ajax({
+                async: false,
+                type: "post",
+                url: '/ly/send',
+                data: $("#ly_form").serialize(),
+                success: function () {
+                    layui.use('layer', function() {
+                        var layer = layui.layer;
+                        layer.msg('留言成功');
+                        location.reload()
+                    })
+                },
+                error: function () {
+                }
+            })
+        })
+    </script>
+</th:block>
+
+</body>
+</html>

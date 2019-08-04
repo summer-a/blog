@@ -13,6 +13,8 @@
     <version>0.0.1-SNAPSHOT</version>
     <name>驰游云校博客</name>
     <description>blog</description>
+    <!-- tomcat用 -->
+    <packaging>jar</packaging>
 
     <properties>
         <java.version>1.8</java.version>
@@ -31,6 +33,28 @@
     </properties>
 
     <dependencies>
+
+        <!-- tomcat 用 -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-tomcat</artifactId>
+            <scope>provided</scope>
+            <!-- 移除嵌入式tomcat插件 -->
+            <exclusions>
+                <exclusion>
+                    <groupId>org.springframework.boot</groupId>
+                    <artifactId>spring-boot-starter-tomcat</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.tomcat</groupId>
+            <artifactId>tomcat-servlet-api</artifactId>
+            <version>8.0.36</version>
+            <scope>provided</scope>
+        </dependency>
+        <!-- tomcat end -->
+
         <!-- Spring依赖 -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -50,11 +74,19 @@
             <artifactId>spring-boot-starter-test</artifactId>
             <scope>test</scope>
         </dependency>
-        <!--<dependency>
+        <!-- hot reload -->
+        <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-devtools</artifactId>
             <optional>true</optional>
-        </dependency>-->
+        </dependency>
+        <!-- hot reload end -->
+        <!-- elasticsearch start -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-elasticsearch</artifactId>
+        </dependency>
+        <!-- elasticsearch end -->
 
         <!-- redis start -->
         <dependency>
@@ -62,13 +94,15 @@
             <artifactId>spring-boot-starter-data-redis</artifactId>
         </dependency>
         <!-- redis start -->
-        <!-- Spring 依赖 结束 -->
-
-        <!-- thymeleaf 依赖 -->
+        <!-- thymeleaf start -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-thymeleaf</artifactId>
         </dependency>
+        <!-- thymeleaf end -->
+
+        <!-- Spring 依赖 结束 -->
+
         <!-- html非严格支持 -->
         <dependency>
             <groupId>net.sourceforge.nekohtml</groupId>
@@ -175,6 +209,21 @@
 
     <build>
         <plugins>
+
+            <plugin>
+                <groupId>org.apache.tomcat.maven</groupId>
+                <artifactId>tomcat7-maven-plugin</artifactId>
+                <configuration>
+                    <port>8084</port>
+                    <path>/</path>
+                    <uriEncoding>UTF-8</uriEncoding>
+                    <url>http://blog.chiyouyun.com/manager/text</url>
+                    <username>admin</username>
+                    <password>88619973</password>
+                    <update>true</update>
+                </configuration>
+            </plugin>
+
             <!-- maven插件 -->
             <plugin>
                 <groupId>org.springframework.boot</groupId>
