@@ -92,12 +92,13 @@
             </if>
         </where>
     </select>
-    <sql id="ddd"></sql>
+
     <update id="updateCommentCount" parameterType="java.lang.Integer">
-        update article a
-        set article_comment_count =
-        (select count(*) from `comment` c where a.id = c.comment_article_id and c.comment_status = 1)
-        where id = #{articleId}
+        update article a set article_comment_count = (a.article_comment_count + 1) where a.id = #{articleId}
+    </update>
+
+    <update id="updateViewCount" parameterType="java.lang.Integer">
+        update article a set article_view_count = (a.article_view_count + 1) where a.id = #{articleId}
     </update>
 
     <select id="selectArticleByCategoryId" resultMap="articleMap">

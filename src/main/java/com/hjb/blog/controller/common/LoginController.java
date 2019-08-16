@@ -1,12 +1,12 @@
 package com.hjb.blog.controller.common;
 
-import com.hjb.blog.entity.dto.JvtcResponse;
 import com.hjb.blog.entity.normal.JvtcUser;
+import com.hjb.blog.entity.vo.JvtcResponseVO;
 import com.hjb.blog.service.normal.JvtcUserService;
 import com.hjb.blog.util.JvtcLoginUtils;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.util.StringUtils;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -41,7 +41,7 @@ public class LoginController {
      * @param rememberMe 是否记住用户
      * @return
      */
-    @RequestMapping(value = "/jvtc/login", method = RequestMethod.POST)
+    @PostMapping(value = "/jvtc/login")
     public String jvtcLogin(@RequestParam(value = "username", required = true) String username,
                             @RequestParam(value = "encoded", required = true) String encoded,
                             @RequestParam(value = "rememberMe", required = false, defaultValue = "false") boolean rememberMe,
@@ -57,7 +57,7 @@ public class LoginController {
 
         if (jvtcUser == null || StringUtils.isEmpty(jvtcUser.getCookie())) {
             // 查询页面
-            JvtcResponse jResponse = JvtcLoginUtils.loginByUserNameAndEncode(username, encoded);
+            JvtcResponseVO jResponse = JvtcLoginUtils.loginByUserNameAndEncode(username, encoded);
             // 有则直接获取
             // 登录失败
             if (jResponse.getCode() == 401) {

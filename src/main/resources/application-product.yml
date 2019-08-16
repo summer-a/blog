@@ -1,0 +1,50 @@
+#host:
+#  ip: 120.77.215.148
+#  indexUrl: http://www.chiyouyun.com/
+#  tableUrl: http://kb.chiyouyun.com/
+spring:
+  profiles: product
+  datasource:
+    druid:
+      driver-class-name: com.mysql.jdbc.Driver
+      url: jdbc:mysql://${host.ip}:3309/hjb_blog?useSSL=false&characterEncoding=utf-8&serverTimezone=UTC
+      username: root
+      password: Hjb88619973.
+      initial-size: 1
+      min-idle: 1
+      max-active: 20
+      test-on-borrow: true
+  thymeleaf:
+    mode: LEGACYHTML5
+    cache: false
+    encoding: utf-8
+    servlet:
+      content-type: text/html
+  redis:
+    lettuce:
+      pool:
+        max-active: 8
+        max-idle: 8
+        max-wait: -1ms
+        min-idle: 0
+    port: 6336
+    host: ${host.ip}
+    password: 88619973
+  devtools:
+    restart:
+      enabled: true
+      additional-paths: src/main/java
+  banner:
+    charset: UTF-8
+server:
+  port: 8089
+  servlet:
+    context-path: /
+logging:
+  #path: /
+  #file: school-blog.log
+  level:
+    com:
+      hjb:
+        blog:
+          mapper: info

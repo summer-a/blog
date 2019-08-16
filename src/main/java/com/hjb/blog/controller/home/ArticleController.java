@@ -1,11 +1,11 @@
 package com.hjb.blog.controller.home;
 
 import com.github.pagehelper.PageInfo;
-import com.hjb.blog.entity.dto.ResultVO;
 import com.hjb.blog.entity.enums.OrderField;
 import com.hjb.blog.entity.normal.Article;
 import com.hjb.blog.entity.normal.Comment;
 import com.hjb.blog.entity.normal.Tag;
+import com.hjb.blog.entity.vo.ResultVO;
 import com.hjb.blog.service.normal.ArticleService;
 import com.hjb.blog.service.normal.CommentService;
 import com.hjb.blog.service.normal.TagService;
@@ -14,7 +14,6 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
-import java.time.LocalDateTime;
 import java.util.List;
 
 /**
@@ -46,9 +45,9 @@ public class ArticleController {
      * @param id 文章id
      * @return
      */
-    @RequestMapping(value = "/detail/{id}", method = RequestMethod.GET)
-    public String articleDetailPage(@PathVariable(name = "id", required = true) Integer id,
-                                    Model model) {
+    @GetMapping(value = "/detail/{id}")
+    public String articleDetailPage(Model model,
+                                    @PathVariable(name = "id", required = true) Integer id) {
 
         // 文章信息
         Article article = articleService.selectOneForFullArticle(id);
@@ -79,7 +78,7 @@ public class ArticleController {
      * @param articleId 文章id
      * @return
      */
-    @RequestMapping(value = "/like/{articleId}", method = RequestMethod.POST)
+    @PostMapping(value = "/like/{articleId}")
     @ResponseBody
     public ResultVO likeArticle(@PathVariable(required = true) Integer articleId) {
 

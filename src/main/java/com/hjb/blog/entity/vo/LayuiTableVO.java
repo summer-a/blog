@@ -1,4 +1,4 @@
-package com.hjb.blog.entity.dto;
+package com.hjb.blog.entity.vo;
 
 import java.util.List;
 

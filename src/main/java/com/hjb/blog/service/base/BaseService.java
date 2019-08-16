@@ -73,6 +73,13 @@ public interface BaseService<T> {
     T selectOne(T t);
 
     /**
+     * 根据id查询
+     * @param id
+     * @return
+     */
+    T selectById(int id);
+
+    /**
      * 根据Example查询
      * @param example 查询条件
      * @return

@@ -7,6 +7,7 @@ import com.hjb.blog.entity.normal.Tag;
 import com.hjb.blog.mapper.TagMapper;
 import com.hjb.blog.service.base.impl.BaseServiceImpl;
 import com.hjb.blog.service.normal.TagService;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -28,6 +29,12 @@ public class TagServiceImpl extends BaseServiceImpl<Tag> implements TagService {
     @Resource
     private TagMapper tagMapper;
 
+    @Transactional(readOnly = true, rollbackFor = RuntimeException.class)
+    @Cacheable(value = "tag", key = "#root.methodName")
+    @Override
+    public List<Tag> selectAll() {
+        return super.selectAll();
+    }
 
     /**
      * 根据标签id查询文章列表

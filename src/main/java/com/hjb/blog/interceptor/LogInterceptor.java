@@ -1,7 +1,6 @@
 package com.hjb.blog.interceptor;
 
 import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONObject;
 import com.hjb.blog.entity.normal.JvtcUser;
 import com.hjb.blog.util.CommonUtils;
 import com.hjb.blog.util.JvtcLoginUtils;

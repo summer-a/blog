@@ -166,7 +166,7 @@
                             <input type="hidden" name="commentAuthorUrl" value="${sessionScope.user.getUserUrl()}">
                         </div>
                         <p class="comment-form-comment">
-                            <textarea id="comment" name="commentContent" rows="4" tabindex="1" required></textarea>
+                            <textarea id="comment" name="commentContent" rows="4" tabindex="1" style="resize: vertical;min-height:100px;max-height:200px;" required></textarea>
                         </p>
                         <div id="comment-author-info">
                             <input type="hidden" name="commentPid" value="0">
@@ -187,6 +187,13 @@
                                     <input type="email" name="commentAuthorEmail" id="author_email" class="" value=""
                                            tabindex="3" required>
                                 </p>
+
+                                <p class="comment-form-email">
+                                    <div id="captcha1">
+                                        <p id="wait1" class="show">正在加载验证码......</p>
+                                    </div>
+                                </p>
+
                             </th:block>
                         </div>
                         <div class="clear"></div>
@@ -302,16 +309,82 @@
                 </ol>
             </div>
             <!--评论框 end-->
-
         </main>
+
         <!-- .site-main -->
     </div>
     <!--博客主体-左侧文章正文end-->
 </th:block>
-<!--<th:block th:text="${article}"></th:block>-->
 
 <th:block layout:fragment="index-right">
     <th:block th:replace="Home/Model/right::sidebar-list"></th:block>
+</th:block>
+
+<th:block layout:fragment="script-extend">
+    <script type="text/javascript" th:src="@{/plugin/geetest/gt.js}"></script>
+
+    <script type="text/javascript">
+        var handler1 = function (captchaObj) {
+            // ajax提交
+            $("#comment_form").submit(function () {
+                var result = captchaObj.getValidate();
+                if (!result) {
+                    layui.use('layer', function () {
+                        var layer = layui.layer;
+                        layer.msg('验证失败', {icon: 5})
+                    })
+                    return false;
+                }
+                //ajax提交评论信息
+                $.ajax({
+                    async: false,
+                    type: "post",
+                    url: '/comment/submit',
+                    data: $("#comment_form").serialize(),
+                    success: function (data) {
+                        layui.use('layer', function () {
+                            var layer = layui.layer;
+                            if (data.code == 200) {
+                                layer.msg('评论成功');
+                                location.reload()
+                            } else {
+                                layer.msg(data.msg);
+                            }
+                        })
+                    },
+                    error: function () {
+                    }
+                })
+            })
+            // 将验证码加到id为captcha的元素里，同时会有三个input的值用于表单提交
+            captchaObj.appendTo("#captcha1");
+            captchaObj.onReady(function () {
+                $("#wait1").hide();
+            });
+            // 更多接口参考：http://www.geetest.com/install/sections/idx-client-sdk.html
+        };
+        $.ajax({
+            url: "/geetest/register?t=" + (new Date()).getTime(), // 加随机数防止缓存
+            data: {"userEmail": $("#author_email").val()},
+            type: "get",
+            dataType: "json",
+            success: function (data) {
+                // 调用 initGeetest 初始化参数
+                // 参数1：配置参数
+                // 参数2：回调，回调的第一个参数验证码对象，之后可以使用它调用相应的接口
+                initGeetest({
+                    gt: data.gt,
+                    challenge: data.challenge,
+                    new_captcha: data.new_captcha, // 用于宕机时表示是新验证码的宕机
+                    offline: !data.success, // 表示用户后台检测极验服务器是否宕机，一般不需要关注
+                    product: "float", // 产品形式，包括：float，popup
+                    width: "100%"
+                    // 更多配置参数请参见：http://www.geetest.com/install/sections/idx-client-sdk.html#config
+                }, handler1);
+            }
+        });
+    </script>
+
 </th:block>
 </body>
 </html>

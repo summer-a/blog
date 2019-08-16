@@ -1,6 +1,5 @@
 package com.hjb.blog.service.normal;
 
-import com.hjb.blog.entity.normal.Article;
 import com.hjb.blog.entity.normal.Menu;
 import com.hjb.blog.service.base.BaseService;
 

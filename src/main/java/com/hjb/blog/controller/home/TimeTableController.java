@@ -1,13 +1,12 @@
 package com.hjb.blog.controller.home;
 
 import com.github.pagehelper.PageInfo;
-import com.hjb.blog.entity.dto.LayuiTableVO;
-import com.hjb.blog.entity.dto.ResultVO;
 import com.hjb.blog.entity.dto.UserRobotDTO;
 import com.hjb.blog.entity.enums.OrderField;
-import com.hjb.blog.entity.enums.QQType;
 import com.hjb.blog.entity.normal.JvtcUser;
 import com.hjb.blog.entity.normal.Robot;
+import com.hjb.blog.entity.vo.LayuiTableVO;
+import com.hjb.blog.entity.vo.ResultVO;
 import com.hjb.blog.service.normal.JvtcUserService;
 import com.hjb.blog.service.normal.RobotService;
 import com.hjb.blog.task.TimeTableTask;
@@ -15,10 +14,7 @@ import com.hjb.blog.util.JvtcLoginUtils;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.util.CollectionUtils;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
@@ -35,7 +31,7 @@ import java.util.concurrent.ScheduledFuture;
  * @date 2019/6/25 20:26
  */
 @Controller
-@RequestMapping(value = "/timetable", method = RequestMethod.GET)
+@RequestMapping("/timetable")
 public class TimeTableController {
 
     @Resource
@@ -48,7 +44,7 @@ public class TimeTableController {
      * 管理页主页
      * @return
      */
-    @RequestMapping(value = {"/index"}, method = RequestMethod.GET)
+    @GetMapping(value = {"/index"})
     public String timeTableManager() {
         return "Home/Page/timeTableManager";
     }
@@ -58,7 +54,7 @@ public class TimeTableController {
      * @param id id
      * @return
      */
-    @RequestMapping(value = "/addOrEditPage", method = RequestMethod.GET)
+    @GetMapping(value = "/addOrEditPage")
     public String addOrEditPage(@RequestParam(value = "id", required = false) Integer id,
                                 Model model) {
         if (id != null) {
@@ -76,7 +72,7 @@ public class TimeTableController {
      * @return
      */
     @ResponseBody
-    @RequestMapping(value = "/getRobotMindList", method = RequestMethod.GET)
+    @GetMapping(value = "/getRobotMindList")
     public LayuiTableVO<Robot> getRobotMindList(
             @RequestParam(value = "pageNum", defaultValue = "1", required = false) Integer pageNum,
             @RequestParam(value = "pageSize", defaultValue = "10", required = false) Integer pageSize,
@@ -105,7 +101,7 @@ public class TimeTableController {
      * @return
      */
     @ResponseBody
-    @RequestMapping(value = "/addOrUpdateRobot", method = RequestMethod.POST)
+    @PostMapping(value = "/addOrUpdateRobot")
     public ResultVO addOrUpdateRobot(Robot robot, HttpServletRequest request) {
 
         JvtcUser jvtcUser = JvtcLoginUtils.getJvtcUser(request);
@@ -143,7 +139,7 @@ public class TimeTableController {
      * @return
      */
     @ResponseBody
-    @RequestMapping(value = "/deleteRobot", method = RequestMethod.POST)
+    @PostMapping(value = "/deleteRobot")
     public ResultVO deleteRobot(@RequestParam(value = "id", required = true) Integer id) {
         // 删除操作
         robotService.deleteByPrimaryKey(id);
@@ -160,7 +156,7 @@ public class TimeTableController {
         return ResultVO.ok();
     }
 
-    @RequestMapping(value = "logout", method = RequestMethod.GET)
+    @GetMapping(value = "logout")
     public String logout(HttpServletRequest request) {
         request.getSession().removeAttribute("jvtc_user");
         return "redirect:jvtc/page/login";

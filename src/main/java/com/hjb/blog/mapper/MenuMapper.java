@@ -2,7 +2,6 @@ package com.hjb.blog.mapper;
 
 
 import com.hjb.blog.entity.normal.Menu;
-import com.hjb.blog.entity.normal.Music;
 import tk.mapper.MyMapper;
 
 /**

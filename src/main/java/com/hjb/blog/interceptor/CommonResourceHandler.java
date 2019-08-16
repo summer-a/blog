@@ -6,24 +6,19 @@ import com.hjb.blog.service.normal.CategoryService;
 import com.hjb.blog.service.normal.MenuService;
 import com.hjb.blog.service.normal.MusicService;
 import com.hjb.blog.service.normal.OptionsService;
-import com.hjb.blog.task.TimeTableTask;
 import com.hjb.blog.util.JvtcLoginUtils;
 import com.hjb.blog.util.TimeTableUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationContext;
+import org.springframework.util.CollectionUtils;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
 
-import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
-import java.time.Duration;
-import java.time.LocalDateTime;
+import java.io.IOException;
 import java.util.List;
 
 /**
@@ -41,22 +36,10 @@ public class CommonResourceHandler extends HandlerInterceptorAdapter {
     private CategoryService categoryService;
 
     @Autowired
-    private MusicService musicService;
-
-    @Autowired
     private MenuService menuService;
 
     @Autowired
     private OptionsService optionsService;
-
-    /** 报课课表页 */
-    private final String TIME_TABLE = "/timetable";
-
-    /** 刷课页 */
-    private final String COURSE = "/course";
-
-    /** 管理员页 */
-    private final String ADMIN = "/admin";
 
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
@@ -79,43 +62,41 @@ public class CommonResourceHandler extends HandlerInterceptorAdapter {
         Options op = optionsService.selectOne(option);
         session.setAttribute("option", op);
 
-        // 歌曲列表
-        Music music = new Music();
-        music.setStatus(true);
-        List<Music> musics = musicService.select(music);
-        session.setAttribute("musics", musics);
-
         // 随机图片数量
         session.setAttribute("images_quantity", 15);
 
+        // 菜单列表获取
         String uri = request.getRequestURI();
-        // 刷课链接
-        if (uri.startsWith(TIME_TABLE)) {
-            JvtcUser jvtc_user = JvtcLoginUtils.getJvtcUser(request);
-            // 用户不存在返回登录页
-            if (jvtc_user == null) {
-                // 原始请求链接
-                session.setAttribute("request_url", uri);
-                response.sendRedirect("/jvtc/page/login");
-                return false;
-            } else {
-                // cookie
-                String jvtcUserId = session.getAttribute("JVTC_USER_ID") + "";
-                // 获取用户cookie
-                Cookie[] cookies = request.getCookies();
-                for (Cookie cookie : cookies) {
-                    String name = cookie.getName();
-                    if (name.equals("JVTC_USER_ID")) {
-                        if (cookie.getValue().equals(jvtcUserId)) {
-                            return true;
+        if (!CollectionUtils.isEmpty(menus)) {
+            for (Menu m : menus) {
+                if (uri.startsWith(m.getMenuUrl()) && m.getMenuPermission() != null  && m.getMenuPermission()) {
+                    JvtcUser jvtc_user = JvtcLoginUtils.getJvtcUser(request);
+                    // 用户不存在返回登录页
+                    if (jvtc_user == null) {
+                        // 原始请求链接
+                        session.setAttribute("request_url", uri);
+                        response.sendRedirect("/jvtc/page/login");
+                        return false;
+                    } else {
+                        // cookie
+                        String jvtcUserId = session.getAttribute("JVTC_USER_ID") + "";
+                        // 获取用户cookie
+                        Cookie[] cookies = request.getCookies();
+                        for (Cookie cookie : cookies) {
+                            String name = cookie.getName();
+                            if (name.equals("JVTC_USER_ID")) {
+                                if (cookie.getValue().equals(jvtcUserId)) {
+                                    return true;
+                                }
+                            }
                         }
+                        // 原始请求链接
+                        // cookie不对，返回登录页
+                        session.setAttribute("request_url", uri);
+                        response.sendRedirect("/jvtc/page/login");
+                        return false;
                     }
                 }
-                // 原始请求链接
-                // cookie不对，返回登录页
-                session.setAttribute("request_url", uri);
-                response.sendRedirect("/jvtc/page/login");
-                return false;
             }
         }
 
@@ -139,7 +120,7 @@ public class CommonResourceHandler extends HandlerInterceptorAdapter {
      */
     @PreDestroy
     public void destroy() {
-        //
+        // 关闭任务计划线程池
         TimeTableUtils.task.shutdownNow();
 
     }

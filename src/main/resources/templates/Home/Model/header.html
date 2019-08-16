@@ -61,11 +61,13 @@
                                 <li th:each="category : ${session.categories}">
                                     <a th:href="@{'/category/' + ${category.parentCategory.id}}">
                                         <i th:class="${category.parentCategory.categoryIcon}"></i>
-                                        <span class="font-text" th:text="${category.parentCategory.categoryName}"></span>
+                                        <span class="font-text"
+                                              th:text="${category.parentCategory.categoryName}"></span>
                                     </a>
                                     <ul class="sub-menu">
                                         <li th:each="child : ${category.childCategory}">
-                                            <a th:href="@{'/category/' + ${child.id}}" th:text="${child.categoryName}" target="_blank"></a>
+                                            <a th:href="@{'/category/' + ${child.id}}" th:text="${child.categoryName}"
+                                               target="_blank"></a>
                                         </li>
                                     </ul>
                                 </li>
@@ -91,11 +93,13 @@
     <div id="search-main">
         <div class="searchbar">
             <form method="get" id="searchform" action="/search" accept-charset="UTF-8">
-        <span>
-            <input type="text" value="" name="keywords" id="s" placeholder="输入搜索内容" required="">
-            <button type="submit" id="searchsubmit">搜索</button>
-        </span>
+                <span>
+                    <input type="text" value="" name="s" id="s" placeholder="输入搜索内容" required="">
+                    <button type="submit" id="searchsubmit">搜索</button>
+                </span>
             </form>
+            <div id="search-list" style="display: none;">
+            </div>
         </div>
         <div class="clear"></div>
     </div>

@@ -4,6 +4,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.servlet.NoHandlerFoundException;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
@@ -29,6 +30,9 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(value = Exception.class)
     public String defaultExceptionHandler(HttpServletRequest request, Exception e) {
         log.error(e.getMessage(), e);
+        if (e instanceof NoHandlerFoundException) {
+            return "Home/Error/404";
+        }
         HttpSession session = request.getSession();
         session.setAttribute("exception_msg", e);
         return "Home/Error/500";

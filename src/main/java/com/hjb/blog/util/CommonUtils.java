@@ -20,6 +20,7 @@ import java.util.Properties;
  */
 public class CommonUtils {
 
+    /** 头像 */
     private static final String AVATAR_URL = "http://cn.gravatar.com/avatar/%s?s=128&d=identicon&r=PG";
 
     /**
@@ -100,9 +101,4 @@ public class CommonUtils {
         return null;
     }
 
-    public static void main(String[] args) {
-        Properties properties = getProperties("jdbc.properties");
-        String property = properties.getProperty("jdbc.username");
-        System.out.println(property);
-    }
 }

@@ -1,7 +1,7 @@
 package com.hjb.blog.util;
 
 import com.alibaba.fastjson.JSON;
-import com.hjb.blog.entity.dto.CqpVO;
+import com.hjb.blog.entity.vo.CqpVO;
 import com.xiaoleilu.hutool.http.HttpUtil;
 import org.nutz.lang.util.NutMap;
 

@@ -1,15 +1,16 @@
 package com.hjb.blog.controller.home;
 
 import com.github.pagehelper.PageInfo;
-import com.hjb.blog.entity.dto.NavVO;
 import com.hjb.blog.entity.enums.ArticleStatus;
 import com.hjb.blog.entity.enums.OrderField;
 import com.hjb.blog.entity.normal.Article;
 import com.hjb.blog.entity.normal.Tag;
+import com.hjb.blog.entity.vo.NavVO;
 import com.hjb.blog.service.normal.ArticleService;
 import com.hjb.blog.service.normal.TagService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -28,7 +29,7 @@ import java.util.List;
  * @date 2019/6/23 20:39
  */
 @Controller
-@RequestMapping(value = "/tag", method = RequestMethod.GET)
+@RequestMapping("/tag")
 public class TagController {
 
     @Resource
@@ -47,7 +48,7 @@ public class TagController {
      * @param model    model
      * @return
      */
-    @RequestMapping(value = {"/{tagId}", "/{tagId}/{pageNum}", "/{tagId}/{pageNum}/{pageSize}"}, method = RequestMethod.GET)
+    @GetMapping(value = {"/{tagId}", "/{tagId}/{pageNum}", "/{tagId}/{pageNum}/{pageSize}"})
     public String selectArticleListByTag(@PathVariable(value = "tagId", required = true) Integer tagId,
                                          @PathVariable(value = "pageNum", required = false) Integer pageNum,
                                          @PathVariable(value = "pageSize", required = false) Integer pageSize,
@@ -61,7 +62,7 @@ public class TagController {
         Tag result = tagService.selectOne(tag);
 
         if (result == null) {
-            return "redirect:/404";
+            return "redirect:Home/Error/404";
         }
         model.addAttribute("nav", NavVO.covert(result));
 

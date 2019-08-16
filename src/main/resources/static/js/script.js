@@ -1,14 +1,59 @@
 $(document).ready(function () {
     // 搜索
-    $(".nav-search").click(function () {
+    $(".nav-search").click(function (e) {
+        e.stopPropagation();
         $("#search-main").fadeToggle(300);
     });
+
+    $("#search-main").click(function(e) {
+        e.stopPropagation();
+    })
+
+    // 点击文档隐藏搜索
+    $(document).click(function() {
+        if ($("#search-main").css("display") != "none") {
+            $("#search-main").hide();
+            $("#search-list").hide();
+        }
+    })
 
     // 菜单
     $(".nav-mobile").click(function () {
         $("#mobile-nav").slideToggle(500);
     });
 
+    // 搜索下拉列表
+    $("#s").on('input propertychange', function(){
+        var keyword = $(this).val();
+        if (keyword != null && keyword != "") {
+            $.ajax({
+                url: '/search/droplist',
+                data: {s: $("#s").val()},
+                //async: false,
+                success: function (data) {
+                    if (data != null && data.length > 0) {
+                        var $search = $("#search-list");
+                        if (!$search.is(":visible")) {
+                            var ul = $("<ul></ul>");
+                            for (var i=0;i<data.length;i++){
+                                var li = $("<li></li>").text(data[i].content).attr("data-id", data[i].id);
+                                ul.append(li);
+                            }
+                            $search.html(ul);
+                            $search.show();
+                        }
+                    }
+                }
+            })
+        } else {
+            $("#search-list").hide();
+        }
+    })
+
+    /** 下拉框点击事件 */
+    $("#search-list").on("click", 'li', function(){
+        location.href = "/article/detail/" + $(this).data("id");
+    })
 
     // 分享 √
     if (/iphone|ipod|ipad|ipad|mobile/i.test(navigator.userAgent.toLowerCase())) {
@@ -346,27 +391,6 @@ function increaseLikeCount(articleId) {
         });
     }
 }
-
-
-//ajax提交评论信息
-$("#comment_form").submit(function () {
-    $.ajax({
-        async: false,
-        type: "post",
-        url: '/comment/submit',
-        //contentType: "application/x-www-form-urlencoded; charset=utf-8",
-        data: $("#comment_form").serialize(),
-        success: function () {
-            layui.use('layer', function() {
-                var layer = layui.layer;
-                layer.msg('评论成功');
-                location.reload()
-            })
-        },
-        error: function () {
-        }
-    })
-})
 
 //百度分享
 window._bd_share_config = {

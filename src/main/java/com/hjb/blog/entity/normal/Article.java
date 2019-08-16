@@ -2,7 +2,8 @@ package com.hjb.blog.entity.normal;
 
 import com.hjb.blog.entity.base.BaseEntity;
 
-import javax.persistence.*;
+import javax.persistence.Column;
+import javax.persistence.Transient;
 import java.util.List;
 
 public class Article extends BaseEntity {

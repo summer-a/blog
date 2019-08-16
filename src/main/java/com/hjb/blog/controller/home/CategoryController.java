@@ -1,21 +1,21 @@
 package com.hjb.blog.controller.home;
 
 import com.github.pagehelper.PageInfo;
-import com.hjb.blog.entity.dto.NavVO;
 import com.hjb.blog.entity.enums.ArticleStatus;
 import com.hjb.blog.entity.enums.OrderField;
 import com.hjb.blog.entity.normal.Article;
 import com.hjb.blog.entity.normal.Category;
 import com.hjb.blog.entity.normal.Tag;
+import com.hjb.blog.entity.vo.NavVO;
 import com.hjb.blog.service.normal.ArticleService;
 import com.hjb.blog.service.normal.CategoryService;
 import com.hjb.blog.service.normal.TagService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
 
 import javax.annotation.Resource;
 import java.util.List;
@@ -52,7 +52,7 @@ public class CategoryController {
      * @param model
      * @return
      */
-    @RequestMapping(value = {"/{cateId}","/{cateId}/{pageNum}","/{cateId}/{pageNum}/{pageSize}"}, method = RequestMethod.GET)
+    @GetMapping(value = {"/{cateId}","/{cateId}/{pageNum}","/{cateId}/{pageNum}/{pageSize}"})
     public String selectArticleListByCategory(@PathVariable(value = "cateId", required = true) Integer cateId,
                                               @PathVariable(value = "pageNum", required = false) Integer pageNum,
                                               @PathVariable(value = "pageSize", required = false) Integer pageSize,
@@ -66,7 +66,7 @@ public class CategoryController {
         c.setId(cateId);
         Category category = categoryService.selectOne(c);
         if (category == null) {
-            return "redirect:/404";
+            return "redirect:Home/Error/404";
         }
         model.addAttribute("nav", NavVO.covert(category));
 

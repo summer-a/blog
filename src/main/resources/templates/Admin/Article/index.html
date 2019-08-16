@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/web/thymeleaf/layout"
+      layout:decorator="Admin/Public/framework">
+<head>
+    <title>文章列表</title>
+    <style>
+        /*覆盖 layui*/
+        .layui-input {
+            display: inline-block;
+            width: 33.333% !important;
+        }
+
+        .layui-input-block {
+            margin: 0px 10px;
+        }
+    </style>
+</head>
+<body>
+    <th:block layout:fragment="content">
+        <blockquote class="layui-elem-quote">
+        <span class="layui-breadcrumb" lay-separator="/">
+          <a th:href="@{/admin}">首页</a>
+          <a><cite>文章列表</cite></a>
+        </span>
+        </blockquote>
+
+        <div class="layui-tab layui-tab-card">
+            <form id="articleForm" method="post">
+                <input type="hidden" name="currentUrl" id="currentUrl" value="">
+                <table class="layui-table">
+                    <colgroup>
+                        <col width="50">
+                        <col width="300">
+                        <col width="150">
+                        <col width="100">
+                        <col width="130">
+                        <col width="120" align="center">
+                    </colgroup>
+                    <thead>
+                    <tr>
+                        <th>id</th>
+                        <th>标题</th>
+                        <th>所属分类</th>
+                        <th>状态</th>
+                        <th>发布时间</th>
+                        <th>操作</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="a : ${pageInfo.list}">
+                            <td th:text="${a.id}">id</td>
+                            <td>
+                                <a th:href="@{'/article/detail/' + ${a.id}}"
+                                   target="_blank" th:text="${a.articleTitle}">
+                                    标题
+                                </a>
+                            </td>
+                            <td>
+                                <a th:href="@{'/category/' + ${c.id}}"
+                                   target="_blank" th:each="c : ${a.categoryList}" th:text="${c.categoryName}">分类名</a>
+                                &nbsp;
+                            </td>
+                            <td>
+                                <a th:href="@{'/admin/article?status=1'}" th:if="${a.articleStatus == 1}">
+                                    <span style="color:#5FB878;">已发布</span>
+                                </a>
+                                <a th:href="@{'/admin/article?status=0'}" th:if="${a.articleStatus != 1}">
+                                    <span style="color:#FF5722;">草稿</span>
+                                </a>
+                            </td>
+                            <td th:text="${#temporals.format(a.createTime, 'yyyy-MM-dd HH:mm:ss')}">
+                                yyyy-MM-dd HH:mm:ss
+                            </td>
+                            <td>
+                                <a th:href="@{'/admin/article/edit/' + ${a.id}}"
+                                   class="layui-btn layui-btn-mini">编辑</a>
+                                <a href="javascript:void(0)"
+                                   th:onclick="'deleteArticle(' + ${a.id} + ')'"
+                                   class="layui-btn layui-btn-danger layui-btn-mini">删除</a>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </form>
+        </div>
+    </th:block>
+</body>
+</html>

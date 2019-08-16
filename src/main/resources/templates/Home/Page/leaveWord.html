@@ -32,38 +32,34 @@
             </h3>
             <form id="ly_form" method="post" onsubmit="return false;">
                 <p class="comment-form-comment">
-                    <textarea id="comment" name="commentContent" rows="4" tabindex="1" required></textarea>
+                    <textarea id="comment" name="content" rows="4" tabindex="1" placeholder="来留个言鸭^-^"
+                              style="resize: vertical;min-height: 100px;max-height: 200px;" required></textarea>
                 </p>
-                <div id="comment-author-info" style="width:100%;">
-                    <th:block th:if="${session.user == null}">
-                        <input type="hidden" name="commentRole" value="0">
-                        <p class="comment-form-author">
-                            <label for="author_name">
-                                昵称<span class="required">*</span>
-                            </label>
-                            <input type="text" name="commentAuthorName" id="author_name" class="" value=""
-                                   tabindex="2" required>
-                        </p>
-                        <p class="comment-form-email">
-                            <label for="author_email">
-                                邮箱<span class="required">*</span>
-                            </label>
-                            <input type="email" name="commentAuthorEmail" id="author_email" class="" value=""
-                                   tabindex="3" required>
-                        </p>
-                        <p class="comment-form-email">
-                            <label for="author_code">
-                                <image src="/img/imgcode.png" th:onclick="this.src='/img/imgcode.png?' + new Date()"></image>
-                            </label>
-                            <input type="email" name="commentAuthorEmail" id="author_code" class="" value=""
-                                   tabindex="4" required>
-                        </p>
-                    </th:block>
+                <div id="comment-author-info">
+                    <input type="hidden" name="commentRole" value="0">
+                    <p class="comment-form-author">
+                        <label for="author_name">
+                            昵称<span class="required">*</span>
+                        </label>
+                        <input type="text" name="nickName" id="author_name" class="" value=""
+                               tabindex="2" required placeholder="请输入你的昵称">
+                    </p>
+                    <p class="comment-form-email">
+                        <label for="author_email">
+                            邮箱<span class="required">*</span>
+                        </label>
+                        <input type="email" name="email" id="author_email" class="" value=""
+                               tabindex="3" required placeholder="请输入邮箱地址">
+                    </p>
+                    <p class="comment-form-email">
+                        <div id="captcha1">
+                            <p id="wait1" class="show">正在加载验证码......</p>
+                        </div>
+                    </p>
                 </div>
                 <div class="clear"></div>
                 <p class="form-submit">
                     <input id="submit" name="submit" type="submit" tabindex="5" value="提交留言" style="width:100%;">
-                    <input type="hidden" name="commentPid" id="comment_pid" value="0">
                 </p>
             </form>
             <div th:replace="Home/Model/link::link"></div>
@@ -101,40 +97,111 @@
                                     </span>
                                 </span>
                             </span>
-                            <p>
-                                <th:block th:text="${item.content}">
-                                    评论内容
-                                </th:block>
+                            <p th:text="${item.content}">
+                                评论内容
                             </p>
                         </div>
                     </div>
                 </li>
             </th:block>
         </ol>
+        <!-- 分页 start -->
+        <nav class="navigation pagination" role="navigation" style="float:left;">
+            <div id="nav-links"></div>
+        </nav>
+        <!-- 分页 end-->
     </div>
     <!-- 留言 end-->
 
 </th:block>
 <th:block layout:fragment="script-extend">
+    <script th:src="@{/plugin/geetest/gt.js}"></script>
     <script type="text/javascript">
-        // ajax提交留言信息
-        $("#ly_form").submit(function () {
-            $.ajax({
-                async: false,
-                type: "post",
-                url: '/ly/send',
-                data: $("#ly_form").serialize(),
-                success: function () {
-                    layui.use('layer', function() {
+
+        var handler1 = function (captchaObj) {
+            // ajax提交留言信息
+            $("#ly_form").submit(function () {
+                var result = captchaObj.getValidate();
+                if (!result) {
+                    layui.use('layer', function () {
                         var layer = layui.layer;
-                        layer.msg('留言成功');
-                        location.reload()
+                        layer.msg('验证失败', {icon: 5})
                     })
-                },
-                error: function () {
+                    return false;
                 }
+                $.ajax({
+                    async: false,
+                    type: "post",
+                    url: '/ly/send',
+                    data: $("#ly_form").serialize(),
+                    success: function (data) {
+                        layui.use('layer', function () {
+                            var layer = layui.layer;
+                            if (data.code == 200) {
+                                layer.msg('留言成功');
+                                location.reload()
+                            } else {
+                                layer.msg(data.msg);
+                            }
+                        })
+                    },
+                    error: function () {
+                    }
+                })
             })
+            // 将验证码加到id为captcha的元素里，同时会有三个input的值用于表单提交
+            captchaObj.appendTo("#captcha1");
+            captchaObj.onReady(function () {
+                $("#wait1").hide();
+            });
+            // 更多接口参考：http://www.geetest.com/install/sections/idx-client-sdk.html
+        };
+        $.ajax({
+            url: "/geetest/register?t=" + (new Date()).getTime(), // 加随机数防止缓存
+            data: {"userEmail": $("#author_email").val()},
+            type: "get",
+            dataType: "json",
+            success: function (data) {
+                // 调用 initGeetest 初始化参数
+                // 参数1：配置参数
+                // 参数2：回调，回调的第一个参数验证码对象，之后可以使用它调用相应的接口
+                initGeetest({
+                    gt: data.gt,
+                    challenge: data.challenge,
+                    new_captcha: data.new_captcha, // 用于宕机时表示是新验证码的宕机
+                    offline: !data.success, // 表示用户后台检测极验服务器是否宕机，一般不需要关注
+                    product: "float", // 产品形式，包括：float，popup
+                    width: "100%"
+                    // 更多配置参数请参见：http://www.geetest.com/install/sections/idx-client-sdk.html#config
+                }, handler1);
+            }
+        });
+
+    </script>
+
+    <script type="text/javascript" th:inline="javascript">
+        <!-- 分页 -->
+        /*<![CDATA[*/
+        var pages = /*[[${leaveWords.pageSize}]]*/ 1;
+        var curr = /*[[${leaveWords.pageNum}]]*/ 1;
+        var size = /*[[${leaveWords.total}]]*/ 5;
+
+        layui.use(['layer','laypage'], function(){
+            var laypage = layui.laypage,layer = layui.layer;
+            laypage.render({
+                elem: 'nav-links'
+                ,limit: pages
+                ,curr: curr
+                ,count: size
+                ,jump: function(obj, first) {
+                    var currPage = obj.curr;
+                    if (!first) {
+                        location.href = '/ly/leaveWord/' + currPage;
+                    }
+                }
+            });
         })
+        /*]]>*/
     </script>
 </th:block>
 

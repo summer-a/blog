@@ -39,3 +39,6 @@ mvnw
 ### log ###
 .log
 .gz
+
+### 忽略生产环境 ###
+application-product.yml

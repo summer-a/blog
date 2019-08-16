@@ -30,6 +30,13 @@ public interface ArticleMapper extends MyMapper<Article> {
     boolean updateCommentCount(Integer articleId);
 
     /**
+     * 更新浏览量(浏览量+1)
+     * @param articleId 文章id
+     * @return
+     */
+    boolean updateViewCount(Integer articleId);
+
+    /**
      * 根据类型id查询文章列表
      * @param categoryId 分类id
      * @param status 状态

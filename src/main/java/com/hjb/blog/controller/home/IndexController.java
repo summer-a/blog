@@ -1,6 +1,7 @@
 package com.hjb.blog.controller.home;
 
 import com.github.pagehelper.PageInfo;
+import com.hjb.blog.entity.dto.ArticleSearchDTO;
 import com.hjb.blog.entity.enums.ArticleStatus;
 import com.hjb.blog.entity.enums.NoticeStatus;
 import com.hjb.blog.entity.enums.OrderField;
@@ -8,19 +9,25 @@ import com.hjb.blog.entity.normal.Article;
 import com.hjb.blog.entity.normal.Comment;
 import com.hjb.blog.entity.normal.Notice;
 import com.hjb.blog.entity.normal.Tag;
+import com.hjb.blog.service.common.ElasticsearchService;
 import com.hjb.blog.service.normal.ArticleService;
 import com.hjb.blog.service.normal.CommentService;
 import com.hjb.blog.service.normal.NoticeService;
 import com.hjb.blog.service.normal.TagService;
-import com.hjb.blog.util.CoolqUtils;
+import org.apache.http.HttpHost;
+import org.elasticsearch.action.get.GetRequest;
+import org.elasticsearch.client.RequestOptions;
+import org.elasticsearch.client.RestClient;
+import org.elasticsearch.client.RestHighLevelClient;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -48,19 +55,23 @@ public class IndexController {
     @Autowired
     private TagService tagService;
 
+    @Autowired
+    private ElasticsearchService<ArticleSearchDTO> elasticsearchService;
+
     /**
      * 首页
-     * @param model model
+     *
+     * @param model     model
      * @param startPage 起始页
-     * @param pageSize 每页文章数量
+     * @param pageSize  每页文章数量
      * @return
      */
-    @RequestMapping(value = {"/", "/index"}, method = RequestMethod.GET)
+    @GetMapping(value = {"/", "/index"})
     public String index(
             Model model,
             @RequestParam(required = false, defaultValue = "1") int startPage,
             @RequestParam(required = false, defaultValue = "10") int pageSize
-            ) {
+    ) {
         // 设置条件为已发布
         Article article = new Article();
         article.setArticleStatus(ArticleStatus.PUBLISH.getValue());
@@ -95,10 +106,12 @@ public class IndexController {
 
     /**
      * 跳转到职教账号登录页
+     *
      * @return
      */
-    @RequestMapping(value = "/jvtc/page/login", method = RequestMethod.GET)
+    @GetMapping(value = "/jvtc/page/login")
     public String jvtcLoginPage() {
         return "Home/Page/jvtcLogin";
     }
+
 }

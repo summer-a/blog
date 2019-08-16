@@ -1,47 +1,24 @@
 spring:
-  datasource:
-    druid:
-      driver-class-name: com.mysql.jdbc.Driver
-      #url: jdbc:mysql://120.77.215.148:3309/hjb_blog?useSSL=false&characterEncoding=utf-8&serverTimezone=UTC
-      url: jdbc:mysql://localhost:3306/hjb_blog?useSSL=false&characterEncoding=utf-8&serverTimezone=UTC
-      username: root
-      password: Hjb88619973.
-      initial-size: 1
-      min-idle: 1
-      max-active: 20
-      test-on-borrow: true
-  thymeleaf:
-    mode: LEGACYHTML5
-    cache: false
-    encoding: utf-8
-    servlet:
-      content-type: text/html
-  redis:
-    lettuce:
-      pool:
-        max-active: 8
-        max-idle: 8
-        max-wait: -1ms
-        min-idle: 0
-    port: 6336
-    host: 120.77.215.148
-    password: 88619973
-server:
-  port: 8089
-  servlet:
-    context-path: /
+  profiles:
+    active: dev
+  elasticsearch:
+    rest:
+      uris: ${host.ip}:${host.es.rest-port}
+  # 当配置没有找到Controller时抛出异常
+  mvc:
+    throw-exception-if-no-handler-found: true
+host:
+  ip: 120.77.215.148
+  indexUrl: http://www.chiyouyun.com/
+  tableUrl: http://kb.chiyouyun.com/
+  es:
+    port: 9300
+    rest-port: 9200
+    pool: 5
+    schema: http
 mybatis:
   type-aliases-package: com.hjb.blog.entity
   mapper-locations: classpath:mapper/*.xml
-logging:
-  #path: /
-  #file: school-blog.log
-  level:
-    com:
-      hjb:
-        blog:
-          mapper: debug
-
 management:
   health:
     db:

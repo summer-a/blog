@@ -1,4 +1,4 @@
-package com.hjb.blog.entity.dto;
+package com.hjb.blog.entity.vo;
 
 import okhttp3.Headers;
 import us.codecraft.webmagic.selector.Html;
@@ -12,7 +12,7 @@ import us.codecraft.webmagic.selector.Html;
  * @description: TODO
  * @date 2019/6/27 20:29
  */
-public class JvtcResponse {
+public class JvtcResponseVO {
 
     /** 状态码 */
     private Integer code;
@@ -21,9 +21,9 @@ public class JvtcResponse {
     /** 头描述 */
     private Headers headers;
 
-    public JvtcResponse() {}
+    public JvtcResponseVO() {}
 
-    public JvtcResponse(Integer code, Html html, Headers headers) {
+    public JvtcResponseVO(Integer code, Html html, Headers headers) {
         this.code = code;
         this.html = html;
         this.headers = headers;
@@ -55,7 +55,7 @@ public class JvtcResponse {
 
     @Override
     public String toString() {
-        return "JvtcResponse{" +
+        return "JvtcResponseVO{" +
                 "code=" + code +
                 ", html=" + html +
                 ", headers=" + headers +

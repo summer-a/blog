@@ -1,11 +1,12 @@
 package com.hjb.blog.util;
 
-import com.hjb.blog.entity.dto.JvtcResponse;
 import com.hjb.blog.entity.normal.JvtcUser;
+import com.hjb.blog.entity.vo.JvtcResponseVO;
 import com.hjb.blog.service.common.RedisService;
 import com.hjb.blog.service.normal.JvtcUserService;
 import okhttp3.*;
 import org.jsoup.nodes.Document;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.util.StringUtils;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
@@ -15,7 +16,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import java.io.IOException;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoField;
@@ -89,25 +89,13 @@ public class JvtcLoginUtils {
      * @return
      */
     public static JvtcUser getJvtcUser() {
-        HttpSession currentSession = getCurrentSession();
+        HttpSession currentSession = SpringUtils.getCurrentSession();
         if (currentSession != null) {
             return (JvtcUser) currentSession.getAttribute("jvtc_user");
         }
         return null;
     }
 
-    /**
-     * 获取当前会话
-     *
-     * @return
-     */
-    public static HttpSession getCurrentSession() {
-        HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
-        if (request != null) {
-            return request.getSession();
-        }
-        return null;
-    }
 
     /**
      * 获取课程表<br>
@@ -145,7 +133,7 @@ public class JvtcLoginUtils {
 
             request.addHeader(COOKIE, jvtcUser.getCookie());
             // 判断缓存是否过期
-            JvtcResponse kbPageResponse = get(kbPage + "?rq=" + date, request);
+            JvtcResponseVO kbPageResponse = get(kbPage + "?rq=" + date, request);
             Html kbHtml = kbPageResponse.getHtml();
             // 成功
             if (isLogined(kbHtml)) {
@@ -161,7 +149,7 @@ public class JvtcLoginUtils {
         loginByUserNameAndEncode(jvtcUser.getUsername(), jvtcUser.getPassword());
 
         // 获取课表
-        JvtcResponse result = get(kbPage + "?rq=" + date, request);
+        JvtcResponseVO result = get(kbPage + "?rq=" + date, request);
         Html html = result.getHtml();
         if (result.getCode() == 200 && !StringUtils.isEmpty(html)) {
             // 处理
@@ -175,8 +163,8 @@ public class JvtcLoginUtils {
     }
 
     /**
-     * html页面处理
-     *
+     * html页面处理<br>
+     *     将源页面修改为通用页面
      * @param date 日期
      * @param html 代码体
      */
@@ -244,7 +232,7 @@ public class JvtcLoginUtils {
             if (res <= 0) {
                 res += (24 * 60 * 60);
             }
-            redisService.set("table-" + clazz, html);
+            redisService.set("table-" + clazz, html, res);
         }
     }
 
@@ -255,12 +243,12 @@ public class JvtcLoginUtils {
      * @param encoded  压缩的密码
      * @return 如果返回401表示账号密码有误
      */
-    public static JvtcResponse loginByUserNameAndEncode(String username, String encoded) {
+    public static JvtcResponseVO loginByUserNameAndEncode(String username, String encoded) {
 
         JvtcUserService jvtcUserService = SpringUtils.getBean(JvtcUserService.class);
 
         // 第一遍非缓存登录
-        JvtcResponse jvtcResponse = loginRequest(loginUrl, username, encoded);
+        JvtcResponseVO jvtcResponse = loginRequest(loginUrl, username, encoded);
         String cookie = jvtcResponse.getHeaders().get(SET_COOKIE);
         if (StringUtils.isEmpty(cookie)) {
             return null;
@@ -270,7 +258,7 @@ public class JvtcLoginUtils {
         cookie = cookie.split(";")[0];
 
         // 第二遍缓存登录
-        JvtcResponse loginResponse = loginRequest(loginUrl, username, encoded, cookie.split(";")[0]);
+        JvtcResponseVO loginResponse = loginRequest(loginUrl, username, encoded, cookie.split(";")[0]);
         // 插入或更新数据库缓存
         JvtcUser user = new JvtcUser();
         user.setUsername(username);
@@ -299,7 +287,7 @@ public class JvtcLoginUtils {
 
                     Request.Builder builder = JvtcLoginUtils.initParam();
                     builder.addHeader(COOKIE, cookie);
-                    JvtcResponse userInfo = JvtcLoginUtils.get(infoPage, builder);
+                    JvtcResponseVO userInfo = JvtcLoginUtils.get(infoPage, builder);
                     Html userInfoHtml = userInfo.getHtml();
                     juser.setClazz(userInfoHtml.xpath("//div[@class='middletopttxlr']/div[6]/div[2]/text()").get());
                     jvtcUserService.update(juser);
@@ -308,7 +296,7 @@ public class JvtcLoginUtils {
 
             return loginResponse;
         }
-        return new JvtcResponse(401, null, null);
+        return new JvtcResponseVO(401, null, null);
     }
 
     /**
@@ -332,7 +320,7 @@ public class JvtcLoginUtils {
      */
     public static boolean isLogined(String cookie) {
         Request.Builder builder = initParam().addHeader(COOKIE, cookie);
-        JvtcResponse resp = get(kbPage, builder);
+        JvtcResponseVO resp = get(kbPage, builder);
         return isLogined(resp.getHtml());
     }
 
@@ -343,7 +331,7 @@ public class JvtcLoginUtils {
      * @param encoded  加密数据
      * @return
      */
-    public static JvtcResponse loginRequest(String username, String encoded) {
+    public static JvtcResponseVO loginRequest(String username, String encoded) {
         return loginRequest(loginUrl, username, encoded, null);
     }
 
@@ -355,7 +343,7 @@ public class JvtcLoginUtils {
      * @param encoded  加密数据
      * @return
      */
-    public static JvtcResponse loginRequest(String url, String username, String encoded) {
+    public static JvtcResponseVO loginRequest(String url, String username, String encoded) {
         return loginRequest(url, username, encoded, null);
     }
 
@@ -368,7 +356,7 @@ public class JvtcLoginUtils {
      * @return
      * @parma cookie 缓存
      */
-    public static JvtcResponse loginRequest(String url, String username, String encoded, String cookie) {
+    public static JvtcResponseVO loginRequest(String url, String username, String encoded, String cookie) {
 
         RequestBody body = new FormBody.Builder()
                 .add("userAccount", username)
@@ -391,16 +379,16 @@ public class JvtcLoginUtils {
      * @param url
      * @return
      */
-    public static JvtcResponse get(String url, Request.Builder builder) {
+    public static JvtcResponseVO get(String url, Request.Builder builder) {
         // 请求
         Request request = builder.url(url).build();
 
         // 响应
         try (Response response = client.newCall(request).execute()) {
-            return new JvtcResponse(response.code(), Html.create(response.body().string()), response.headers());
+            return new JvtcResponseVO(response.code(), Html.create(response.body().string()), response.headers());
         } catch (IOException e) {
             e.printStackTrace();
-            return new JvtcResponse(500, null, null);
+            return new JvtcResponseVO(500, null, null);
         }
     }
 
@@ -413,10 +401,10 @@ public class JvtcLoginUtils {
      * @return
      * @throws IOException
      */
-    private static JvtcResponse post(String url, Request.Builder builder, RequestBody body) {
+    private static JvtcResponseVO post(String url, Request.Builder builder, RequestBody body) {
         Request request = builder.url(url).post(body).build();
         try (Response response = client.newCall(request).execute()) {
-            return new JvtcResponse(response.code(), Html.create(response.body().string()), response.headers());
+            return new JvtcResponseVO(response.code(), Html.create(response.body().string()), response.headers());
         } catch (IOException e) {
             return null;
         }

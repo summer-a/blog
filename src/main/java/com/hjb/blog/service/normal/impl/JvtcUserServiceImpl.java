@@ -6,6 +6,7 @@ import com.hjb.blog.mapper.JvtcUserMapper;
 import com.hjb.blog.service.base.impl.BaseServiceImpl;
 import com.hjb.blog.service.normal.JvtcUserService;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.util.List;
@@ -29,6 +30,7 @@ public class JvtcUserServiceImpl extends BaseServiceImpl<JvtcUser> implements Jv
      *
      * @return
      */
+    @Transactional(readOnly = true, rollbackFor = RuntimeException.class)
     @Override
     public List<UserRobotDTO> selectUserRobotList() {
         return jvtcUserMapper.selectUserRobotList();

@@ -77,6 +77,16 @@ public class BaseServiceImpl<T extends BaseEntity> implements BaseService<T> {
         return mapper.selectOne(t);
     }
 
+    /**
+     * 根据id查询
+     * @param id
+     * @return
+     */
+    @Override
+    public T selectById(int id) {
+        return mapper.selectByPrimaryKey(id);
+    }
+
     @Override
     public List<T> selectByExample(Example example) {
         return mapper.selectByExample(example);
@@ -95,7 +105,6 @@ public class BaseServiceImpl<T extends BaseEntity> implements BaseService<T> {
 
         example.createCriteria().andEqualTo(t);
         List<T> list = mapper.selectByExample(example);
-//        List<T> list = mapper.select(t);
         PageInfo<T> pageInfo = new PageInfo<>(list);
         return pageInfo;
     }

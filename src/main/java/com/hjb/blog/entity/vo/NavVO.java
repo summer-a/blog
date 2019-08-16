@@ -1,4 +1,4 @@
-package com.hjb.blog.entity.dto;
+package com.hjb.blog.entity.vo;
 
 import com.hjb.blog.entity.normal.Category;
 import com.hjb.blog.entity.normal.Tag;

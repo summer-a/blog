@@ -1,0 +1,118 @@
+<!DOCTYPE html >
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/web/thymeleaf/layout"
+      layout:decorator="Home/Model/template">
+
+<head>
+    <title th:text="${keyword}">搜索结果</title>
+</head>
+<body>
+<!-- nav -->
+<th:block layout:fragment="breadcrumb">
+    <nav class="breadcrumb">
+        <a class="crumbs" href="/">
+            <i class="fa fa-home"></i>首页
+        </a>
+        <i class="fa fa-angle-right"></i> 关键字:
+        <th:block th:text="${keyword}"></th:block>
+    </nav>
+</th:block>
+<!-- nav end -->
+<th:block layout:fragment="index-left">
+    <!-- 左侧区域 start -->
+    <div th:fragment="left" id="primary" class="content-area a">
+        <main id="main" class="site-main" role="main">
+            <th:block th:each="article : ${articles.list}">
+                <article class="post type-post">
+                    <figure class="thumbnail">
+                        <a th:href="@{'/article/detail/' + ${article.id}}">
+                            <img width="280" height="210"
+                                 th:src="@{'/img/thumbnail/random/img_' + ${article.id % session.images_quantity} + '.jpg'}"
+                                 class="attachment-content size-content wp-post-image"
+                                 th:alt="${article.title}">
+                        </a>
+                    </figure>
+
+                    <header class="entry-header link-effect">
+                        <h2 class="entry-title">
+                            <a th:href="@{'/article/detail/' + ${article.id}}" th:text="${article.title}" rel="bookmark">
+                            </a>
+                        </h2>
+                    </header>
+
+                    <div class="entry-content">
+                        <div class="archive-content" th:text="${article.summary}">
+                        </div>
+                        <span class="title-l"></span>
+                        <span class="entry-meta">
+                                <span class="date" th:text="${article.date}">
+                                </span>
+                                &nbsp;&nbsp;
+                                <span class="views">
+                                    <i class="fa fa-eye"></i>
+                                    <th:block th:text="${article.viewCount}"></th:block>
+                                </span>
+                                <span class="comment">
+                                    &nbsp;&nbsp;
+                                    <a th:href="@{'/article/detail/' + ${article.id} + '#comments'}" rel="external nofollow">
+                                        <i class="fa fa-comment-o"></i>
+                                        <th:block th:text="${article.commentCount}"></th:block>
+                                    </a>
+                                </span>
+                            </span>
+                        <div class="clear"></div>
+                    </div>
+
+                    <span class="entry-more">
+                        <a th:href="'/article/detail/' + ${article.id}" rel="bookmark">
+                            阅读全文
+                        </a>
+                    </span>
+                </article>
+            </th:block>
+        </main>
+
+        <!-- 分页 start -->
+        <nav class="navigation pagination" role="navigation">
+            <div id="nav-links"></div>
+        </nav>
+        <!-- 分页 end-->
+
+    </div>
+</th:block>
+
+<th:block layout:fragment="index-right">
+    <th:block th:replace="Home/Model/right::sidebar-list"></th:block>
+</th:block>
+
+<!-- 扩展js -->
+<th:block layout:fragment="script-extend">
+    <script th:inline="javascript">
+        <!-- 分页 -->
+        /*<![CDATA[*/
+        var pages = /*[[${articles.size}]]*/ 1;
+        var curr = /*[[${articles.number + 1}]]*/ 1;
+        var size = /*[[${articles.totalElements}]]*/ 10;
+        var keyword = /*[[${keyword}]]*/ 'java';
+
+        layui.use(['layer','laypage'], function(){
+            var laypage = layui.laypage,layer = layui.layer;
+            laypage.render({
+                elem: 'nav-links'
+                ,limit: pages
+                ,curr: curr
+                ,count: size
+                ,jump: function(obj, first) {
+                    var currPage = obj.curr;
+                    if (!first) {
+                        location.href = '/search?s=' + keyword + '&pageNum=' + currPage;
+                    }
+                }
+            });
+        })
+
+        /*]]>*/
+    </script>
+</th:block>
+</body>
+</html>

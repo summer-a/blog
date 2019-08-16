@@ -1,11 +1,9 @@
 package com.hjb.blog.entity.normal;
 
 import com.hjb.blog.entity.base.BaseEntity;
+import lombok.Data;
 
 import javax.persistence.Column;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
 
 /**
  * @author 胡江斌
@@ -15,6 +13,7 @@ import javax.persistence.Id;
  * @description: TODO
  * @date 2019/6/16 2:44
  */
+@Data
 public class Menu extends BaseEntity {
 
     @Column(name = "menu_name")
@@ -32,55 +31,7 @@ public class Menu extends BaseEntity {
     @Column(name = "menu_status")
     private Boolean menuStatus;
 
-    public String getMenuName() {
-        return menuName;
-    }
+    @Column(name = "menu_permission")
+    private Boolean menuPermission;
 
-    public void setMenuName(String menuName) {
-        this.menuName = menuName;
-    }
-
-    public String getMenuUrl() {
-        return menuUrl;
-    }
-
-    public void setMenuUrl(String menuUrl) {
-        this.menuUrl = menuUrl;
-    }
-
-    public String getMenuIcon() {
-        return menuIcon;
-    }
-
-    public void setMenuIcon(String menuIcon) {
-        this.menuIcon = menuIcon;
-    }
-
-    public String getMenuOrder() {
-        return menuOrder;
-    }
-
-    public void setMenuOrder(String menuOrder) {
-        this.menuOrder = menuOrder;
-    }
-
-    public Boolean getMenuStatus() {
-        return menuStatus;
-    }
-
-    public void setMenuStatus(Boolean menuStatus) {
-        this.menuStatus = menuStatus;
-    }
-
-    @Override
-    public String toString() {
-        return "Menu{" +
-                "id=" + super.getId() +
-                ", menuName='" + menuName + '\'' +
-                ", menuUrl='" + menuUrl + '\'' +
-                ", menuIcon='" + menuIcon + '\'' +
-                ", menuOrder='" + menuOrder + '\'' +
-                ", menuStatus='" + menuStatus + '\'' +
-                '}';
-    }
 }

@@ -2,7 +2,6 @@ package com.hjb.blog.service.normal;
 
 import com.hjb.blog.entity.normal.Music;
 import com.hjb.blog.service.base.BaseService;
-import tk.mapper.MyMapper;
 
 /**
  * @author 胡江斌

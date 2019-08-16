@@ -1,12 +1,14 @@
 package com.hjb.blog.controller.home;
 
-import com.hjb.blog.entity.dto.ResultVO;
 import com.hjb.blog.entity.enums.Role;
 import com.hjb.blog.entity.normal.Comment;
+import com.hjb.blog.entity.vo.ResultVO;
 import com.hjb.blog.service.normal.ArticleService;
 import com.hjb.blog.service.normal.CommentService;
+import com.hjb.blog.util.CodeFilterUtils;
 import com.hjb.blog.util.CommonUtils;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -39,7 +41,7 @@ public class CommentController {
      * 提交评论
      * @return
      */
-    @RequestMapping(value = "/submit", method = RequestMethod.POST)
+    @PostMapping(value = "/submit")
     @ResponseBody
     public ResultVO submitComment(Comment comment,
                                   HttpServletRequest request) {
@@ -53,6 +55,9 @@ public class CommentController {
             comment.setCommentRole(Role.VISITOR.getValue());
         }
         comment.setCommentAuthorAvatar(CommonUtils.getGravatar(comment.getCommentAuthorEmail()));
+
+        // 过滤尖括号
+        comment.setCommentContent(CodeFilterUtils.replaceGtAndLt(comment.getCommentContent()));
 
         commentService.insert(comment);
 

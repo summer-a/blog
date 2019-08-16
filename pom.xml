@@ -18,6 +18,7 @@
 
     <properties>
         <java.version>1.8</java.version>
+        <springboot.version>2.1.5.RELEASE</springboot.version>
         <druid.version>1.1.10</druid.version>
         <mysql.version>5.1.39</mysql.version>
         <tk.mybatis.version>2.0.2</tk.mybatis.version>
@@ -30,6 +31,7 @@
         <nutz.version>1.r.63</nutz.version>
         <webmagic.version>0.7.3</webmagic.version>
         <okhttp.version>3.13.1</okhttp.version>
+        <elasticsearch.version>6.8.1</elasticsearch.version>
     </properties>
 
     <dependencies>
@@ -83,15 +85,24 @@
         <!-- hot reload end -->
         <!-- elasticsearch start -->
         <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-data-elasticsearch</artifactId>
+            <groupId>org.elasticsearch</groupId>
+            <artifactId>elasticsearch</artifactId>
+            <version>${elasticsearch.version}</version>
         </dependency>
         <!-- elasticsearch end -->
+        <!-- es high level start client start -->
+        <dependency>
+            <groupId>org.elasticsearch.client</groupId>
+            <artifactId>elasticsearch-rest-high-level-client</artifactId>
+            <version>${elasticsearch.version}</version>
+        </dependency>
+        <!-- es high level start client end -->
 
         <!-- redis start -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-data-redis</artifactId>
+            <version>${springboot.version}</version>
         </dependency>
         <!-- redis start -->
         <!-- thymeleaf start -->
@@ -231,6 +242,8 @@
                 <configuration>
                     <!-- 指定主函数入口 -->
                     <mainClass>com.hjb.blog.BlogApplication</mainClass>
+                    <!-- 使用utf-8编码,解决添加热部署后控制台乱码 -->
+                    <jvmArguments>-Dfile.encoding=UTF-8</jvmArguments>
                 </configuration>
             </plugin>
 

@@ -6,8 +6,10 @@ import com.hjb.blog.entity.enums.ArticleStatus;
 import com.hjb.blog.entity.enums.OrderField;
 import com.hjb.blog.entity.normal.Article;
 import com.hjb.blog.entity.normal.Category;
-import com.hjb.blog.entity.normal.Tag;
-import com.hjb.blog.mapper.*;
+import com.hjb.blog.mapper.ArticleCategoryRefMapper;
+import com.hjb.blog.mapper.ArticleMapper;
+import com.hjb.blog.mapper.ArticleTagRefMapper;
+import com.hjb.blog.mapper.CategoryMapper;
 import com.hjb.blog.service.base.impl.BaseServiceImpl;
 import com.hjb.blog.service.normal.ArticleService;
 import org.springframework.stereotype.Service;
@@ -77,7 +79,7 @@ public class ArticleServiceImpl extends BaseServiceImpl<Article> implements Arti
      * @param id
      * @return
      */
-    @Transactional(readOnly = true, rollbackFor = RuntimeException.class)
+    @Transactional(readOnly = false, rollbackFor = RuntimeException.class)
     @Override
     public Article selectOneForFullArticle(Integer id) {
         Article article = new Article();
@@ -91,6 +93,9 @@ public class ArticleServiceImpl extends BaseServiceImpl<Article> implements Arti
 
             // 设置标签
             art.setTagList(articleTagRefMapper.selectTagByArticleId(id));
+
+            // 查看数+1
+            articleMapper.updateViewCount(id);
             return art;
         }
         return null;
@@ -131,7 +136,7 @@ public class ArticleServiceImpl extends BaseServiceImpl<Article> implements Arti
      * @return
      */
     @Override
-    @Transactional(readOnly = false, rollbackFor = RuntimeException.class)
+    @Transactional(readOnly = true, rollbackFor = RuntimeException.class)
     public PageInfo<Article> pageArticleByCategoryId(int pageNum, int pageSize, Integer categoryId, ArticleStatus status) {
         PageHelper.startPage(pageNum, pageSize);
         List<Article> articleList = articleMapper.selectArticleByCategoryId(categoryId, status.getValue());

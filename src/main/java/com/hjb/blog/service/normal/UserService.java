@@ -13,5 +13,4 @@ import com.hjb.blog.service.base.BaseService;
  * @date 2019/6/9 10:07
  */
 public interface UserService extends BaseService<User> {
-
 }

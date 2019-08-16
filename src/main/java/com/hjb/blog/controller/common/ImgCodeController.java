@@ -3,13 +3,14 @@ package com.hjb.blog.controller.common;
 import com.xiaoleilu.hutool.captcha.CaptchaUtil;
 import com.xiaoleilu.hutool.captcha.LineCaptcha;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
-import java.awt.image.BufferedImage;
 import java.io.IOException;
 
 /**
@@ -30,13 +31,17 @@ public class ImgCodeController {
      * @param session
      * @param response
      */
-    @RequestMapping(value = "/imgcode.png", method = RequestMethod.GET)
-    public void createImgCode(HttpSession session, HttpServletResponse response) {
+    @GetMapping(value = "/imgcode.png")
+    public void createImgCode(HttpSession session,
+                              HttpServletResponse response,
+                              @RequestParam(required = false, defaultValue = "200") Integer width,
+                              @RequestParam(required = false, defaultValue = "100") Integer height
+                              ) {
         try (ServletOutputStream outputStream = response.getOutputStream()) {
-            LineCaptcha lineCaptcha = CaptchaUtil.createLineCaptcha(200, 100, 4, 150);
+            LineCaptcha lineCaptcha = CaptchaUtil.createLineCaptcha(width, height, 4, 150);
             String code = lineCaptcha.getCode();
             session.setAttribute("imgcode", code);
-            session.setMaxInactiveInterval(60);
+            session.setMaxInactiveInterval(120);
             lineCaptcha.write(outputStream);
         } catch (IOException e) {
             e.printStackTrace();
