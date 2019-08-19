@@ -1,6 +1,8 @@
 package com.hjb.blog.entity.normal;
 
 import com.hjb.blog.entity.base.BaseEntity;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import javax.persistence.Column;
 
@@ -12,6 +14,8 @@ import javax.persistence.Column;
  * @description: TODO
  * @date 2019/6/15 3:28
  */
+@Data
+@NoArgsConstructor
 public class Music extends BaseEntity {
 
     @Column(name = "title")
@@ -29,67 +33,4 @@ public class Music extends BaseEntity {
     @Column(name = "status")
     private Boolean status;
 
-    public Music() {
-    }
-
-    public Music(String title, String artist, String mp3, String poster, Boolean status) {
-        this.title = title;
-        this.artist = artist;
-        this.mp3 = mp3;
-        this.poster = poster;
-        this.status = status;
-    }
-
-
-    public String getTitle() {
-        return title;
-    }
-
-    public void setTitle(String title) {
-        this.title = title;
-    }
-
-    public String getArtist() {
-        return artist;
-    }
-
-    public void setArtist(String artist) {
-        this.artist = artist;
-    }
-
-    public String getMp3() {
-        return mp3;
-    }
-
-    public void setMp3(String mp3) {
-        this.mp3 = mp3;
-    }
-
-    public String getPoster() {
-        return poster;
-    }
-
-    public void setPoster(String poster) {
-        this.poster = poster;
-    }
-
-    public Boolean isStatus() {
-        return status;
-    }
-
-    public void setStatus(Boolean status) {
-        this.status = status;
-    }
-
-    @Override
-    public String toString() {
-        return "Music{" +
-                "id=" + super.getId() +
-                ", title='" + title + '\'' +
-                ", artist='" + artist + '\'' +
-                ", mp3='" + mp3 + '\'' +
-                ", poster='" + poster + '\'' +
-                ", status=" + status +
-                '}';
-    }
 }

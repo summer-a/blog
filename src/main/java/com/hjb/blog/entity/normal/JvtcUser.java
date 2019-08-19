@@ -2,6 +2,7 @@ package com.hjb.blog.entity.normal;
 
 import com.hjb.blog.entity.base.BaseEntity;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import javax.persistence.Column;
 import java.time.LocalDateTime;
@@ -16,6 +17,7 @@ import java.time.LocalDateTime;
  * @date 2019/6/25 21:28
  */
 @Data
+@NoArgsConstructor
 public class JvtcUser extends BaseEntity {
 
     @Column(name = "username")

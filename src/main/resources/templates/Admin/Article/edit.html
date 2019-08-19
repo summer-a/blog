@@ -1,205 +1,200 @@
-<%--保留此处 start--%>
-<%@ page language="java" contentType="text/html; charset=UTF-8"
-         pageEncoding="UTF-8" %>
-<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
-<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
-<%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %>
-<%@ taglib prefix="rapid" uri="http://www.rapid-framework.org.cn/rapid" %>
-<%--保留此处 end--%>
-<rapid:override name="title">
-    - 修改文章
-</rapid:override>
-<rapid:override name="header-style">
-
-</rapid:override>
-
-<rapid:override name="content">
-    <blockquote class="layui-elem-quote">
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/web/thymeleaf/layout"
+      layout:decorator="Admin/Public/framework">
+    <head>
+        <title>修改文章</title>
+    </head>
+    <body>
+        <th:block layout:fragment="content">
+            <blockquote class="layui-elem-quote">
         <span class="layui-breadcrumb" lay-separator="/">
               <a th:href="@{/admin}">首页</a>
               <a th:href="@{/admin/article}">文章列表</a>
               <a><cite>修改文章</cite></a>
         </span>
-    </blockquote>
+            </blockquote>
 
 
-    <form class="layui-form" method="post" id="myForm" action="/admin/article/editSubmit">
-        <input type="hidden" name="articleId" value="${article.articleId}">
-        <div class="layui-form-item">
-            <label class="layui-form-label">标题 <span style="color: #FF5722; ">*</span></label>
-            <div class="layui-input-block">
-                <input type="text" name="articleTitle" lay-verify="title" id="title" value="${article.articleTitle}"
-                       class="layui-input">
-            </div>
-        </div>
+            <form class="layui-form" method="post" id="myForm" action="/admin/article/editSubmit">
+                <input type="hidden" name="id" th:value="${article.id}">
+                <div class="layui-form-item">
+                    <label class="layui-form-label">标题 <span style="color: #FF5722; ">*</span></label>
+                    <div class="layui-input-block">
+                        <input type="text" name="articleTitle" lay-verify="title" id="title" th:value="${article.articleTitle}"
+                               class="layui-input">
+                    </div>
+                </div>
 
-        <div class="layui-form-item layui-form-text">
-            <label class="layui-form-label">内容 <span style="color: #FF5722; ">*</span></label>
-            <div class="layui-input-block">
-                <textarea class="layui-textarea layui-hide" name="articleContent"
-                          id="content">${article.articleContent}</textarea>
-            </div>
-        </div>
+                <div class="layui-form-item layui-form-text">
+                    <label class="layui-form-label">内容 <span style="color: #FF5722; ">*</span></label>
+                    <div class="layui-input-block">
+                    <textarea class="layui-textarea layui-hide" name="articleContent" id="content" th:utext="${article.articleContent}">
+                        内容
+                    </textarea>
+                    </div>
+                </div>
 
+                <div class="layui-form-item">
+                    <label class="layui-form-label">分类 <span style="color: #FF5722; ">*</span></label>
+                    <div class="layui-input-inline">
+                        <select name="parentId" id="articleParentCategoryId"
+                                lay-filter="articleParentCategoryId" lay-verify="parentId">
+                            <option th:each="c : ${categoryList}"
+                                    th:value="${c.id}"
+                                    th:if="${c.categoryPid == 0}"
+                                    th:selected="${#lists.size(article.categoryList) > 0 && article.categoryList[0].categoryPid == c.id}"
+                                    th:text="${c.categoryName}">
+                                分类名
+                            </option>
+                        </select>
+                    </div>
+                    <div class="layui-input-inline">
+                        <select name="childId" id="articleChildCategoryId" lay-filter="articleChildCategoryId" lay-verify="childId">
+                            <option th:each="c : ${categoryList}"
+                                    th:value="${c.id}"
+                                    th:text="${c.categoryName}"
+                                    th:selected="${(article.categoryList != null) && (#lists.size(article.categoryList) > 0) && (c.id == article.categoryList[0].id)}"
+                                    th:if="${(article.categoryList != null) && (#lists.size(article.categoryList) > 0) && (c.categoryPid == article.categoryList[0].categoryPid)}">分类名</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="layui-form-item" pane="">
+                    <label class="layui-form-label">标签</label>
+                    <div class="layui-input-block">
+                        <th:block th:each="t : ${tagList}">
+                            <input type="checkbox" name="articleTagIds" lay-skin="primary"
+                                   th:title="${t.tagName}"
+                                   th:value="${t.id}"
+                                   th:checked="${t.status == null}">
+                        </th:block>
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label">order</label>
+                    <div class="layui-input-inline">
+                        <input type="number" name="articleOrder" th:value="${article.articleOrder}" autocomplete="off"
+                               class="layui-input" max="10" min="1" lay-verify="order">
+                    </div>
+                    <div class="layui-form-mid layui-word-aux">输入1-10的数字,order越大排序越前</div>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label">状态</label>
+                    <div class="layui-input-block">
+                        <input type="radio" name="articleStatus" value="1" title="发布" th:checked="${article.articleStatus == 1}">
+                        <input type="radio" name="articleStatus" value="0" title="草稿" th:checked="${article.articleStatus == 0}">
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <div class="layui-input-block">
+                        <button class="layui-btn" lay-submit="" lay-filter="demo1">保存</button>
+                        <button type="reset" class="layui-btn layui-btn-primary">重置</button>
+                    </div>
+                </div>
+            </form>
 
-        <div class="layui-form-item">
-            <label class="layui-form-label">分类 <span style="color: #FF5722; ">*</span></label>
-            <div class="layui-input-inline">
-                <select name="articleParentCategoryId" id="articleParentCategoryId"
-                        lay-filter="articleParentCategoryId">
-                    <option value="">一级分类</option>
-                    <c:forEach items="${categoryList}" var="c">
-                        <c:if test="${c.categoryPid == 0}">
-                            <option value="${c.categoryId}"
-                                    <c:if test="${article.categoryList[0].categoryId == c.categoryId}">
-                                        selected
-                                    </c:if>
-                            >${c.categoryName}</option>
-                        </c:if>
-                    </c:forEach>
-                </select>
-            </div>
-            <div class="layui-input-inline">
-                <select name="articleChildCategoryId" id="articleChildCategoryId" lay-filter="articleChildCategoryId">
-                    <c:forEach items="${categoryList}" var="c">
-                        <c:if test="${c.categoryPid == article.categoryList[0].categoryId}">
-                            <option value="${c.categoryId}"
-                                    <c:if test="${article.categoryList[1].categoryId == c.categoryId}">selected</c:if>>${c.categoryName}</option>
-                        </c:if>
-                    </c:forEach>
-                </select>
-            </div>
-        </div>
-        <div class="layui-form-item" pane="">
-            <label class="layui-form-label">标签</label>
-            <div class="layui-input-block">
-                <c:forEach items="${tagList}" var="t">
-                    <input type="checkbox" name="articleTagIds" lay-skin="primary" title="${t.tagName}"
-                           value="${t.tagId}"
-                    <c:forEach items="${article.tagList}" var="t2">
-                           <c:if test="${t.tagId == t2.tagId}">checked</c:if>
-                    </c:forEach>>
-                </c:forEach>
-            </div>
-        </div>
-        <div class="layui-form-item">
-            <label class="layui-form-label">order</label>
-            <div class="layui-input-inline">
-                <input type="number" name="articleOrder" value="${article.articleOrder}" autocomplete="off"
-                       class="layui-input">
-            </div>
-            <div class="layui-form-mid layui-word-aux">输入1-10的数字,order越大排序越前</div>
-        </div>
-        <div class="layui-form-item">
-            <label class="layui-form-label">状态</label>
-            <div class="layui-input-block">
-                <input type="radio" name="articleStatus" value="1" title="发布"
-                       <c:if test="${article.articleStatus==1}">checked</c:if>>
-                <input type="radio" name="articleStatus" value="0" title="草稿"
-                       <c:if test="${article.articleStatus==0}">checked</c:if>>
-            </div>
-        </div>
-        <div class="layui-form-item">
-            <div class="layui-input-block">
-                <button class="layui-btn" lay-submit="" lay-filter="demo1">保存</button>
-                <button type="reset" class="layui-btn layui-btn-primary">重置</button>
-            </div>
-        </div>
-    </form>
-
-    <blockquote class="layui-elem-quote layui-quote-nm">
-        温馨提示：
-        1、插入代码前，可以点击 <a href="http://liuyanzhao.com/code-highlight.html" target="_blank">代码高亮</a>,将代码转成HTML格式
-    </blockquote>
-
-</rapid:override>
-
-
-<rapid:override name="footer-script">
-
-    <script>
+            <blockquote class="layui-elem-quote layui-quote-nm">
+                温馨提示：
+                1、插入代码前，可以点击 <a href="http://liuyanzhao.com/code-highlight.html" target="_blank">代码高亮</a>,将代码转成HTML格式
+            </blockquote>
+        </th:block>
+        <th:block layout:fragment="script-extend">
+            <script>
+                layui.use(['form', 'layedit', 'laydate'], function () {
+                    var form = layui.form
+                        , layer = layui.layer
+                        , layedit = layui.layedit
+                        , laydate = layui.laydate;
 
 
-        layui.use(['form', 'layedit', 'laydate'], function () {
-            var form = layui.form
-                , layer = layui.layer
-                , layedit = layui.layedit
-                , laydate = layui.laydate;
+                    //上传图片,必须放在 创建一个编辑器前面
+                    layedit.set({
+                        uploadImage: {
+                            url: '/uploadFile' //接口url
+                            , type: 'post' //默认post
+                        }
+                    });
+
+                    //创建一个编辑器
+                    var editIndex = layedit.build('content', {
+                            height: 350,
+                        }
+                    );
 
 
-            //上传图片,必须放在 创建一个编辑器前面
-            layedit.set({
-                uploadImage: {
-                    url: '/uploadFile' //接口url
-                    , type: 'post' //默认post
-                }
-            });
+                    //自定义验证规则
+                    form.verify({
+                        title: function (value) {
+                            if (value.length < 5) {
+                                return '标题至少得5个字符';
+                            }
+                        }
+                        , content: function (value) {
+                            layedit.sync(editIndex);
+                        }
+                        , parentId: function (value, item) {
+                            if (value == null || value < 0) {
+                                return '分类必选';
+                            }
+                        }
+                        , childId: function(value, item) {
+                            if (value == null || value < 0) {
+                                return '分类必选';
+                            }
+                        }
+                        , order: function(value, item) {
+                            if (value == null || isNaN(value)) {
+                                return '格式无效'
+                            } else if (value < 1 || value > 10) {
+                                return '请输入范围之间的数字'
+                            }
+                        }
+                    });
+                    layedit.build('content', {
+                        tool: [
+                            'strong' //加粗
+                            , 'italic' //斜体
+                            , 'underline' //下划线
+                            , 'del' //删除线
+                            , '|' //分割线
+                            , 'left' //左对齐
+                            , 'center' //居中对齐
+                            , 'right' //右对齐
+                            , 'link' //超链接
+                            , 'unlink' //清除链接
+                            , 'face' //表情
+                            , 'image' //插入图片
+                            , 'code'
+                        ]
+                    });
 
 
-            //创建一个编辑器
-            var editIndex = layedit.build('content', {
-                    height: 350,
-                }
-            );
+                    //二级联动
+                    form.on("select(articleParentCategoryId)", function () {
+                        var str = "";
+                        var articleParentCategoryId = $("#articleParentCategoryId").val();
+                        var articleList = new Array();
+                        $.ajax({
+                            url: "/admin/article/getCategoryList",
+                            type: "get",
+                            async: false,
+                            dataType: "json",
+                            success: function(data) {
+                                articleList = data;
+                            }
+                        })
+                        for (var i in articleList) {
+                            if (articleParentCategoryId == articleList[i].categoryPid) {
+                                str += "<option name='childCategory' value='" + articleList[i].id + "'>" + articleList[i].categoryName + "</option>";
+                            }
+                        }
+                        $("#articleChildCategoryId").html(str);
+                        form.render('select'); //这个很重要
+                    })
 
-//            layui.code({
-//                elem: 'pre', //默认值为.layui-code
-//            });
-
-            //自定义验证规则
-            form.verify({
-                title: function (value) {
-                    if (value.length < 5) {
-                        return '标题至少得5个字符啊';
-                    }
-                }
-                , content: function (value) {
-                    layedit.sync(editIndex);
-                }
-            });
-            layedit.build('content', {
-                tool: [
-                    'strong' //加粗
-                    , 'italic' //斜体
-                    , 'underline' //下划线
-                    , 'del' //删除线
-
-                    , '|' //分割线
-
-                    , 'left' //左对齐
-                    , 'center' //居中对齐
-                    , 'right' //右对齐
-                    , 'link' //超链接
-                    , 'unlink' //清除链接
-                    , 'face' //表情
-                    , 'image' //插入图片
-                    , 'code'
-                ]
-            });
-
-
-            //二级联动
-            form.on("select(articleParentCategoryId)", function () {
-                var str = "";
-                var articleParentCategoryId = $("#articleParentCategoryId").val();
-                <c:forEach items="${categoryList}" var="c">
-                if (articleParentCategoryId ==${c.categoryPid}) {
-                    str += "<option name='childCategory' value='${c.categoryId}'<c:if test='${article.categoryList[1].categoryId == c.categoryId}'>selected</c:if>>${c.categoryName}</option>";
-                }
-                </c:forEach>
-                $("#articleChildCategoryId").html("  <option value=''selected>二级分类</option>" + str);
-                form.render('select'); //这个很重要
-            })
-
-        });
-        //end
-
-
-    </script>
-
-</rapid:override>
-
-
-<%--此句必须放在最后--%>
-<%@ include file="../Public/framework.jsp" %>
-
+                });
+                //end
+            </script>
+        </th:block>
+    </body>
+</html>

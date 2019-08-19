@@ -22,7 +22,7 @@ public interface ArticleService extends BaseService<Article> {
      * 查询一个完整的文章信息
      * @return
      */
-    Article selectOneForFullArticle(Integer id);
+    Article selectOneForFullArticle(Article article);
 
     /**
      * 查询完整的文章信息列表

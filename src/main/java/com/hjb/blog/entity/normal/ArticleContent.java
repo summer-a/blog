@@ -1,10 +1,14 @@
 package com.hjb.blog.entity.normal;
 
 import com.hjb.blog.entity.base.BaseEntity;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import javax.persistence.Column;
 import javax.persistence.Table;
 
+@Data
+@NoArgsConstructor
 @Table(name = "article_content")
 public class ArticleContent extends BaseEntity {
 
@@ -20,39 +24,7 @@ public class ArticleContent extends BaseEntity {
     @Column(name = "article_content")
     private String articleContent;
 
-    /**
-     * 获取文章id
-     *
-     * @return article_id - 文章id
-     */
-    public Integer getArticleId() {
-        return articleId;
-    }
-
-    /**
-     * 设置文章id
-     *
-     * @param articleId 文章id
-     */
-    public void setArticleId(Integer articleId) {
-        this.articleId = articleId;
-    }
-
-
-    public String getArticleContent() {
-        return articleContent;
-    }
-
-    public void setArticleContent(String articleContent) {
-        this.articleContent = articleContent;
-    }
-
-    @Override
-    public String toString() {
-        return "ArticleContent{" +
-                "id=" + super.getId() +
-                ", articleId=" + articleId +
-                ", articleContent='" + articleContent + '\'' +
-                '}';
+    public ArticleContent(Integer id) {
+        super(id);
     }
 }

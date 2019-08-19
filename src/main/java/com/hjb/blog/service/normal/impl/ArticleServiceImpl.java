@@ -4,20 +4,20 @@ import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.hjb.blog.entity.enums.ArticleStatus;
 import com.hjb.blog.entity.enums.OrderField;
-import com.hjb.blog.entity.normal.Article;
-import com.hjb.blog.entity.normal.Category;
-import com.hjb.blog.mapper.ArticleCategoryRefMapper;
-import com.hjb.blog.mapper.ArticleMapper;
-import com.hjb.blog.mapper.ArticleTagRefMapper;
-import com.hjb.blog.mapper.CategoryMapper;
+import com.hjb.blog.entity.normal.*;
+import com.hjb.blog.mapper.*;
 import com.hjb.blog.service.base.impl.BaseServiceImpl;
 import com.hjb.blog.service.normal.ArticleService;
+import com.hjb.blog.util.CommonUtils;
+import org.jsoup.nodes.Document;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 import tk.mybatis.mapper.entity.Example;
+import us.codecraft.webmagic.selector.Html;
 
 import javax.annotation.Resource;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -39,10 +39,13 @@ public class ArticleServiceImpl extends BaseServiceImpl<Article> implements Arti
     private CategoryMapper categoryMapper;
 
     @Resource
+    private ArticleCategoryRefMapper articleCategoryRefMapper;
+
+    @Resource
     private ArticleTagRefMapper articleTagRefMapper;
 
     @Resource
-    private ArticleCategoryRefMapper articleCategoryRefMapper;
+    private ArticleContentMapper articleContentMapper;
 
     @Transactional(readOnly = true, rollbackFor = RuntimeException.class)
     @Override
@@ -76,15 +79,15 @@ public class ArticleServiceImpl extends BaseServiceImpl<Article> implements Arti
     /**
      * 查询一个完整的文章信息
      *
-     * @param id
+     * @param article
      * @return
      */
     @Transactional(readOnly = false, rollbackFor = RuntimeException.class)
     @Override
-    public Article selectOneForFullArticle(Integer id) {
-        Article article = new Article();
-        article.setId(id);
-        article.setArticleStatus(ArticleStatus.PUBLISH.getValue());
+    public Article selectOneForFullArticle(Article article) {
+        if (article == null || article.getId() == null) {
+            return null;
+        }
         List<Article> articleList = articleMapper.selectFullArticle(article);
         if (!CollectionUtils.isEmpty(articleList)) {
             Article art = articleList.get(0);
@@ -92,10 +95,10 @@ public class ArticleServiceImpl extends BaseServiceImpl<Article> implements Arti
             art.setCategoryList(categoryMapper.selectArticleCategorysByArticleId(art.getId()));
 
             // 设置标签
-            art.setTagList(articleTagRefMapper.selectTagByArticleId(id));
+            art.setTagList(articleTagRefMapper.selectTagByArticleId(article.getId()));
 
             // 查看数+1
-            articleMapper.updateViewCount(id);
+            articleMapper.updateViewCount(article.getId());
             return art;
         }
         return null;
@@ -143,5 +146,107 @@ public class ArticleServiceImpl extends BaseServiceImpl<Article> implements Arti
         PageInfo<Article> articlePageInfo = new PageInfo<>(articleList);
 
         return articlePageInfo;
+    }
+
+    /**
+     * 根据主键删除
+     * @param id id
+     * @return
+     */
+    @Override
+    @Transactional(readOnly = false, rollbackFor = RuntimeException.class)
+    public int deleteByPrimaryKey(Integer id) {
+        articleContentMapper.deleteByPrimaryKey(id);
+        return super.deleteByPrimaryKey(id);
+    }
+
+    /**
+     * 根据条件删除
+     * @param article
+     * @return
+     */
+    @Override
+    @Transactional(readOnly = false, rollbackFor = RuntimeException.class)
+    public int delete(Article article) {
+        List<Article> articles = articleMapper.select(article);
+        if (!CollectionUtils.isEmpty(articles)) {
+            articles.forEach(r -> articleContentMapper.delete(new ArticleContent(r.getId())));
+        }
+        return super.delete(article);
+    }
+
+    @Override
+    @Transactional(readOnly = false, rollbackFor = RuntimeException.class)
+    public int update(Article article) {
+        // 更新文章基本信息, 内容, 分类, 标签, 新增也是
+        if (article != null) {
+            // 更新内容
+            String articleContent = article.getArticleContent();
+            ArticleContent content = new ArticleContent();
+            content.setArticleContent(articleContent);
+            content.setUpdateTime(LocalDateTime.now());
+
+            Example example = new Example(ArticleContent.class);
+            example.createCriteria().andEqualTo("articleId", article.getId());
+
+            articleContentMapper.updateByExampleSelective(content, example);
+
+            // 更新分类(删除-新增)
+            List<Category> categoryList = article.getCategoryList();
+            if (!CollectionUtils.isEmpty(categoryList)) {
+                // 删除
+                ArticleCategoryRef articleCategoryRef = new ArticleCategoryRef();
+                articleCategoryRef.setArticleId(article.getId());
+                articleCategoryRefMapper.delete(articleCategoryRef);
+                // 新增
+                for (Category category : categoryList) {
+                    ArticleCategoryRef articleCategoryRefAdd = new ArticleCategoryRef();
+                    articleCategoryRefAdd.setCategoryId(category.getId());
+                    articleCategoryRefAdd.setArticleId(article.getId());
+                    articleCategoryRefAdd.setUpdateTime(LocalDateTime.now());
+                    articleCategoryRefAdd.setCreateTime(LocalDateTime.now());
+
+                    articleCategoryRefMapper.insertSelective(articleCategoryRefAdd);
+                }
+            }
+
+            // 更新标签
+            List<Tag> tagList = article.getTagList();
+            if (!CollectionUtils.isEmpty(tagList)) {
+                // 删除
+                ArticleTagRef articleTagRef = new ArticleTagRef();
+                articleTagRef.setArticleId(article.getId());
+                articleTagRefMapper.delete(articleTagRef);
+
+                for (Tag tag : tagList) {
+                    ArticleTagRef articleTagRefAdd = new ArticleTagRef();
+                    articleTagRefAdd.setTagId(tag.getId());
+                    articleTagRefAdd.setArticleId(article.getId());
+                    articleTagRefAdd.setUpdateTime(LocalDateTime.now());
+                    articleTagRefAdd.setCreateTime(LocalDateTime.now());
+
+                    articleTagRefMapper.insertSelective(articleTagRefAdd);
+                }
+            }
+            // 更新摘要
+            int size = 140;
+            Document doc = new Html(articleContent).getDocument();
+            String text = doc.text();
+            int txtLength = text.length();
+            String summary = text.substring(0, txtLength < 140 ? txtLength : size);
+            article.setArticleSummary(summary);
+            return super.update(article);
+        }
+        throw new NullPointerException("Article is null");
+    }
+
+    @Override
+    public int insert(Article article) {
+        return super.insert(article);
+    }
+
+    @Override
+    public int insertSelective(Article article) {
+        return super.insertSelective(article);
     }
 }

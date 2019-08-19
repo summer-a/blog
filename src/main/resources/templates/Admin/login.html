@@ -1,8 +1,10 @@
 <!DOCTYPE html>
 <html lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
 <head>
+    <title th:text="${session.option.optionSiteTitle} + ' > 后台登录'">登录</title>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-    <title >登录</title>
+    <meta name='robots' content='noindex,follow' />
+    <meta name="viewport" content="width=device-width" />
     <link rel="stylesheet" th:href="@{/plugin/font-awesome/css/font-awesome.min.css}">
     <link rel="shortcut icon" th:href="@{/img/logo.png}">
     <link rel='stylesheet' id='dashicons-css'  th:href='@{/plugin/login/dashicons.min.css}' type='text/css' media='all' />
@@ -12,8 +14,9 @@
     <link rel='stylesheet' id='login-css'  th:href='@{/plugin/login/login.min.css}' type='text/css' media='all' />
     <style type="text/css">
         body{
+            background-size: 100% 100%;
             font-family: "Microsoft YaHei", Helvetica, Arial, Lucida Grande, Tahoma, sans-serif;
-            background: url(http://blogcdn.liuyanzhao.com/img/loginBg.jpg);
+            background: url('/img/loginBg.jpg') no-repeat fixed;
             width:100%;
             height:100%;
         }
@@ -23,6 +26,8 @@
             height: 50px;
             padding: 0;
             margin: 0 auto 1em;
+            color: #f3f3f3;
+            font-weight: bold;
         }
         .login form {
             background: #fff;
@@ -39,30 +44,23 @@
             color: #fff !important;
         }
 
-    </style><meta name='robots' content='noindex,follow' />
-    <meta name="viewport" content="width=device-width" />
-    <style>
-        body {
-            background-repeat: no-repeat;
-            background-size: 100% 100%;
-            background-attachment: fixed;
-        }
     </style>
 </head>
 <body class="login login-action-login wp-core-ui  locale-zh-cn">
 <div id="login">
-    <h1><a href="/" title="欢迎您光临本站！" tabindex="-1">${options.optionSiteTitle}</a></h1>
+    <h1><a href="/" title="欢迎您光临本站！" tabindex="-1" th:text="${session.option.optionSiteTitle}">标题</a></h1>
     <form name="loginForm" id="loginForm"  method="post">
         <p>
             <label for="user_login">用户名或电子邮件地址<br />
-                <input type="text" name="username" id="user_login" class="input" value="<%=username%>" size="20" required/></label>
+                <input type="text" name="username" id="user_login" class="input" size="20" required/></label>
         </p>
         <p>
             <label for="user_pass">密码<br />
-                <input type="password" name="password" id="user_pass" class="input" value="<%=password%>" size="20" required/>
+                <input type="password" id="user_pass" class="input" size="20" required/>
+                <input type="hidden" name="password" id="true_pass"/>
             </label>
         </p>
-        <p class="forgetmenot"><label for="rememberme"><input name="rememberme" type="checkbox" id="rememberme" value="1" checked /> 记住密码</label></p>
+        <p class="forgetmenot"><label for="rememberme"><input name="rememberMe" type="checkbox" id="rememberme" checked /> 记住密码</label></p>
         <p class="submit">
             <input type="button" name="wp-submit" id="submit-btn" class="button button-primary button-large" value="登录" />
         </p>
@@ -82,24 +80,30 @@
         if(typeof wpOnload=='function')wpOnload();
     </script>
 
-    <p id="backtoblog"><a href="/">&larr; 返回到风吟博客</a></p>
+    <p id="backtoblog"><a href="/">&larr; 返回到博客</a></p>
 
 </div>
-
 
 <div class="clear"></div>
 
 <script th:src="@{/js/jquery.min.js}"></script>
+<script th:src="@{/js/jquery.md5.js}"></script>
+<script th:src="@{/plugin/layui/layui.js}"></script>
 <script type="text/javascript">
+    layui.use('layer', function () {
+        var layer = layui.layer;
+    })
 
     $("#submit-btn").click(function () {
         var user = $("#user_login").val();
         var password = $("#user_pass").val();
         if(user=="") {
-            alert("用户名不可为空!");
+            layer.msg("用户名不可为空!")
         } else if(password==""){
-            alert("密码不可为空!");
+            layer.msg("密码不可为空!")
         } else {
+            // 加密
+            $("#true_pass").val($.md5(user + "-" + password));
             $.ajax({
                 async: false,//同步，待请求完毕后再执行后面的代码
                 type: "POST",
@@ -109,14 +113,19 @@
                 dataType: "json",
                 success: function (data) {
                     if(data.code==0) {
-                        alert(data.msg);
+                        layer.msg(data.msg);
                     } else {
-                        window.location.th:href="@{/admin}";
-
+                        // 根据请求url跳转
+                        console.log(data.data);
+                        if (data.data == null || data.data == "") {
+                            window.location.href="/admin";
+                        } else {
+                            window.location.href=data.data;
+                        }
                     }
                 },
                 error: function () {
-                    alert("数据获取失败")
+                    layer.msg("数据获取失败");
                 }
             })
         }

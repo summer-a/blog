@@ -5,9 +5,11 @@ import com.hjb.blog.entity.enums.OrderField;
 import com.hjb.blog.entity.normal.Article;
 import com.hjb.blog.entity.normal.Comment;
 import com.hjb.blog.entity.normal.User;
+import com.hjb.blog.entity.vo.ResultVO;
 import com.hjb.blog.service.normal.ArticleService;
 import com.hjb.blog.service.normal.CommentService;
 import com.hjb.blog.service.normal.UserService;
+import com.hjb.blog.util.AdminUserUtils;
 import com.hjb.blog.util.CommonUtils;
 import com.xiaoleilu.hutool.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,14 +26,11 @@ import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.time.LocalDateTime;
+import java.util.*;
 
 
 /**
- *
  * @author h1525
  */
 @Controller
@@ -45,6 +44,11 @@ public class AdminController {
 
     @Autowired
     private CommentService commentService;
+
+    /**
+     * 超时时间
+     */
+    private static final int TIME_OUT = 7 * 24 * 60 * 60;
 
     /**
      * 后台首页
@@ -81,6 +85,10 @@ public class AdminController {
      */
     @GetMapping("/login")
     public String loginPage() {
+        User currentUser = AdminUserUtils.getCurrentUser();
+        if (currentUser != null) {
+            return "/admin";
+        }
         return "Admin/login";
     }
 
@@ -93,13 +101,14 @@ public class AdminController {
      */
     @PostMapping(value = "/loginVerify")
     @ResponseBody
-    public String loginVerify(
+    public ResultVO loginVerify(
             HttpServletRequest request,
             HttpServletResponse response,
             String username,
             String password,
-            String rememberme) {
-        Map<String, Object> map = new HashMap<>(2);
+            Boolean rememberMe) {
+
+        HttpSession session = request.getSession();
 
         Example example = new Example(User.class);
         example.createCriteria().andEqualTo("userName", username).orEqualTo("userEmail");
@@ -108,35 +117,34 @@ public class AdminController {
         User user = CollectionUtils.isEmpty(userList) ? null : userList.get(0);
 
         if (user == null) {
-            map.put("code", 0);
-            map.put("msg", "用户名无效！");
+            return ResultVO.build(0, "用户名无效!", null);
         } else if (!user.getUserPass().equals(password)) {
-            map.put("code", 0);
-            map.put("msg", "密码错误！");
+            return ResultVO.build(0, "密码错误!", null);
         } else {
-            //登录成功
-            map.put("code", 1);
-            map.put("msg", "");
-            //添加session
-            request.getSession().setAttribute("user", user);
-            //添加cookie
-            if (rememberme != null) {
-                //创建两个Cookie对象
-                Cookie nameCookie = new Cookie("username", username);
-                //设置Cookie的有效期为3天
-                nameCookie.setMaxAge(60 * 60 * 24 * 3);
-                Cookie pwdCookie = new Cookie("password", password);
-                pwdCookie.setMaxAge(60 * 60 * 24 * 3);
-                response.addCookie(nameCookie);
-                response.addCookie(pwdCookie);
+            // 添加session
+            session.setAttribute("user", user);
+            session.setMaxInactiveInterval(TIME_OUT);
+            // 添加cookie
+            if (rememberMe != null && rememberMe) {
+                // 生成随机id
+                String userId = UUID.randomUUID().toString();
+                // 创建Cookie对象
+                Cookie cookie = new Cookie("ADMIN_USER_ID", userId);
+                // 创建session
+                session.setAttribute("ADMIN_USER_ID", userId);
+                // 设置Cookie的有效期为7天
+                cookie.setMaxAge(TIME_OUT);
+                cookie.setPath("/");
+                response.addCookie(cookie);
             }
-            user.setUserLastLoginTime(new Date());
-            user.setUserLastLoginIp(CommonUtils.getIpAddr(request));
-            userService.update(user);
-
+            User userUpdate = new User();
+            userUpdate.setId(user.getId());
+            userUpdate.setUserLastLoginTime(LocalDateTime.now());
+            userUpdate.setUserLastLoginIp(CommonUtils.getIpAddr(request));
+            userService.update(userUpdate);
+            // 登录成功,返回请求url
+            return ResultVO.build(1, "登录成功", session.getAttribute("request_url"));
         }
-        String result = new JSONObject(map).toString();
-        return result;
     }
 
     /**
@@ -151,6 +159,5 @@ public class AdminController {
         session.invalidate();
         return "redirect:/login";
     }
-
 
 }

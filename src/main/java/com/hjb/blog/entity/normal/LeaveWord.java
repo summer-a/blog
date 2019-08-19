@@ -2,6 +2,7 @@ package com.hjb.blog.entity.normal;
 
 import com.hjb.blog.entity.base.BaseEntity;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import javax.persistence.Column;
 
@@ -15,6 +16,7 @@ import javax.persistence.Column;
  * @date 2019/7/23 16:09
  */
 @Data
+@NoArgsConstructor
 public class LeaveWord extends BaseEntity {
 
     @Column(name = "nick_name")

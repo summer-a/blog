@@ -1,11 +1,15 @@
 package com.hjb.blog.entity.normal;
 
 import com.hjb.blog.entity.base.BaseEntity;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import javax.persistence.Column;
 import javax.persistence.Transient;
 import java.util.List;
 
+@Data
+@NoArgsConstructor
 public class Article extends BaseEntity {
 
     /**
@@ -77,219 +81,8 @@ public class Article extends BaseEntity {
     @Transient
     private List<Category> categoryList;
 
-    /**
-     * 获取文章对应用户id
-     *
-     * @return article_user_id - 文章对应用户id
-     */
-    public Integer getArticleUserId() {
-        return articleUserId;
+    public Article(Integer id) {
+        super(id);
     }
 
-    /**
-     * 设置文章对应用户id
-     *
-     * @param articleUserId 文章对应用户id
-     */
-    public void setArticleUserId(Integer articleUserId) {
-        this.articleUserId = articleUserId;
-    }
-
-    /**
-     * 获取文章标题
-     *
-     * @return article_title - 文章标题
-     */
-    public String getArticleTitle() {
-        return articleTitle;
-    }
-
-    /**
-     * 设置文章标题
-     *
-     * @param articleTitle 文章标题
-     */
-    public void setArticleTitle(String articleTitle) {
-        this.articleTitle = articleTitle;
-    }
-
-    /**
-     * 获取文章被查看数
-     *
-     * @return article_view_count - 文章被查看数
-     */
-    public Integer getArticleViewCount() {
-        return articleViewCount;
-    }
-
-    /**
-     * 设置文章被查看数
-     *
-     * @param articleViewCount 文章被查看数
-     */
-    public void setArticleViewCount(Integer articleViewCount) {
-        this.articleViewCount = articleViewCount;
-    }
-
-    /**
-     * 获取文章被评论数
-     *
-     * @return article_comment_count - 文章被评论数
-     */
-    public Integer getArticleCommentCount() {
-        return articleCommentCount;
-    }
-
-    /**
-     * 设置文章被评论数
-     *
-     * @param articleCommentCount 文章被评论数
-     */
-    public void setArticleCommentCount(Integer articleCommentCount) {
-        this.articleCommentCount = articleCommentCount;
-    }
-
-    /**
-     * 获取文章被赞数
-     *
-     * @return article_like_count - 文章被赞数
-     */
-    public Integer getArticleLikeCount() {
-        return articleLikeCount;
-    }
-
-    /**
-     * 设置文章被赞数
-     *
-     * @param articleLikeCount 文章被赞数
-     */
-    public void setArticleLikeCount(Integer articleLikeCount) {
-        this.articleLikeCount = articleLikeCount;
-    }
-
-    /**
-     * 获取文章是否允许评论
-     *
-     * @return article_is_comment - 文章是否允许评论
-     */
-    public Integer getArticleIsComment() {
-        return articleIsComment;
-    }
-
-    /**
-     * 设置文章是否允许评论
-     *
-     * @param articleIsComment 文章是否允许评论
-     */
-    public void setArticleIsComment(Integer articleIsComment) {
-        this.articleIsComment = articleIsComment;
-    }
-
-    /**
-     * 获取文章状态
-     *
-     * @return article_status - 文章状态
-     */
-    public Integer getArticleStatus() {
-        return articleStatus;
-    }
-
-    /**
-     * 设置文章状态
-     *
-     * @param articleStatus 文章状态
-     */
-    public void setArticleStatus(Integer articleStatus) {
-        this.articleStatus = articleStatus;
-    }
-
-    /**
-     * 获取文章排序
-     *
-     * @return article_order - 文章排序
-     */
-    public Integer getArticleOrder() {
-        return articleOrder;
-    }
-
-    /**
-     * 设置文章排序
-     *
-     * @param articleOrder 文章排序
-     */
-    public void setArticleOrder(Integer articleOrder) {
-        this.articleOrder = articleOrder;
-    }
-
-
-    /**
-     * 获取文章摘要
-     *
-     * @return article_summary - 文章摘要
-     */
-    public String getArticleSummary() {
-        return articleSummary;
-    }
-
-    /**
-     * 设置文章摘要
-     *
-     * @param articleSummary 文章摘要
-     */
-    public void setArticleSummary(String articleSummary) {
-        this.articleSummary = articleSummary;
-    }
-
-
-    public User getUser() {
-        return user;
-    }
-
-    public void setUser(User user) {
-        this.user = user;
-    }
-
-    public List<Tag> getTagList() {
-        return tagList;
-    }
-
-    public void setTagList(List<Tag> tagList) {
-        this.tagList = tagList;
-    }
-
-    public List<Category> getCategoryList() {
-        return categoryList;
-    }
-
-    public String getArticleContent() {
-        return articleContent;
-    }
-
-    public void setArticleContent(String articleContent) {
-        this.articleContent = articleContent;
-    }
-
-    public void setCategoryList(List<Category> categoryList) {
-        this.categoryList = categoryList;
-    }
-
-    @Override
-    public String toString() {
-        return "Article{" +
-                "id=" + super.getId() +
-                ", articleUserId=" + articleUserId +
-                ", articleTitle='" + articleTitle + '\'' +
-                ", articleViewCount=" + articleViewCount +
-                ", articleCommentCount=" + articleCommentCount +
-                ", articleLikeCount=" + articleLikeCount +
-                ", articleIsComment=" + articleIsComment +
-                ", articleStatus=" + articleStatus +
-                ", articleOrder=" + articleOrder +
-                ", articleSummary='" + articleSummary + '\'' +
-                ", articleContent='" + articleContent + '\'' +
-                ", user=" + user +
-                ", tagList=" + tagList +
-                ", categoryList=" + categoryList +
-                '}';
-    }
 }

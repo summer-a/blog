@@ -2,6 +2,7 @@ package com.hjb.blog.entity.normal;
 
 import com.hjb.blog.entity.base.BaseEntity;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import javax.persistence.Column;
 
@@ -14,6 +15,7 @@ import javax.persistence.Column;
  * @date 2019/6/16 2:44
  */
 @Data
+@NoArgsConstructor
 public class Menu extends BaseEntity {
 
     @Column(name = "menu_name")

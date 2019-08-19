@@ -90,12 +90,13 @@ public class LoginController {
                     // 存入cookie和session
                     String jvtcUserId = UUID.randomUUID().toString();
                     session.setAttribute("JVTC_USER_ID", jvtcUserId);
-                    // 过期时间，单位=秒
-                    session.setMaxInactiveInterval(24 * 60 * 60);
+                    // 过期时间7天，单位=秒
+                    session.setMaxInactiveInterval(24 * 60 * 60 * 7);
                     Cookie jvtcUserIdCookie = new Cookie("JVTC_USER_ID", jvtcUserId);
-                    jvtcUserIdCookie.setMaxAge(24 * 60 * 60);
+                    jvtcUserIdCookie.setMaxAge(24 * 60 * 60 * 7);
                     jvtcUserIdCookie.setPath("/");
                     response.addCookie(jvtcUserIdCookie);
+
                     return "redirect:/timetable/index";
                 }
             } else {

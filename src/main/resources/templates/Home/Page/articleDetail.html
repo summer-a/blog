@@ -92,7 +92,7 @@
                         <ul class="single-meta">
                             <li class="edit-link">
                                 <a target="_blank" class="post-edit-link"
-                                   href="#">编辑</a>
+                                   th:href="@{'/admin/article/edit/' + ${article.id}}">编辑</a>
                             </li>
                             <li class="comment">
                                 <a href="#comments"
@@ -156,7 +156,6 @@
                             <img alt="头像"
                                  th:src="${session.user.userAvatar}"
                                  class="avatar avatar-64 photo" height="64" width="64">
-                            <th:block th:text="${session.user.userNickname}">登录者：xxx</th:block>
                             <br> <a href="javascript:void(0)" onclick="logout()">登出</a>
                             <input type="hidden" name="commentRole" value="1">
                             <input type="hidden" name="commentAuthorName"
@@ -193,7 +192,6 @@
                                         <p id="wait1" class="show">正在加载验证码......</p>
                                     </div>
                                 </p>
-
                             </th:block>
                         </div>
                         <div class="clear"></div>
@@ -233,13 +231,6 @@
                                                     </span>
                                                     <th:block th:text="${#temporals.format(c.createTime, 'yyyy年MM月dd日 HH:mm:ss')} + '&nbsp;'">
                                                         yyyy年MM月dd日 HH:mm:ss
-                                                    </th:block>
-                                                    <th:block th:if="${session.user != null}">
-                                                        <a href="javascript:void(0)"
-                                                           th:onclick="'deleteComment(' + ${c.id} + ')'">删除</a>
-                                                        <a class="comment-edit-link"
-                                                           th:href="@{'/admin/comment/edit/' + ${c.id}}"
-                                                           target="_blank">编辑</a>
                                                     </th:block>
                                                     <span class="floor" th:text="'&nbsp;' + ${cstat.index + 1} + '楼'"> &nbsp;${floor}楼 </span>
                                                 </span>
@@ -281,13 +272,6 @@
                                                             </a>
                                                         </span>
                                                         <th:block th:text="${#temporals.format(c2.createTime, 'yyyy年MM月dd日 HH:mm:ss')} + '&nbsp;'"></th:block>
-                                                        <th:block th:if="${session.user != null}">
-                                                            <a href="javascript:void(0)"
-                                                               th:onclick="'deleteComment(' + ${c2.commentId} + ')'">删除</a>
-                                                            <a class="comment-edit-link"
-                                                               th:href="@{'/admin/comment/edit/' + ${c2.id}}"
-                                                               target="_blank">编辑</a>
-                                                        </th:block>
                                                         <span class="floor" th:text="'&nbsp;' + ${c2stat.index + 1} + '楼'"> &nbsp;${floor}层 </span>
                                                     </span>
                                                 </span>

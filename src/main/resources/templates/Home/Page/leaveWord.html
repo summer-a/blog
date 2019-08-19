@@ -83,7 +83,7 @@
                                     <br>
                                     <span class="comment-aux">
                                         <th:block
-                                                th:text="${#temporals.format(item.createTime, 'yyyy年MM月dd日 HH:mm:ss')} + '&nbsp;'">
+                                                th:text="${#temporals.format(item.createTime, 'yyyy年MM月dd日 HH:mm')} + '&nbsp;'">
                                             yyyy年MM月dd日 HH:mm:ss
                                         </th:block>
                                         <th:block th:if="${session.user != null}">

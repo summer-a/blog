@@ -1,11 +1,15 @@
 package com.hjb.blog.controller.admin;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.github.pagehelper.PageInfo;
+import com.hjb.blog.entity.enums.ArticleStatus;
 import com.hjb.blog.entity.enums.OrderField;
 import com.hjb.blog.entity.normal.Article;
 import com.hjb.blog.entity.normal.Category;
 import com.hjb.blog.entity.normal.Tag;
 import com.hjb.blog.entity.normal.User;
+import com.hjb.blog.entity.vo.ResultVO;
 import com.hjb.blog.service.normal.ArticleService;
 import com.hjb.blog.service.normal.CategoryService;
 import com.hjb.blog.service.normal.TagService;
@@ -13,12 +17,14 @@ import com.hjb.blog.util.AdminUserUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpSession;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 
 /**
@@ -45,12 +51,13 @@ public class BackArticleController {
     @GetMapping(value = "")
     public String index(@RequestParam(required = false, defaultValue = "1") Integer pageIndex,
                         @RequestParam(required = false, defaultValue = "10") Integer pageSize,
-                        @RequestParam(required = false, defaultValue = "1") Integer status,
+                        @RequestParam(required = false) Integer status,
                         Model model) {
 
         Article articleParam = new Article();
 
         if (status == null) {
+            // 设置分页时当前的url
             model.addAttribute("pageUrlPrefix", "/admin/article?pageIndex");
         } else {
             articleParam.setArticleStatus(status);
@@ -129,7 +136,7 @@ public class BackArticleController {
      *
      * @param id 文章ID
      */
-    @GetMapping(value = "/delete/{id}")
+    @PostMapping(value = "/delete/{id}")
     public void deleteArticle(@PathVariable("id") Integer id) {
         articleService.deleteByPrimaryKey(id);
     }
@@ -143,20 +150,30 @@ public class BackArticleController {
      */
     @GetMapping(value = "/edit/{id}")
     public ModelAndView editArticleView(@PathVariable("id") Integer id) {
+
         ModelAndView modelAndView = new ModelAndView();
 
-        Article articleExample = new Article();
-        articleExample.setArticleStatus(null);
-        articleExample.setId(id);
-        Article article = articleService.selectOne(articleExample);
+        Article article = articleService.selectOneForFullArticle(new Article(id));
         modelAndView.addObject("article", article);
 
+        List<Tag> tagList = tagService.selectAll();
+        List<Tag> tagSelecteds = article.getTagList();
+        if (!CollectionUtils.isEmpty(tagList)) {
+            tagList = JSON.parseArray(JSONObject.toJSONString(tagList), Tag.class);
+            for (Tag tag : tagList) {
+                for (Tag tagSelect : tagSelecteds) {
+                    if (Objects.equals(tagSelect.getId(), tag.getId())) {
+                        // 为null则表示选中
+                        tag.setStatus(null);
+                        break;
+                    }
+                }
+            }
+        }
+        modelAndView.addObject("tagList", tagList);
 
         List<Category> categoryList = categoryService.selectAll();
         modelAndView.addObject("categoryList", categoryList);
-
-        List<Tag> tagList = tagService.selectAll();
-        modelAndView.addObject("tagList", tagList);
 
 
         modelAndView.setViewName("Admin/Article/edit");
@@ -171,37 +188,36 @@ public class BackArticleController {
      * @return
      */
     @PostMapping(value = "/editSubmit")
-    public String editArticleSubmit(Article articleParam) {
-        Article article = new Article();
-        article.setId(articleParam.getId());
-        article.setArticleTitle(articleParam.getArticleTitle());
-        article.setArticleContent(articleParam.getArticleContent());
-        article.setArticleStatus(articleParam.getArticleStatus());
-        //文章摘要
-        article.setArticleSummary(articleParam.getArticleSummary());
-        //填充分类
+    public String editArticleSubmit(Article articleParam,
+                                    @RequestParam("childId") Integer childId,
+                                    @RequestParam("articleTagIds") List<Integer> articleTagIds) {
+        // 填充分类
         List<Category> categoryList = new ArrayList<>();
-        /*if (articleParam.getArticleChildCategoryId() != null) {
-            categoryList.add(new Category(articleParam.getArticleParentCategoryId()));
+        if (childId != null) {
+            categoryList.add(new Category(childId));
         }
-        if (articleParam.getArticleChildCategoryId() != null) {
-            categoryList.add(new Category(articleParam.getArticleChildCategoryId()));
-        }*/
-        article.setCategoryList(categoryList);
+
+        articleParam.setCategoryList(categoryList);
         //填充标签
         List<Tag> tagList = new ArrayList<>();
-        /*if (articleParam.getArticleTagIds() != null) {
-            for (int i = 0; i < articleParam.getArticleTagIds().size(); i++) {
-                Tag tag = new Tag(articleParam.getArticleTagIds().get(i));
-                tagList.add(tag);
-            }
-        }*/
-        article.setTagList(tagList);
-        articleService.update(article);
+        if (!CollectionUtils.isEmpty(articleTagIds)) {
+            articleTagIds.stream().forEach(r -> tagList.add(new Tag(r)));
+            articleParam.setTagList(tagList);
+        }
+        articleService.update(articleParam);
         return "redirect:/admin/article";
     }
 
-
+    /**
+     * 获取分类
+     * @return
+     */
+    @ResponseBody
+    @GetMapping("/getCategoryList")
+    public List<Category> getCategoryList() {
+        List<Category> categoryList = categoryService.selectAll();
+        return categoryList;
+    }
 }
 
 

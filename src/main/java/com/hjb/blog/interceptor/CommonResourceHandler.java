@@ -6,6 +6,7 @@ import com.hjb.blog.service.normal.CategoryService;
 import com.hjb.blog.service.normal.MenuService;
 import com.hjb.blog.service.normal.MusicService;
 import com.hjb.blog.service.normal.OptionsService;
+import com.hjb.blog.util.AdminUserUtils;
 import com.hjb.blog.util.JvtcLoginUtils;
 import com.hjb.blog.util.TimeTableUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -73,8 +74,6 @@ public class CommonResourceHandler extends HandlerInterceptorAdapter {
                     JvtcUser jvtc_user = JvtcLoginUtils.getJvtcUser(request);
                     // 用户不存在返回登录页
                     if (jvtc_user == null) {
-                        // 原始请求链接
-                        session.setAttribute("request_url", uri);
                         response.sendRedirect("/jvtc/page/login");
                         return false;
                     } else {
@@ -90,9 +89,9 @@ public class CommonResourceHandler extends HandlerInterceptorAdapter {
                                 }
                             }
                         }
-                        // 原始请求链接
+                        // 如果没有JVTC_USER_ID的cookie和session,清除掉用户
+                        AdminUserUtils.logoutCurrentUser();
                         // cookie不对，返回登录页
-                        session.setAttribute("request_url", uri);
                         response.sendRedirect("/jvtc/page/login");
                         return false;
                     }

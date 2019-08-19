@@ -66,14 +66,14 @@ public class TagController {
         }
         model.addAttribute("nav", NavVO.covert(result));
 
-        // 文章列表
-        PageInfo<Article> tagPageInfo = tagService.pageArticleByTagId(pageNum, pageSize, tagId);
-        model.addAttribute("pageInfo", tagPageInfo);
-
         // 侧边栏
         // 标签列表显示
         List<Tag> allTagList = tagService.selectAll();
         model.addAttribute("tags", allTagList);
+
+        // 文章列表
+        PageInfo<Article> tagPageInfo = tagService.pageArticleByTagId(pageNum, pageSize, tagId);
+        model.addAttribute("pageInfo", tagPageInfo);
 
         //获得热评文章
         Article t = new Article();

@@ -8,6 +8,7 @@ import com.hjb.blog.service.normal.CategoryService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
+import tk.mybatis.mapper.entity.Example;
 
 import javax.annotation.Resource;
 import java.util.ArrayList;
@@ -39,10 +40,10 @@ public class CategoryServiceImpl extends BaseServiceImpl<Category> implements Ca
     @Transactional(readOnly = true, rollbackFor = RuntimeException.class)
     @Override
     public List<LayerMenuDTO<Category>> selectCategoryToLayerMenu(Category category) {
-        List<Category> categories = categoryMapper.selectAll();
 
-        List<LayerMenuDTO<Category>> layerMenuDTOS = categorysToLayerMenu(categories, 0);
-        return layerMenuDTOS;
+        List<Category> categories = categoryMapper.select(category);
+
+        return categorysToLayerMenu(categories, 0);
     }
 
     private List<LayerMenuDTO<Category>> categorysToLayerMenu(List<Category> categories, int parentId) {

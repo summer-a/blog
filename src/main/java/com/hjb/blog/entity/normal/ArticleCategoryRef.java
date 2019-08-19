@@ -1,10 +1,14 @@
 package com.hjb.blog.entity.normal;
 
 import com.hjb.blog.entity.base.BaseEntity;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import javax.persistence.Column;
 import javax.persistence.Table;
 
+@Data
+@NoArgsConstructor
 @Table(name = "article_category_ref")
 public class ArticleCategoryRef extends BaseEntity {
     /**
@@ -19,41 +23,8 @@ public class ArticleCategoryRef extends BaseEntity {
     @Column(name = "category_id")
     private Integer categoryId;
 
-    /**
-     * 获取文章id
-     *
-     * @return article_id - 文章id
-     */
-    public Integer getArticleId() {
-        return articleId;
+    public ArticleCategoryRef(Integer id) {
+        super(id);
     }
-
-    /**
-     * 设置文章id
-     *
-     * @param articleId 文章id
-     */
-    public void setArticleId(Integer articleId) {
-        this.articleId = articleId;
-    }
-
-    /**
-     * 获取类型id
-     *
-     * @return category_id - 类型id
-     */
-    public Integer getCategoryId() {
-        return categoryId;
-    }
-
-    /**
-     * 设置类型id
-     *
-     * @param categoryId 类型id
-     */
-    public void setCategoryId(Integer categoryId) {
-        this.categoryId = categoryId;
-    }
-
 
 }

@@ -39,16 +39,15 @@
         <ul class="layui-nav layui-layout-right">
             <li class="layui-nav-item">
                 <a href="javascript:;">
-                    <img src="${sessionScope.user.userAvatar}" class="layui-nav-img">
-                    ${sessionScope.user.userName}
+                    <img th:src="${session.user.userAvatar}" class="layui-nav-img">
+                    <th:block th:text="${session.user.userName}"></th:block>
                 </a>
                 <dl class="layui-nav-child">
-                    <!--th:href="@{'/admin/user/profile/' + ${session.user.id}}"-->
-                    <dd><a >基本资料</a></dd>
+                    <dd><a th:href="@{'/admin/user/profile/' + ${session.user.id}}">基本资料</a></dd>
                 </dl>
             </li>
             <li class="layui-nav-item">
-                <a th:href="@{/admin/logout}">退了</a>
+                <a th:href="@{/admin/logout}">退出</a>
             </li>
         </ul>
     </div>
@@ -128,14 +127,19 @@
 </div>
 
 <script th:src="@{/js/jquery.min.js}"></script>
-<script th:src="@{/plugin/layui/layui.all.js}"></script>
+<script th:src="@{/plugin/layui/layui.js}"></script>
+<!--<script th:src="@{/plugin/layui/lay/modules/element.js}"></script>-->
 <script th:src="@{/js/back.js}"></script>
 <!-- 扩展 -->
 <th:block layout:fragment="script-extend"></th:block>
 <script>
-    //给文本编辑器的iframe引入代码高亮的css
+    // 给文本编辑器的iframe引入代码高亮的css
     $("iframe").contents().find("head").append("<link rel=\"stylesheet\" href=\"/css/highlight.css\">\n");
 
+    // 初始化element
+    layui.use('element', function () {
+        var element = layui.element;
+    })
 </script>
 
 </body>

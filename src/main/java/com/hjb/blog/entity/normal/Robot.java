@@ -3,6 +3,7 @@ package com.hjb.blog.entity.normal;
 import com.hjb.blog.entity.base.BaseEntity;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 
 import javax.persistence.Column;
 import javax.validation.constraints.NotNull;
@@ -18,7 +19,7 @@ import java.time.LocalTime;
  * @date 2019/7/5 23:20
  */
 @Data
-@EqualsAndHashCode(callSuper = false)
+@NoArgsConstructor
 public class Robot extends BaseEntity {
 
     @NotNull(message = "机器人名不能为空")
@@ -48,12 +49,7 @@ public class Robot extends BaseEntity {
     @Column(name = "status")
     private Integer status;
 
-    public Robot() {
-
-    }
-
     public Robot(Integer id) {
-        super.setId(id);
+        super(id);
     }
-
 }

@@ -2,11 +2,13 @@ package com.hjb.blog.entity.normal;
 
 import com.hjb.blog.entity.base.BaseEntity;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import javax.persistence.Column;
 import javax.persistence.Transient;
 
 @Data
+@NoArgsConstructor
 public class Comment extends BaseEntity {
 
     /**

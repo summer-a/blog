@@ -25,4 +25,13 @@ public class AdminUserUtils {
         HttpSession currentSession = SpringUtils.getCurrentSession();
         return (User) currentSession.getAttribute("user");
     }
+
+    /**
+     * 登出当前用户
+     */
+    public static void logoutCurrentUser() {
+        HttpSession session = SpringUtils.getCurrentSession();
+        session.removeAttribute("user");
+        session.invalidate();
+    }
 }

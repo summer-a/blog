@@ -1,9 +1,13 @@
 package com.hjb.blog.entity.normal;
 
 import com.hjb.blog.entity.base.BaseEntity;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import javax.persistence.Column;
 
+@Data
+@NoArgsConstructor
 public class Tag extends BaseEntity {
 
     /**
@@ -18,40 +22,10 @@ public class Tag extends BaseEntity {
     @Column(name = "tag_description")
     private String tagDescription;
 
-    /**
-     * 获取标签名
-     *
-     * @return tag_name - 标签名
-     */
-    public String getTagName() {
-        return tagName;
-    }
+    @Column(name = "status")
+    private Boolean status;
 
-    /**
-     * 设置标签名
-     *
-     * @param tagName 标签名
-     */
-    public void setTagName(String tagName) {
-        this.tagName = tagName;
+    public Tag(Integer id) {
+        super(id);
     }
-
-    /**
-     * 获取标签描述
-     *
-     * @return tag_description - 标签描述
-     */
-    public String getTagDescription() {
-        return tagDescription;
-    }
-
-    /**
-     * 设置标签描述
-     *
-     * @param tagDescription 标签描述
-     */
-    public void setTagDescription(String tagDescription) {
-        this.tagDescription = tagDescription;
-    }
-
 }

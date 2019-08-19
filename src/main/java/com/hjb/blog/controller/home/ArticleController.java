@@ -1,6 +1,7 @@
 package com.hjb.blog.controller.home;
 
 import com.github.pagehelper.PageInfo;
+import com.hjb.blog.entity.enums.ArticleStatus;
 import com.hjb.blog.entity.enums.OrderField;
 import com.hjb.blog.entity.normal.Article;
 import com.hjb.blog.entity.normal.Comment;
@@ -50,7 +51,10 @@ public class ArticleController {
                                     @PathVariable(name = "id", required = true) Integer id) {
 
         // 文章信息
-        Article article = articleService.selectOneForFullArticle(id);
+        Article param = new Article();
+        param.setId(id);
+        param.setArticleStatus(ArticleStatus.PUBLISH.getValue());
+        Article article = articleService.selectOneForFullArticle(param);
         if (article == null) {
             return "Home/Error/404";
         }

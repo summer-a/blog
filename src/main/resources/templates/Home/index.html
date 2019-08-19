@@ -67,9 +67,7 @@
         </main>
 
         <!-- 分页 start -->
-        <nav class="navigation pagination" role="navigation">
-            <div id="nav-links"></div>
-        </nav>
+        <div id="nav-links" style="float: right;"></div>
         <!-- 分页 end-->
 
     </div>
@@ -86,10 +84,10 @@
         /*<![CDATA[*/
         var pages = /*[[${articles.pageSize}]]*/ 1;
         var curr = /*[[${articles.pageNum}]]*/ 1;
-        var size = /*[[${articles.total}]]*/ 5;
+        var size = /*[[${articles.total}]]*/ 10;
 
-        layui.use(['layer','laypage'], function(){
-            var laypage = layui.laypage,layer = layui.layer;
+        layui.use(['laypage'], function(){
+            var laypage = layui.laypage;
             laypage.render({
                 elem: 'nav-links'
                 ,limit: pages

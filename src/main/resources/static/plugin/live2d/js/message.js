@@ -67,17 +67,15 @@ function loadRandTextures() {
 
 function modelStorageGetItem(key) { return live2d_settings.modelStorage ? localStorage.getItem(key) : sessionStorage.getItem(key); }
 
-function loadModel(modelId, modelTexturesId=0) {
+function loadModel(modelId, modelTexturesId) {
     if (modelId == null || modelTexturesId == null) {
         return ;
     }
     if (live2d_settings.modelStorage) {
         localStorage.setItem('modelId', modelId);
         localStorage.setItem('modelTexturesId', modelTexturesId);
-    } else {
-        sessionStorage.setItem('modelId', modelId);
-        sessionStorage.setItem('modelTexturesId', modelTexturesId);
     }
+
     loadlive2d('live2d', live2d_settings.modelAPI+'get/?id='+modelId+'-'+modelTexturesId, (live2d_settings.showF12Status ? console.log('[Status]','live2d','模型',modelId+'-'+modelTexturesId,'加载完成'):null));
 }
 
@@ -146,7 +144,10 @@ $('.waifu-tool .fa-camera').click(function(){
 });
 
 $('.waifu-tool .fa-close').click(function(){
-    sessionStorage.setItem('waifu-dsiplay','none');
+
+    localStorage.setItem('waifu-dsiplay','none');
+    localStorage.setItem('live2d-status','hide');
+
     showMessage('愿你有一天能与重要的人重逢',2000);
     $('#landlord').animate({bottom:'-400px'},50)
     window.setTimeout(function(){$('#landlord').css("opacity", 0);},300);
@@ -155,7 +156,7 @@ $('.waifu-tool .fa-close').click(function(){
 function initTips(){
     $.ajax({
         cache: true,
-        url: `${message_Path}message.json`,
+        url: '/plugin/live2d/message.json', // 配置地址
         dataType: "json",
         success: function (result){
             $.each(result.mouseover, function (index, tips){
@@ -194,7 +195,7 @@ initTips();
             text = '嗨！ 来自 谷歌搜索 的朋友！<br>欢迎访问<span style="color:#0099cc;">「 ' + document.title.split(' - ')[0] + ' 」</span>';
         }
     }else {
-        if (window.location.href == `${home_Path}`) { //主页URL判断，需要斜杠结尾
+        if (window.location.href == (location.origin + '/')) { //主页URL判断，需要斜杠结尾
             var now = (new Date()).getHours();
             if (now > 23 || now <= 5) {
                 text = '你是夜猫子呀？这么晚还不睡觉，明天起的来嘛？';
@@ -258,5 +259,14 @@ function initLive2d (){
     }, () => {
         $('.hide-button').fadeOut(600)
     })
+}
+
+var status = localStorage.getItem("live2d-status");
+if (status && status == "show") {
+    $('#landlord').animate({bottom:'0px'},50)
+    window.setTimeout(function(){$('#landlord').css("opacity", 1);},300);
+} else {
+    $('#landlord').animate({bottom:'-400px'},50)
+    window.setTimeout(function(){$('#landlord').css("opacity", 0);},300);
 }
 initLive2d ();

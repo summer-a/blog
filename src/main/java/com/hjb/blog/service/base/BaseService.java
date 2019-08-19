@@ -53,6 +53,14 @@ public interface BaseService<T> {
     int update(T t);
 
     /**
+     * 根据条件更新
+     * @param t 更新的内容
+     * @param example 更新条件
+     * @return
+     */
+    int updateByExampleSelective(T t, Example example);
+
+    /**
      * 根据实体类查询
      * @param t 实体类
      * @return

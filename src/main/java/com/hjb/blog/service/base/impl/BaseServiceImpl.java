@@ -62,6 +62,19 @@ public class BaseServiceImpl<T extends BaseEntity> implements BaseService<T> {
         return mapper.updateByPrimaryKeySelective(t);
     }
 
+    /**
+     * 根据条件更新
+     *
+     * @param t       更新的内容
+     * @param example 更新条件
+     * @return
+     */
+    @Override
+    public int updateByExampleSelective(T t, Example example) {
+        t.setUpdateTime(LocalDateTime.now());
+        return mapper.updateByExampleSelective(t, example);
+    }
+
     @Override
     public List<T> select(T t) {
         return mapper.select(t);

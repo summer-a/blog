@@ -57,15 +57,14 @@
                                 </a>
                             </td>
                             <td>
-                                <a th:href="@{'/category/' + ${c.id}}"
-                                   target="_blank" th:each="c : ${a.categoryList}" th:text="${c.categoryName}">分类名</a>
+                                <a target="_blank" th:each="c : ${a.categoryList}" th:text="${c.categoryName}">分类名</a>
                                 &nbsp;
                             </td>
                             <td>
-                                <a th:href="@{'/admin/article?status=1'}" th:if="${a.articleStatus == 1}">
+                                <a th:if="${a.articleStatus == 1}">
                                     <span style="color:#5FB878;">已发布</span>
                                 </a>
-                                <a th:href="@{'/admin/article?status=0'}" th:if="${a.articleStatus != 1}">
+                                <a th:if="${a.articleStatus != 1}">
                                     <span style="color:#FF5722;">草稿</span>
                                 </a>
                             </td>
@@ -83,7 +82,12 @@
                     </tbody>
                 </table>
             </form>
+            <!-- 分页 -->
+            <div id="paging"></div>
         </div>
+    </th:block>
+    <th:block layout:fragment="script-extend">
+        <th:block th:replace="Admin/Public/paging::paging"></th:block>
     </th:block>
 </body>
 </html>

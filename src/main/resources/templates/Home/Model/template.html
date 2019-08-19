@@ -16,6 +16,7 @@
     <meta name="HandheldFriendly" content="true"/>
     <link rel="shortcut icon" th:href="@{/img/logo.png}"/>
     <!-- 通用css -->
+    <link rel="stylesheet" th:href="@{/plugin/layui/css/layui.css}">
     <link rel="stylesheet" th:href="@{/css/style.css}"/>
     <link rel="stylesheet" th:href="@{/plugin/font-awesome/css/font-awesome.min.css}"/>
     <!-- 引入看板娘css -->
@@ -68,6 +69,12 @@
                 </div>
             </div>
 
+            <!-- 固定块 -->
+            <ul class="fix-block">
+                <li class="live2d-block">看板娘</li>
+                <li class="top-block" style="display: none">△</li>
+            </ul>
+
             <!-- 音乐 -->
             <th:block th:replace="Home/Model/music::music"></th:block>
         </div>
@@ -81,7 +88,7 @@
     <script th:src="@{/js/superfish.js}"></script>
     <script th:src="@{/js/sticky.js}"></script>
     <script th:src="@{/js/script.js}"></script>
-    <script th:src="@{/plugin/layui/layui.all.js}"></script>
+    <script th:src="@{/plugin/layui/layui.js}"></script>
 
     <script th:src="@{/plugin/music/js/player.js}"></script>
     <script th:src="@{/plugin/music/js/playlist.js}"></script>
@@ -91,11 +98,6 @@
     <!-- 二维码 -->
     <script type="text/javascript" th:src="@{/js/qrcode.min.js}"></script>
 
-    <!-- 看板娘js -->
-    <script type="text/javascript">
-        var message_Path = '/plugin/live2d/'
-        var home_Path = 'http://localhost:8080/'
-    </script>
     <script type="text/javascript" th:src="@{/plugin/live2d/js/live2d.js}"></script>
     <script type="text/javascript" th:src="@{/plugin/live2d/js/message.js}"></script>
     <script type="text/javascript">
@@ -148,6 +150,39 @@
                 }
             }
         }
+
+        /**
+         * 固定块按钮
+         */
+        $(window).scroll(function () {
+            if ($(document).scrollTop() > 160) {
+                $('.top-block').fadeIn();
+            } else {
+                $('.top-block').fadeOut();
+            }
+        });
+        // 置顶按钮
+        $('.top-block').click(function () {
+            var timer = setInterval(function () {
+                if ($(document).scrollTop() == 0) {
+                    clearInterval(timer);
+                } else {
+                    $(document).scrollTop($(document).scrollTop() - 30);
+                }
+            }, 5);
+        });
+        // 看板娘按钮
+        $(".live2d-block").click(function() {
+            if ($("#landlord").css("opacity") == 1) {
+                $('#landlord').animate({bottom:'-400px'},50)
+                window.setTimeout(function(){$('#landlord').css("opacity", 0);},300);
+                localStorage.setItem("live2d-status", "hide");
+            } else {
+                $('#landlord').animate({bottom:'0px'},50)
+                window.setTimeout(function(){$('#landlord').css("opacity", 1);},300);
+                localStorage.setItem("live2d-status", "show");
+            }
+        })
 
     </script>
 

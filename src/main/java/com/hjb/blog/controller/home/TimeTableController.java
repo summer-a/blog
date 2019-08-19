@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 import java.util.List;
 import java.util.concurrent.ScheduledFuture;
 
@@ -157,8 +158,9 @@ public class TimeTableController {
     }
 
     @GetMapping(value = "logout")
-    public String logout(HttpServletRequest request) {
-        request.getSession().removeAttribute("jvtc_user");
+    public String logout(HttpSession session) {
+        session.removeAttribute("jvtc_user");
+        session.invalidate();
         return "redirect:jvtc/page/login";
     }
 
