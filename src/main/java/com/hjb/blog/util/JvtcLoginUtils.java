@@ -1,20 +1,18 @@
 package com.hjb.blog.util;
 
 import com.hjb.blog.entity.normal.JvtcUser;
-import com.hjb.blog.entity.vo.JvtcResponseVO;
+import com.hjb.blog.entity.vo.ResponseVO;
 import com.hjb.blog.service.common.RedisService;
 import com.hjb.blog.service.normal.JvtcUserService;
-import okhttp3.*;
+import okhttp3.FormBody;
+import okhttp3.Request;
+import okhttp3.RequestBody;
 import org.jsoup.nodes.Document;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.util.StringUtils;
-import org.springframework.web.context.request.RequestContextHolder;
-import org.springframework.web.context.request.ServletRequestAttributes;
 import us.codecraft.webmagic.selector.Html;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
-import java.io.IOException;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
@@ -52,11 +50,6 @@ public class JvtcLoginUtils {
      * 格式化器
      */
     private static DateTimeFormatter formatYMD = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-
-    /**
-     * okhttp客户端
-     */
-    private static OkHttpClient client = new OkHttpClient();
 
     /**
      * 配置
@@ -133,7 +126,7 @@ public class JvtcLoginUtils {
 
             request.addHeader(COOKIE, jvtcUser.getCookie());
             // 判断缓存是否过期
-            JvtcResponseVO kbPageResponse = get(kbPage + "?rq=" + date, request);
+            ResponseVO kbPageResponse = HttpUtils.get(kbPage + "?rq=" + date, request);
             Html kbHtml = kbPageResponse.getHtml();
             // 成功
             if (isLogined(kbHtml)) {
@@ -149,7 +142,7 @@ public class JvtcLoginUtils {
         loginByUserNameAndEncode(jvtcUser.getUsername(), jvtcUser.getPassword());
 
         // 获取课表
-        JvtcResponseVO result = get(kbPage + "?rq=" + date, request);
+        ResponseVO result = HttpUtils.get(kbPage + "?rq=" + date, request);
         Html html = result.getHtml();
         if (result.getCode() == 200 && !StringUtils.isEmpty(html)) {
             // 处理
@@ -243,12 +236,12 @@ public class JvtcLoginUtils {
      * @param encoded  压缩的密码
      * @return 如果返回401表示账号密码有误
      */
-    public static JvtcResponseVO loginByUserNameAndEncode(String username, String encoded) {
+    public static ResponseVO loginByUserNameAndEncode(String username, String encoded) {
 
         JvtcUserService jvtcUserService = SpringUtils.getBean(JvtcUserService.class);
 
         // 第一遍非缓存登录
-        JvtcResponseVO jvtcResponse = loginRequest(loginUrl, username, encoded);
+        ResponseVO jvtcResponse = loginRequest(loginUrl, username, encoded);
         String cookie = jvtcResponse.getHeaders().get(SET_COOKIE);
         if (StringUtils.isEmpty(cookie)) {
             return null;
@@ -258,13 +251,13 @@ public class JvtcLoginUtils {
         cookie = cookie.split(";")[0];
 
         // 第二遍缓存登录
-        JvtcResponseVO loginResponse = loginRequest(loginUrl, username, encoded, cookie.split(";")[0]);
+        ResponseVO loginResponse = loginRequest(loginUrl, username, encoded, cookie.split(";")[0]);
         // 插入或更新数据库缓存
         JvtcUser user = new JvtcUser();
         user.setUsername(username);
         JvtcUser jvtcUser = jvtcUserService.selectOne(user);
 
-        if (isLogined(loginResponse.getHtml())) {
+        if (loginResponse != null && isLogined(loginResponse.getHtml())) {
             // 插入/更新cookie
             if (jvtcUser == null) {
                 jvtcUser = new JvtcUser();
@@ -287,7 +280,7 @@ public class JvtcLoginUtils {
 
                     Request.Builder builder = JvtcLoginUtils.initParam();
                     builder.addHeader(COOKIE, cookie);
-                    JvtcResponseVO userInfo = JvtcLoginUtils.get(infoPage, builder);
+                    ResponseVO userInfo = HttpUtils.get(infoPage, builder);
                     Html userInfoHtml = userInfo.getHtml();
                     juser.setClazz(userInfoHtml.xpath("//div[@class='middletopttxlr']/div[6]/div[2]/text()").get());
                     jvtcUserService.update(juser);
@@ -296,7 +289,7 @@ public class JvtcLoginUtils {
 
             return loginResponse;
         }
-        return new JvtcResponseVO(401, null, null);
+        return new ResponseVO(401, null, null);
     }
 
     /**
@@ -306,6 +299,9 @@ public class JvtcLoginUtils {
      * @return
      */
     public static boolean isLogined(Html html) {
+        if (html == null) {
+            return false;
+        }
         if (html.getDocument().title().equals(LOGIN_TITLE_TEXT)) {
             return false;
         }
@@ -320,7 +316,7 @@ public class JvtcLoginUtils {
      */
     public static boolean isLogined(String cookie) {
         Request.Builder builder = initParam().addHeader(COOKIE, cookie);
-        JvtcResponseVO resp = get(kbPage, builder);
+        ResponseVO resp = HttpUtils.get(kbPage, builder);
         return isLogined(resp.getHtml());
     }
 
@@ -331,7 +327,7 @@ public class JvtcLoginUtils {
      * @param encoded  加密数据
      * @return
      */
-    public static JvtcResponseVO loginRequest(String username, String encoded) {
+    public static ResponseVO loginRequest(String username, String encoded) {
         return loginRequest(loginUrl, username, encoded, null);
     }
 
@@ -343,7 +339,7 @@ public class JvtcLoginUtils {
      * @param encoded  加密数据
      * @return
      */
-    public static JvtcResponseVO loginRequest(String url, String username, String encoded) {
+    public static ResponseVO loginRequest(String url, String username, String encoded) {
         return loginRequest(url, username, encoded, null);
     }
 
@@ -356,7 +352,7 @@ public class JvtcLoginUtils {
      * @return
      * @parma cookie 缓存
      */
-    public static JvtcResponseVO loginRequest(String url, String username, String encoded, String cookie) {
+    public static ResponseVO loginRequest(String url, String username, String encoded, String cookie) {
 
         RequestBody body = new FormBody.Builder()
                 .add("userAccount", username)
@@ -369,46 +365,9 @@ public class JvtcLoginUtils {
             builder.addHeader(COOKIE, cookie);
         }
 
-        return post(url, builder, body);
+        return HttpUtils.post(url, builder, body);
     }
 
-
-    /**
-     * get请求
-     *
-     * @param url
-     * @return
-     */
-    public static JvtcResponseVO get(String url, Request.Builder builder) {
-        // 请求
-        Request request = builder.url(url).build();
-
-        // 响应
-        try (Response response = client.newCall(request).execute()) {
-            return new JvtcResponseVO(response.code(), Html.create(response.body().string()), response.headers());
-        } catch (IOException e) {
-            e.printStackTrace();
-            return new JvtcResponseVO(500, null, null);
-        }
-    }
-
-    /**
-     * post 请求
-     *
-     * @param url     地址
-     * @param builder 信息
-     * @param body    主体信息
-     * @return
-     * @throws IOException
-     */
-    private static JvtcResponseVO post(String url, Request.Builder builder, RequestBody body) {
-        Request request = builder.url(url).post(body).build();
-        try (Response response = client.newCall(request).execute()) {
-            return new JvtcResponseVO(response.code(), Html.create(response.body().string()), response.headers());
-        } catch (IOException e) {
-            return null;
-        }
-    }
 
     /**
      * 参数初始化

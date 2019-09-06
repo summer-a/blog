@@ -67,6 +67,36 @@ public class Article extends BaseEntity {
     private String articleSummary;
 
     /**
+     * 是否原创
+     */
+    @Column(name = "article_is_original")
+    private Boolean articleIsOriginal;
+
+    /**
+     * 来源
+     */
+    @Column(name = "article_from")
+    private String articleFrom;
+
+    /**
+     * 来源文章url
+     */
+    @Column(name = "article_from_url")
+    private String articleFromUrl;
+
+    /**
+     * 来源作者
+     */
+    @Column(name = "article_from_author")
+    private String articleFromAuthor;
+
+    /**
+     * 来源作者url
+     */
+    @Column(name = "article_from_author_url")
+    private String articleFromAuthorUrl;
+
+    /**
      * 文章内容放在另一张表
      */
     @Transient

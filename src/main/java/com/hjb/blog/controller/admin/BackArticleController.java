@@ -3,13 +3,11 @@ package com.hjb.blog.controller.admin;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.github.pagehelper.PageInfo;
-import com.hjb.blog.entity.enums.ArticleStatus;
 import com.hjb.blog.entity.enums.OrderField;
 import com.hjb.blog.entity.normal.Article;
 import com.hjb.blog.entity.normal.Category;
 import com.hjb.blog.entity.normal.Tag;
 import com.hjb.blog.entity.normal.User;
-import com.hjb.blog.entity.vo.ResultVO;
 import com.hjb.blog.service.normal.ArticleService;
 import com.hjb.blog.service.normal.CategoryService;
 import com.hjb.blog.service.normal.TagService;
@@ -19,7 +17,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpSession;
 import java.util.ArrayList;
@@ -149,12 +146,11 @@ public class BackArticleController {
      * @return
      */
     @GetMapping(value = "/edit/{id}")
-    public ModelAndView editArticleView(@PathVariable("id") Integer id) {
+    public String editArticleView(Model model, @PathVariable("id") Integer id) {
 
-        ModelAndView modelAndView = new ModelAndView();
 
         Article article = articleService.selectOneForFullArticle(new Article(id));
-        modelAndView.addObject("article", article);
+        model.addAttribute("article", article);
 
         List<Tag> tagList = tagService.selectAll();
         List<Tag> tagSelecteds = article.getTagList();
@@ -170,14 +166,12 @@ public class BackArticleController {
                 }
             }
         }
-        modelAndView.addObject("tagList", tagList);
+        model.addAttribute("tagList", tagList);
 
         List<Category> categoryList = categoryService.selectAll();
-        modelAndView.addObject("categoryList", categoryList);
+        model.addAttribute("categoryList", categoryList);
 
-
-        modelAndView.setViewName("Admin/Article/edit");
-        return modelAndView;
+        return "Admin/Article/edit";
     }
 
 
@@ -189,8 +183,8 @@ public class BackArticleController {
      */
     @PostMapping(value = "/editSubmit")
     public String editArticleSubmit(Article articleParam,
-                                    @RequestParam("childId") Integer childId,
-                                    @RequestParam("articleTagIds") List<Integer> articleTagIds) {
+                                    @RequestParam(value = "childId", required = true) Integer childId,
+                                    @RequestParam(value = "articleTagIds", required = false) List<Integer> articleTagIds) {
         // 填充分类
         List<Category> categoryList = new ArrayList<>();
         if (childId != null) {

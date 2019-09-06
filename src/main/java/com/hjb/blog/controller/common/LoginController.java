@@ -1,14 +1,12 @@
 package com.hjb.blog.controller.common;
 
 import com.hjb.blog.entity.normal.JvtcUser;
-import com.hjb.blog.entity.vo.JvtcResponseVO;
+import com.hjb.blog.entity.vo.ResponseVO;
 import com.hjb.blog.service.normal.JvtcUserService;
 import com.hjb.blog.util.JvtcLoginUtils;
 import org.springframework.stereotype.Controller;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
@@ -57,7 +55,7 @@ public class LoginController {
 
         if (jvtcUser == null || StringUtils.isEmpty(jvtcUser.getCookie())) {
             // 查询页面
-            JvtcResponseVO jResponse = JvtcLoginUtils.loginByUserNameAndEncode(username, encoded);
+            ResponseVO jResponse = JvtcLoginUtils.loginByUserNameAndEncode(username, encoded);
             // 有则直接获取
             // 登录失败
             if (jResponse.getCode() == 401) {

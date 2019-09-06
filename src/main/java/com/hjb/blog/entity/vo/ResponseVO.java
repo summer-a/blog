@@ -12,7 +12,7 @@ import us.codecraft.webmagic.selector.Html;
  * @description: TODO
  * @date 2019/6/27 20:29
  */
-public class JvtcResponseVO {
+public class ResponseVO {
 
     /** 状态码 */
     private Integer code;
@@ -21,9 +21,9 @@ public class JvtcResponseVO {
     /** 头描述 */
     private Headers headers;
 
-    public JvtcResponseVO() {}
+    public ResponseVO() {}
 
-    public JvtcResponseVO(Integer code, Html html, Headers headers) {
+    public ResponseVO(Integer code, Html html, Headers headers) {
         this.code = code;
         this.html = html;
         this.headers = headers;
@@ -55,7 +55,7 @@ public class JvtcResponseVO {
 
     @Override
     public String toString() {
-        return "JvtcResponseVO{" +
+        return "ResponseVO{" +
                 "code=" + code +
                 ", html=" + html +
                 ", headers=" + headers +

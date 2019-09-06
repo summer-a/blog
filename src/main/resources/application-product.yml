@@ -1,25 +1,15 @@
-#host:
-#  ip: 120.77.215.148
-#  indexUrl: http://www.chiyouyun.com/
-#  tableUrl: http://kb.chiyouyun.com/
 spring:
   profiles: product
   datasource:
     druid:
       driver-class-name: com.mysql.jdbc.Driver
-      url: jdbc:mysql://${host.ip}:3309/hjb_blog?useSSL=false&characterEncoding=utf-8&serverTimezone=UTC
+      url: jdbc:mysql://${host.ip}:3309/hjb_blog?useSSL=false&serverTimezone=UTC
       username: root
       password: Hjb88619973.
       initial-size: 1
       min-idle: 1
       max-active: 20
       test-on-borrow: true
-  thymeleaf:
-    mode: LEGACYHTML5
-    cache: false
-    encoding: utf-8
-    servlet:
-      content-type: text/html
   redis:
     lettuce:
       pool:
@@ -37,7 +27,7 @@ spring:
   banner:
     charset: UTF-8
 server:
-  port: 8089
+  port: 8084
   servlet:
     context-path: /
 logging:

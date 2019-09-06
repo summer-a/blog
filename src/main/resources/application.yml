@@ -7,10 +7,24 @@ spring:
   # 当配置没有找到Controller时抛出异常
   mvc:
     throw-exception-if-no-handler-found: true
+  servlet:
+    multipart:
+      # 单个文件的最大值
+      max-file-size: 2MB
+      # 多个文件的总大小
+      max-request-size: 5MB
+  thymeleaf:
+    mode: LEGACYHTML5
+    cache: false
+    encoding: utf-8
+    servlet:
+      content-type: text/html
+    prefix: classpath:/templates/
 host:
   ip: 120.77.215.148
   indexUrl: http://www.chiyouyun.com/
   tableUrl: http://kb.chiyouyun.com/
+  imageUrl: http://image.chiyouyun.com/
   es:
     port: 9300
     rest-port: 9200

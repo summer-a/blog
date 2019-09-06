@@ -47,6 +47,9 @@ public class ArticleServiceImpl extends BaseServiceImpl<Article> implements Arti
     @Resource
     private ArticleContentMapper articleContentMapper;
 
+    @Resource
+    private CommentMapper commentMapper;
+
     @Transactional(readOnly = true, rollbackFor = RuntimeException.class)
     @Override
     public PageInfo<Article> page(int pageNum, int pageSize, Article article, OrderField orderField) {
@@ -135,7 +138,7 @@ public class ArticleServiceImpl extends BaseServiceImpl<Article> implements Arti
      * @param pageNum    页码
      * @param pageSize   每页数量
      * @param categoryId 分类id
-     * @param status 文章状态
+     * @param status     文章状态
      * @return
      */
     @Override
@@ -150,29 +153,65 @@ public class ArticleServiceImpl extends BaseServiceImpl<Article> implements Arti
 
     /**
      * 根据主键删除
+     *
      * @param id id
      * @return
      */
     @Override
     @Transactional(readOnly = false, rollbackFor = RuntimeException.class)
     public int deleteByPrimaryKey(Integer id) {
+        // 删除分类引用
+        ArticleCategoryRef articleCategoryRef = new ArticleCategoryRef();
+        articleCategoryRef.setArticleId(id);
+        articleCategoryRefMapper.delete(articleCategoryRef);
+        // 删除标签引用
+        ArticleTagRef articleTagRef = new ArticleTagRef();
+        articleTagRef.setArticleId(id);
+        articleTagRefMapper.delete(articleTagRef);
+        // 删除评论
+        Comment comment = new Comment();
+        comment.setCommentArticleId(id);
+        commentMapper.delete(comment);
+        // 删除内容
         articleContentMapper.deleteByPrimaryKey(id);
+        // 删除主体
         return super.deleteByPrimaryKey(id);
     }
 
     /**
      * 根据条件删除
+     *
      * @param article
      * @return
      */
     @Override
     @Transactional(readOnly = false, rollbackFor = RuntimeException.class)
     public int delete(Article article) {
+        // 删除
         List<Article> articles = articleMapper.select(article);
         if (!CollectionUtils.isEmpty(articles)) {
-            articles.forEach(r -> articleContentMapper.delete(new ArticleContent(r.getId())));
+            for (Article a : articles) {
+                // 删除分类引用
+                ArticleCategoryRef articleCategoryRef = new ArticleCategoryRef();
+                articleCategoryRef.setArticleId(a.getId());
+                articleCategoryRefMapper.delete(articleCategoryRef);
+                // 删除标签引用
+                ArticleTagRef articleTagRef = new ArticleTagRef();
+                articleTagRef.setArticleId(a.getId());
+                articleTagRefMapper.delete(articleTagRef);
+                // 删除评论
+                Comment comment = new Comment();
+                comment.setCommentArticleId(a.getId());
+                commentMapper.delete(comment);
+                // 删除内容
+                articleContentMapper.deleteByPrimaryKey(a.getId());
+                // 删除主体
+                super.deleteByPrimaryKey(a.getId());
+            }
+
+            return articles.size();
         }
-        return super.delete(article);
+        return 0;
     }
 
     @Override
@@ -212,12 +251,13 @@ public class ArticleServiceImpl extends BaseServiceImpl<Article> implements Arti
 
             // 更新标签
             List<Tag> tagList = article.getTagList();
-            if (!CollectionUtils.isEmpty(tagList)) {
-                // 删除
-                ArticleTagRef articleTagRef = new ArticleTagRef();
-                articleTagRef.setArticleId(article.getId());
-                articleTagRefMapper.delete(articleTagRef);
 
+            // 删除
+            ArticleTagRef articleTagRef = new ArticleTagRef();
+            articleTagRef.setArticleId(article.getId());
+            articleTagRefMapper.delete(articleTagRef);
+
+            if (!CollectionUtils.isEmpty(tagList)) {
                 for (Tag tag : tagList) {
                     ArticleTagRef articleTagRefAdd = new ArticleTagRef();
                     articleTagRefAdd.setTagId(tag.getId());
@@ -240,13 +280,90 @@ public class ArticleServiceImpl extends BaseServiceImpl<Article> implements Arti
         throw new NullPointerException("Article is null");
     }
 
+    @Transactional(readOnly = false, rollbackFor = RuntimeException.class)
     @Override
     public int insert(Article article) {
-        return super.insert(article);
+        // 插入主体
+        int result = super.insert(article);
+        // 插入内容
+        ArticleContent content = new ArticleContent();
+        content.setArticleContent(article.getArticleContent());
+        content.setArticleId(article.getId());
+        content.setCreateTime(LocalDateTime.now());
+        content.setUpdateTime(LocalDateTime.now());
+        articleContentMapper.insertSelective(content);
+        if (result > 0) {
+            // 插入分类引用
+            List<Category> categoryList = article.getCategoryList();
+            if (!CollectionUtils.isEmpty(categoryList)) {
+                for (Category category : categoryList) {
+                    ArticleCategoryRef articleCategoryRef = new ArticleCategoryRef();
+                    articleCategoryRef.setArticleId(article.getId());
+                    articleCategoryRef.setCategoryId(category.getId());
+                    articleCategoryRef.setCreateTime(LocalDateTime.now());
+                    articleCategoryRef.setUpdateTime(LocalDateTime.now());
+                    articleCategoryRefMapper.insert(articleCategoryRef);
+                }
+            }
+            // 插入标签引用
+            List<Tag> tagList = article.getTagList();
+            if (!CollectionUtils.isEmpty(tagList)) {
+                for (Tag tag : tagList) {
+                    ArticleTagRef articleTagRef = new ArticleTagRef();
+                    articleTagRef.setArticleId(article.getId());
+                    articleTagRef.setTagId(tag.getId());
+                    articleTagRef.setCreateTime(LocalDateTime.now());
+                    articleTagRef.setUpdateTime(LocalDateTime.now());
+                    articleTagRefMapper.insert(articleTagRef);
+                }
+            }
+
+        }
+        return result;
     }
 
+    @Transactional(readOnly = false, rollbackFor = RuntimeException.class)
     @Override
     public int insertSelective(Article article) {
-        return super.insertSelective(article);
+        // 插入主体
+        int result = super.insertSelective(article);
+        // 插入内容
+        ArticleContent content = new ArticleContent();
+        content.setArticleContent(article.getArticleContent());
+        content.setArticleId(article.getId());
+        content.setCreateTime(LocalDateTime.now());
+        content.setUpdateTime(LocalDateTime.now());
+        articleContentMapper.insertSelective(content);
+
+        if (result > 0) {
+            // 插入分类引用
+            List<Category> categoryList = article.getCategoryList();
+            if (!CollectionUtils.isEmpty(categoryList)) {
+                for (Category category : categoryList) {
+                    ArticleCategoryRef articleCategoryRef = new ArticleCategoryRef();
+                    articleCategoryRef.setArticleId(article.getId());
+                    articleCategoryRef.setCategoryId(category.getId());
+                    articleCategoryRef.setCreateTime(LocalDateTime.now());
+                    articleCategoryRef.setUpdateTime(LocalDateTime.now());
+                    articleCategoryRefMapper.insertSelective(articleCategoryRef);
+                }
+            }
+            // 插入标签引用
+            List<Tag> tagList = article.getTagList();
+            if (!CollectionUtils.isEmpty(tagList)) {
+                for (Tag tag : tagList) {
+                    ArticleTagRef articleTagRef = new ArticleTagRef();
+                    articleTagRef.setArticleId(article.getId());
+                    articleTagRef.setTagId(tag.getId());
+                    articleTagRef.setCreateTime(LocalDateTime.now());
+                    articleTagRef.setUpdateTime(LocalDateTime.now());
+                    articleTagRefMapper.insertSelective(articleTagRef);
+                }
+            }
+
+        }
+        // 更新elasticsearch搜索引擎数据
+        // ..
+        return result;
     }
 }

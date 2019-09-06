@@ -23,6 +23,9 @@ public class CommonUtils {
     /** 头像 */
     private static final String AVATAR_URL = "http://cn.gravatar.com/avatar/%s?s=128&d=identicon&r=PG";
 
+    /** 默认配置路径 */
+    private static final String CONFIG_PATH = "config.properties";
+
     /**
      * 字符串转为MD5
      */
@@ -101,4 +104,11 @@ public class CommonUtils {
         return null;
     }
 
+    /**
+     * 获取配置文件的配置
+     * @return
+     */
+    public static Properties getProperties() {
+        return getProperties(CONFIG_PATH);
+    }
 }

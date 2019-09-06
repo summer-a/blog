@@ -25,7 +25,7 @@ import java.util.Properties;
 @RequestMapping("/geetest")
 public class GeetestController {
 
-    private Properties config = CommonUtils.getProperties("config.properties");
+    private Properties config = CommonUtils.getProperties();
 
     private GeetestLib gtSdk = new GeetestLib(config.getProperty("geetest.id"), config.getProperty("geetest.key"),
             Boolean.parseBoolean(config.getProperty("geetest.newfailback")));

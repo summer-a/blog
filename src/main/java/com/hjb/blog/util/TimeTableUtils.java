@@ -90,7 +90,7 @@ public class TimeTableUtils {
                 try {
                     for (MessageInfo messageInfo : messageInfos) {
                         // 消息间隔
-                        Properties properties = CommonUtils.getProperties("config.properties");
+                        Properties properties = CommonUtils.getProperties();
                         Thread.sleep(Integer.parseInt(properties.getProperty("message.interval", "10")));
                         // 根据类型发送消息
                         if (messageInfo.getType().equals(QQType.QQ)) {

@@ -40,6 +40,17 @@
                     <div class="single-content" th:utext="${article.articleContent}">
                         文章内容
                     </div>
+                    <div style="border: 1px solid #009688; padding: 3px;">
+                        <div th:if="${article.articleIsOriginal}">
+                            本文为 [原创文章] 转载时请注明出处
+                        </div>
+                        <div th:if="${article.articleIsOriginal == false}">
+                            本文为
+                            <th:block th:text="'转载文章，转载自' + ${article.articleFrom}"></th:block>
+                            原作者：<a target="_blank" th:href="@{${article.articleFromAuthorUrl}}" th:text="${article.articleFromAuthor}"></a>
+                            <p>来源:<a target="_blank" th:href="@{${article.articleFromUrl}}" th:text="${article.articleFromUrl}"></a></p>
+                        </div>
+                    </div>
                     <!-- 联系方式 -->
                     <div th:replace="Home/Model/link::link"></div>
 
@@ -48,7 +59,7 @@
                         <div class="social-main">
                             <span class="like">
                                 <a href="javascript:;" data-action="ding" data-id="1" title="点赞"
-                                   class="favorite" th:onclick="'increaseLikeCount(' + ${article.id} +')'">
+                                   class="favorite" onclick="'increaseLikeCount(' + ${article.id} +')'">
                                     <i class="fa fa-thumbs-up"></i>赞
                                     <i class="count"
                                        th:id="'count-' + ${article.id}" th:text="${article.articleLikeCount}">0</i>
@@ -62,11 +73,11 @@
                                 </span>
                             </div>
                             <div class="share-sd">
-                                        <span class="share-s"style="margin-top: 25px!important;">
-                                            <a href="javascript:void(0)" id="share-s" title="分享">
-                                                <i class="fa fa-share-alt"></i>分享
-                                            </a>
-                                        </span>
+                                <span class="share-s"style="margin-top: 25px!important;">
+                                    <a href="javascript:void(0)" id="share-s" title="分享">
+                                        <i class="fa fa-share-alt"></i>分享
+                                    </a>
+                                </span>
                                 <div id="share">
                                     <ul class="bdsharebuttonbox bdshare-button-style1-16" data-bd-bind="1503997585792">
                                         <li><a title="更多" class="bds_more fa fa-plus-square" data-cmd="more"
@@ -118,7 +129,7 @@
                         </ul>
                         <div class="single-cat-tag">
                             <div class="single-cat">所属分类：
-                                <a th:each="c : ${article.categoryList}" th:href="@{'/category/' + c.id}"
+                                <a th:each="c : ${article.categoryList}" th:href="@{'/category/' + ${c.id}}"
                                    th:text="${c.categoryName}">
                                     ${c.categoryName}
                                 </a>

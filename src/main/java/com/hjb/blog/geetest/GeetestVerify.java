@@ -19,7 +19,7 @@ import java.util.Properties;
  */
 public class GeetestVerify {
 
-    private static Properties config = CommonUtils.getProperties("config.properties");
+    private static Properties config = CommonUtils.getProperties();
 
     private static GeetestLib gtSdk = new GeetestLib(config.getProperty("geetest.id"), config.getProperty("geetest.key"),
             Boolean.parseBoolean(config.getProperty("geetest.newfailback")));

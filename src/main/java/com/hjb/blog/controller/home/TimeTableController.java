@@ -157,11 +157,11 @@ public class TimeTableController {
         return ResultVO.ok();
     }
 
-    @GetMapping(value = "logout")
+    @GetMapping(value = "/logout")
     public String logout(HttpSession session) {
         session.removeAttribute("jvtc_user");
         session.invalidate();
-        return "redirect:jvtc/page/login";
+        return "redirect:/jvtc/page/login";
     }
 
 }

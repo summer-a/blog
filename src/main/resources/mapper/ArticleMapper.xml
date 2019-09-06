@@ -25,6 +25,11 @@
         <id property="id" column="id"/>
         <result property="articleUserId" column="article_user_id"/>
         <result property="articleTitle" column="article_title"/>
+        <result property="articleIsOriginal" column="article_is_original"/>
+        <result property="articleFrom" column="article_from"/>
+        <result property="articleFromUrl" column="article_from_url"/>
+        <result property="articleFromAuthor" column="article_from_author"/>
+        <result property="articleFromAuthorUrl" column="article_from_author_url"/>
         <result property="articleViewCount" column="article_view_count"/>
         <result property="articleCommentCount" column="article_comment_count"/>
         <result property="articleLikeCount" column="article_like_count"/>
@@ -45,6 +50,11 @@
         a.id,
         a.article_user_id,
         a.article_title,
+        a.article_is_original,
+        a.article_from,
+        a.article_from_url,
+        a.article_from_author,
+        a.article_from_author_url,
         a.article_view_count,
         a.article_comment_count,
         a.article_like_count,
@@ -106,6 +116,11 @@
             a.id,
             a.article_user_id,
             a.article_title,
+            a.article_is_original,
+            a.article_from,
+            a.article_from_url,
+            a.article_from_author,
+            a.article_from_author_url,
             a.article_summary,
             a.article_view_count,
             a.article_comment_count,

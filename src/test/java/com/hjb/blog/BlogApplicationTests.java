@@ -6,18 +6,11 @@ import com.hjb.blog.entity.dto.ArticleSearchDTO;
 import com.hjb.blog.entity.normal.Article;
 import com.hjb.blog.service.common.ElasticsearchService;
 import com.hjb.blog.service.normal.ArticleService;
+import com.hjb.blog.util.ReprintUtils;
 import org.elasticsearch.action.get.GetRequest;
 import org.elasticsearch.action.get.GetResponse;
-import org.elasticsearch.action.search.SearchRequest;
-import org.elasticsearch.action.search.SearchRequestBuilder;
-import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.client.RequestOptions;
 import org.elasticsearch.client.RestHighLevelClient;
-import org.elasticsearch.index.query.BoolQueryBuilder;
-import org.elasticsearch.index.query.QueryBuilders;
-import org.elasticsearch.search.SearchHit;
-import org.elasticsearch.search.SearchHits;
-import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -46,6 +39,14 @@ public class BlogApplicationTests {
 
     @Resource
     private ElasticsearchService<ArticleSearchDTO> elasticsearchService;
+
+    @Test
+    public void csdnReprint() {
+        List<Article> reprintArticles = ReprintUtils.csdnList("java");
+        System.out.println(reprintArticles);
+
+        ReprintUtils.csdnReprint(reprintArticles);
+    }
 
     @Test
     public void search() {

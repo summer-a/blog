@@ -15,7 +15,6 @@
         </span>
             </blockquote>
 
-
             <form class="layui-form" method="post" id="myForm" action="/admin/article/editSubmit">
                 <input type="hidden" name="id" th:value="${article.id}">
                 <div class="layui-form-item">
@@ -110,7 +109,7 @@
                     //上传图片,必须放在 创建一个编辑器前面
                     layedit.set({
                         uploadImage: {
-                            url: '/uploadFile' //接口url
+                            url: '/img/editor/upload' //接口url
                             , type: 'post' //默认post
                         }
                     });

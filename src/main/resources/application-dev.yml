@@ -3,19 +3,13 @@ spring:
   datasource:
     druid:
       driver-class-name: com.mysql.jdbc.Driver
-      url: jdbc:mysql://localhost:3306/hjb_blog?useSSL=false&characterEncoding=utf-8&serverTimezone=UTC
+      url: jdbc:mysql://localhost:3306/hjb_blog?useSSL=false&serverTimezone=UTC
       username: root
       password: 123456
       initial-size: 1
       min-idle: 1
       max-active: 20
       test-on-borrow: true
-  thymeleaf:
-    mode: LEGACYHTML5
-    cache: false
-    encoding: utf-8
-    servlet:
-      content-type: text/html
   redis:
     lettuce:
       pool:
