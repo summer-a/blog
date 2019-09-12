@@ -20,6 +20,7 @@ import org.springframework.util.CollectionUtils;
 import us.codecraft.webmagic.selector.Html;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
@@ -66,7 +67,7 @@ public class TimeTableTask {
     private String line = "-------------------------------------------\n";
 
     /**
-     * 上午提醒时间(默认)
+     * 上午提醒时间(默认)7,10
      */
     private LocalTime am = LocalTime.of(7, 10);
     /**
@@ -97,6 +98,7 @@ public class TimeTableTask {
         this.ni = ni == null ? this.ni : ni;
     }
 
+
     /**
      * 组团发送
      *
@@ -107,9 +109,9 @@ public class TimeTableTask {
         // 每天执行
         int now = LocalTime.now().toSecondOfDay();
         int exetime = TimeTableUtils.firstTime - now;
-        // 如果超时则第二天执行
-        exetime = exetime < 0 ? exetime + TimeTableUtils.oneDaySeconds : exetime;
-
+        // 如果超时则立即执行
+        //exetime = exetime < 0 ? exetime + TimeTableUtils.oneDaySeconds : exetime;
+        exetime = exetime < 0 ? 0 : exetime;
         log.info("课程提醒已开启!,首次任务将在 {} 后执行", LocalTime.ofSecondOfDay(exetime).format(DateTimeFormatter.ofPattern("HH小时mm分")));
 
         // 每天执行一次
@@ -138,9 +140,8 @@ public class TimeTableTask {
                     Optional<TimeTablePerTime> t4 = courseOfDay.stream().filter(f -> f.getNo() == 4).findFirst();
                     Optional<TimeTablePerTime> t5 = courseOfDay.stream().filter(f -> f.getNo() == 5).findFirst();
                     Optional<TimeTablePerTime> t6 = courseOfDay.stream().filter(f -> f.getNo() == 6).findFirst();
-                    // 天气，延迟一秒
-//                Map<String, String> weather = WeatherUtils.getJiuJiangTodayWeather();
-                    String timeTableUrl = YmlUtils.get("host.tableUrl", "http://kb.chiyouyun.com/") + userRobot.getJvtcUser().getClazz();
+
+                    String timeTableUrl = YmlUtils.get("host.tableUrl", "https://www.chiyouyun.com/timetable") + "?id=" + userRobot.getJvtcUser().getUsername();
                     // 早
                     if (t1.isPresent() || t2.isPresent()) {
                         String tableText = createTableText(t1, t2, timeTableUrl);
@@ -158,11 +159,14 @@ public class TimeTableTask {
                     }
                 }
             }
-            sendList(amCourse, am.toSecondOfDay() - TimeTableUtils.firstTime);
-            sendList(pmCourse, pm.toSecondOfDay() - TimeTableUtils.firstTime);
-            sendList(eveCourse, ni.toSecondOfDay() - TimeTableUtils.firstTime);
+            // 消息定时发送
+            int nowSecondOfDay = LocalTime.now().toSecondOfDay();
+            sendList(amCourse, am.toSecondOfDay() - nowSecondOfDay);
+            sendList(pmCourse, pm.toSecondOfDay() - nowSecondOfDay);
+            sendList(eveCourse, ni.toSecondOfDay() - nowSecondOfDay);
             log.info("今日任务创建成功,日期:{}", today);
         }, exetime, TimeTableUtils.oneDaySeconds, TimeUnit.SECONDS);
+
     }
 
     /**

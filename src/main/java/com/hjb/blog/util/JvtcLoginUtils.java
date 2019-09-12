@@ -4,7 +4,10 @@ import com.hjb.blog.entity.normal.JvtcUser;
 import com.hjb.blog.entity.vo.ResponseVO;
 import com.hjb.blog.service.common.RedisService;
 import com.hjb.blog.service.normal.JvtcUserService;
+import com.xiaoleilu.hutool.Hutool;
+import com.xiaoleilu.hutool.http.HttpUtil;
 import okhttp3.FormBody;
+import okhttp3.Headers;
 import okhttp3.Request;
 import okhttp3.RequestBody;
 import org.jsoup.nodes.Document;
@@ -17,6 +20,7 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoField;
+import java.util.Objects;
 
 /**
  * jvtc登录工具
@@ -118,37 +122,40 @@ public class JvtcLoginUtils {
         if (!StringUtils.isEmpty(jvtcUser.getCookie())) {
 
             // 根据班级获取该班级的课表（本周）
-            RedisService<String> redisService = SpringUtils.getBean(RedisService.class);
-            String table = redisService.get("table-" + jvtcUser.getClazz());
+            //RedisService<String> redisService = SpringUtils.getBean(RedisService.class);
+            /*String table = redisService.get("table-" + jvtcUser.getClazz());
             if (!StringUtils.isEmpty(table)) {
                 return new Html(table);
-            }
+            }*/
 
-            request.addHeader(COOKIE, jvtcUser.getCookie());
+            request.header(COOKIE, jvtcUser.getCookie());
             // 判断缓存是否过期
             ResponseVO kbPageResponse = HttpUtils.get(kbPage + "?rq=" + date, request);
             Html kbHtml = kbPageResponse.getHtml();
             // 成功
             if (isLogined(kbHtml)) {
                 // 处理
-                processHtml(date, kbHtml);
+                processHtml(jvtcUser.getUsername(), date, kbHtml);
                 // 存入redis
-                saveToRedis(kbHtml.get(), jvtcUser.getClazz());
+                //saveToRedis(kbHtml.get(), jvtcUser.getClazz());
                 return kbHtml;
             }
 
         }
         // 未登录则进行登录,根据缓存获取页面失败了，表示缓存过期了
-        loginByUserNameAndEncode(jvtcUser.getUsername(), jvtcUser.getPassword());
+        ResponseVO loginResult = loginByUserNameAndEncode(jvtcUser.getUsername(), jvtcUser.getPassword());
+        if (loginResult != null && loginResult.getCode() == 200) {
+            request.header(COOKIE, loginResult.getCookie());
+        }
 
         // 获取课表
         ResponseVO result = HttpUtils.get(kbPage + "?rq=" + date, request);
         Html html = result.getHtml();
         if (result.getCode() == 200 && !StringUtils.isEmpty(html)) {
             // 处理
-            processHtml(date, html);
+            processHtml(jvtcUser.getUsername(), date, html);
             // 存入redis
-            saveToRedis(html.get(), jvtcUser.getClazz());
+            //saveToRedis(html.get(), jvtcUser.getClazz());
             return html;
         }
 
@@ -161,7 +168,7 @@ public class JvtcLoginUtils {
      * @param date 日期
      * @param html 代码体
      */
-    public static void processHtml(String date, Html html) {
+    public static void processHtml(String id, String date, Html html) {
         // 获取日期
         LocalDate now = LocalDate.now();
 
@@ -190,7 +197,7 @@ public class JvtcLoginUtils {
         }
         Document doc = html.getDocument();
         // 计算开学到现在多少周（减掉开学之前的时间）
-        String weekTitle = "第 " + (now.get(ChronoField.ALIGNED_WEEK_OF_YEAR) - (isWeek ? 6 : 7)) + " 周";
+        String weekTitle = "第 " + (now.get(ChronoField.ALIGNED_WEEK_OF_YEAR) - (isWeek ? 34 : 35)) + " 周";
         doc.title(weekTitle);
         doc.select("table")
                 .attr("border", "1")
@@ -203,7 +210,7 @@ public class JvtcLoginUtils {
                 .forEach(element -> {
                     element.html(element.attr("title"));
                 });
-        doc.getElementsByTag("table").get(0).before(createPrevOrNextWeekNode(now, "/", weekTitle));
+        doc.getElementsByTag("table").get(0).before(createPrevOrNextWeekNode(now, "/", weekTitle, id));
     }
 
     /**
@@ -251,13 +258,14 @@ public class JvtcLoginUtils {
         cookie = cookie.split(";")[0];
 
         // 第二遍缓存登录
-        ResponseVO loginResponse = loginRequest(loginUrl, username, encoded, cookie.split(";")[0]);
+        ResponseVO loginResponse = loginRequest(loginUrl, username, encoded, cookie);
         // 插入或更新数据库缓存
         JvtcUser user = new JvtcUser();
         user.setUsername(username);
         JvtcUser jvtcUser = jvtcUserService.selectOne(user);
 
         if (loginResponse != null && isLogined(loginResponse.getHtml())) {
+            loginResponse.setCookie(cookie);
             // 插入/更新cookie
             if (jvtcUser == null) {
                 jvtcUser = new JvtcUser();
@@ -302,7 +310,7 @@ public class JvtcLoginUtils {
         if (html == null) {
             return false;
         }
-        if (html.getDocument().title().equals(LOGIN_TITLE_TEXT)) {
+        if (Objects.equals(html.getDocument().title(), LOGIN_TITLE_TEXT)) {
             return false;
         }
         return true;
@@ -394,18 +402,19 @@ public class JvtcLoginUtils {
      * @param date 日期
      * @param host 主机地址
      * @param week 周标题
+     * @param id 教务系统用户id
      * @return
      */
-    private static String createPrevOrNextWeekNode(LocalDate date, String host, String week) {
+    private static String createPrevOrNextWeekNode(LocalDate date, String host, String week, String id) {
         StringBuilder sb = new StringBuilder();
         // 上一周
         String prev = date.minusWeeks(1).format(formatYMD);
         // 下一周
         String next = date.plusWeeks(1).format(formatYMD);
         sb.append("<div style=\"width: 100%;height: 70px;line-height: 70px;text-align: center;padding: 5px 0px;\">");
-        sb.append("	<a href=\"" + (host + "?date=" + prev) + "\" style=\"text-decoration: none;font-size:35px;float: left;padding-left: 10px;padding-right: 5px;border-right: 3px solid burlywood;width:40%;border-top: 3px solid burlywood;\">上一周</a>");
+        sb.append("	<a href=\"" + (host + "timetable?id=" + id + "&date=" + prev) + "\" style=\"text-decoration: none;font-size:35px;float: left;padding-left: 10px;padding-right: 5px;border-right: 3px solid burlywood;width:40%;border-top: 3px solid burlywood;\">上一周</a>");
         sb.append(" <span style=\"font-size:35px;\"><b>" + week + "</b></span>");
-        sb.append("	<a href=\"" + (host + "?date=" + next) + "\" style=\"text-decoration: none;font-size:35px;float: right;padding-right: 10px;padding-left: 5px;border-left: 3px solid burlywood;width:40%;border-top: 3px solid burlywood;\">下一周</a>");
+        sb.append("	<a href=\"" + (host + "timetable?id=" + id + "&date=" + next) + "\" style=\"text-decoration: none;font-size:35px;float: right;padding-right: 10px;padding-left: 5px;border-left: 3px solid burlywood;width:40%;border-top: 3px solid burlywood;\">下一周</a>");
         sb.append("</div>");
         return sb.toString();
     }

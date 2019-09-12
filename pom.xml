@@ -37,7 +37,6 @@
     </properties>
 
     <dependencies>
-
         <!-- Spring依赖 -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -169,7 +168,7 @@
         <!-- 酷Q机器人 end -->
 
         <!-- quartz start -->
-        <dependency>
+        <!--<dependency>
             <groupId>org.nutz</groupId>
             <artifactId>nutz</artifactId>
             <version>${nutz.version}</version>
@@ -178,6 +177,10 @@
             <groupId>org.nutz</groupId>
             <artifactId>nutz-integration-quartz</artifactId>
             <version>${nutz.version}</version>
+        </dependency>-->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-quartz</artifactId>
         </dependency>
         <!-- quartz end -->
 
@@ -214,7 +217,7 @@
 
     <build>
 
-        <resources>
+        <!--<resources>
             <resource>
                 <directory>src/main/java</directory>
                 <excludes>
@@ -227,7 +230,7 @@
                     <include>**/*.*</include>
                 </includes>
             </resource>
-        </resources>
+        </resources>-->
 
         <plugins>
             <plugin>

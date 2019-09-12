@@ -59,7 +59,7 @@
                         <div class="social-main">
                             <span class="like">
                                 <a href="javascript:;" data-action="ding" data-id="1" title="点赞"
-                                   class="favorite" onclick="'increaseLikeCount(' + ${article.id} +')'">
+                                   class="favorite" th:onclick="'increaseLikeCount(' + ${article.id} +')'">
                                     <i class="fa fa-thumbs-up"></i>赞
                                     <i class="count"
                                        th:id="'count-' + ${article.id}" th:text="${article.articleLikeCount}">0</i>

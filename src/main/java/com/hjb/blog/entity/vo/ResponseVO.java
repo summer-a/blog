@@ -1,5 +1,6 @@
 package com.hjb.blog.entity.vo;
 
+import lombok.Data;
 import okhttp3.Headers;
 import us.codecraft.webmagic.selector.Html;
 
@@ -12,6 +13,7 @@ import us.codecraft.webmagic.selector.Html;
  * @description: TODO
  * @date 2019/6/27 20:29
  */
+@Data
 public class ResponseVO {
 
     /** 状态码 */
@@ -20,6 +22,8 @@ public class ResponseVO {
     private Html html;
     /** 头描述 */
     private Headers headers;
+    /** 缓存 */
+    private String cookie;
 
     public ResponseVO() {}
 
@@ -29,36 +33,4 @@ public class ResponseVO {
         this.headers = headers;
     }
 
-    public Html getHtml() {
-        return html;
-    }
-
-    public void setHtml(Html html) {
-        this.html = html;
-    }
-
-    public Headers getHeaders() {
-        return headers;
-    }
-
-    public void setHeaders(Headers headers) {
-        this.headers = headers;
-    }
-
-    public Integer getCode() {
-        return code;
-    }
-
-    public void setCode(Integer code) {
-        this.code = code;
-    }
-
-    @Override
-    public String toString() {
-        return "ResponseVO{" +
-                "code=" + code +
-                ", html=" + html +
-                ", headers=" + headers +
-                '}';
-    }
 }

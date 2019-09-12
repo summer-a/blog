@@ -13,6 +13,28 @@ spring:
       max-file-size: 2MB
       # 多个文件的总大小
       max-request-size: 5MB
+#  quartz:
+#    #相关属性配置
+#    properties:
+#      org:
+#        quartz:
+#          scheduler:
+#            instanceName: singleScheduler
+#            instanceId: AUTO
+#          jobStore:
+#            class: org.quartz.impl.jdbcjobstore.JobStoreTX
+#            driverDelegateClass: org.quartz.impl.jdbcjobstore.StdJDBCDelegate
+#            tablePrefix: qrtz_
+#            isClustered: true
+#            clusterCheckinInterval: 10000
+#            useProperties: false
+#          threadPool:
+#            class: org.quartz.simpl.SimpleThreadPool
+#            threadCount: 10
+#            threadPriority: 5
+#            threadsInheritContextClassLoaderOfInitializingThread: true
+#    #数据库方式
+#    job-store-type: jdbc
   thymeleaf:
     mode: LEGACYHTML5
     cache: false
@@ -22,8 +44,8 @@ spring:
     prefix: classpath:/templates/
 host:
   ip: 120.77.215.148
-  indexUrl: http://www.chiyouyun.com/
-  tableUrl: http://kb.chiyouyun.com/
+  indexUrl: https://www.chiyouyun.com/
+  tableUrl: https://www.chiyouyun.com/timetable
   imageUrl: http://image.chiyouyun.com/
   es:
     port: 9300

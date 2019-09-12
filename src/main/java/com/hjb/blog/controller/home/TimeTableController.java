@@ -14,11 +14,18 @@ import com.hjb.blog.util.JvtcLoginUtils;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.util.CollectionUtils;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
+import us.codecraft.webmagic.selector.Html;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.concurrent.ScheduledFuture;
 
@@ -164,4 +171,30 @@ public class TimeTableController {
         return "redirect:/jvtc/page/login";
     }
 
+    /**
+     * 课表页面
+     * @param request
+     * @param response
+     * @param id
+     * @param date
+     * @throws IOException
+     */
+    @GetMapping(value = "")
+    public void page(HttpServletRequest request,
+                     HttpServletResponse response,
+                     String id,
+                     @RequestParam(required = false) String date) throws IOException {
+        request.setCharacterEncoding("GB2312");
+        response.setCharacterEncoding("GB2312");
+
+        if (StringUtils.isEmpty(date)) {
+            date = LocalDate.now().format(DateTimeFormatter.ISO_LOCAL_DATE);
+        }
+
+        JvtcUser userParam = new JvtcUser();
+        userParam.setUsername(id);
+        JvtcUser jvtcUser = jvtcUserService.selectOne(userParam);
+        Html timeTable = JvtcLoginUtils.getTimeTable(date, jvtcUser);
+        response.getWriter().write(timeTable.get());
+    }
 }

@@ -3,7 +3,6 @@ package com.hjb.blog.util;
 import com.alibaba.fastjson.JSON;
 import com.hjb.blog.entity.vo.CqpVO;
 import com.xiaoleilu.hutool.http.HttpUtil;
-import org.nutz.lang.util.NutMap;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -66,7 +65,9 @@ public class CoolqUtils {
      * @return
      */
     public CqpVO sendPrivateMsg(long qq, String message) {
-        NutMap map = new NutMap().setv("user_id", qq).setv("message", message);
+        Map<String, Object> map = new HashMap<>(2);
+        map.put("user_id", qq);
+        map.put("message", message);
         return sendMsg(SEND_PRIVATE_MSG, map);
     }
 
@@ -78,7 +79,9 @@ public class CoolqUtils {
      * @return
      */
     public CqpVO sendGroupMsg(long groupId, String message) {
-        NutMap map = new NutMap("group_id", groupId).setv("message", message);
+        Map<String, Object> map = new HashMap<>(2);
+        map.put("group_id", groupId);
+        map.put("message", message);
         return sendMsg(SEND_GROUP_MSG, map);
     }
 
@@ -90,7 +93,9 @@ public class CoolqUtils {
      * @return
      */
     public CqpVO sendDisCussMsg(long groupId, String message) {
-        NutMap map = new NutMap("discuss_id", groupId).setv("message", message);
+        Map<String, Object> map = new HashMap<>(2);
+        map.put("discuss_id", groupId);
+        map.put("message", message);
         return sendMsg(SEND_DISCUSS_MSG, map);
     }
 
@@ -101,7 +106,8 @@ public class CoolqUtils {
      * @return
      */
     public CqpVO deleteMsg(long messageId) {
-        NutMap map = new NutMap().setv("message_id", messageId);
+        Map<String, Object> map = new HashMap<>(2);
+        map.put("message_id", messageId);
         String resp = HttpUtil.post(HTTP_SERVER_HOST + DELETE_MSG, map, timeOut);
         return JSON.parseObject(resp, CqpVO.class);
     }

@@ -6,7 +6,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.CollectionUtils;
 
+import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Properties;
 import java.util.concurrent.ScheduledExecutorService;
@@ -85,33 +87,45 @@ public class TimeTableUtils {
      */
     public static ScheduledFuture<?> createScheduleList(List<MessageInfo> messageInfos, int delay) {
         if (!CollectionUtils.isEmpty(messageInfos)) {
-            // 多用户同步发送消息
-            ScheduledFuture<?> schedule = task.schedule(() -> {
-                try {
-                    for (MessageInfo messageInfo : messageInfos) {
-                        // 消息间隔
-                        Properties properties = CommonUtils.getProperties();
-                        Thread.sleep(Integer.parseInt(properties.getProperty("message.interval", "10")));
-                        // 根据类型发送消息
-                        if (messageInfo.getType().equals(QQType.QQ)) {
-                            // QQ消息
-                            CoolqUtils.getInstance().sendPrivateMsg(messageInfo.getNum(), messageInfo.getMessage());
-                        } else if (messageInfo.getType().equals(QQType.QUN)) {
-                            // 群聊消息
-                            CoolqUtils.getInstance().sendGroupMsg(messageInfo.getNum(), messageInfo.getMessage());
-                        } else {
-                            // 讨论组消息
-                            CoolqUtils.getInstance().sendDisCussMsg(messageInfo.getNum(), messageInfo.getMessage());
-                        }
-                    }
-                } catch (Exception e) {
-                    e.printStackTrace();
-                    log.error("任务计划创建失败。原因：{}", e.getMessage());
-                }
-            }, delay, TimeUnit.SECONDS);
-            log.info("已创建定时! 该任务将在{}小时后执行！", (delay / 3600));
-            return schedule;
+            // 超时任务不开启
+            if (delay >= 0) {
+                // 多用户同步发送消息
+                ScheduledFuture<?> schedule = task.schedule(() -> {
+                    // 发送
+                    send(messageInfos);
+                }, delay, TimeUnit.SECONDS);
+                log.info("已创建定时! 该任务将在{}执行！", LocalTime.now().plusSeconds(delay).format(DateTimeFormatter.ISO_LOCAL_TIME));
+                return schedule;
+            }
         }
         return null;
+    }
+
+    /**
+     * 发送
+     * @param messageInfos
+     */
+    public static void send(List<MessageInfo> messageInfos) {
+        try {
+            for (MessageInfo messageInfo : messageInfos) {
+                // 消息间隔
+                Properties properties = CommonUtils.getProperties();
+                Thread.sleep(Integer.parseInt(properties.getProperty("message.interval", "10")));
+                // 根据类型发送消息
+                if (messageInfo.getType().equals(QQType.QQ)) {
+                    // QQ消息
+                    CoolqUtils.getInstance().sendPrivateMsg(messageInfo.getNum(), messageInfo.getMessage());
+                } else if (messageInfo.getType().equals(QQType.QUN)) {
+                    // 群聊消息
+                    CoolqUtils.getInstance().sendGroupMsg(messageInfo.getNum(), messageInfo.getMessage());
+                } else {
+                    // 讨论组消息
+                    CoolqUtils.getInstance().sendDisCussMsg(messageInfo.getNum(), messageInfo.getMessage());
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            log.error("任务计划创建失败。原因：{}", e.getMessage());
+        }
     }
 }
