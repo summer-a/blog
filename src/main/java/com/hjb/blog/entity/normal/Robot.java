@@ -2,7 +2,6 @@ package com.hjb.blog.entity.normal;
 
 import com.hjb.blog.entity.base.BaseEntity;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.Column;

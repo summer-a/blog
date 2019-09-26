@@ -42,4 +42,23 @@ public interface RedisService<T> {
      * @param key
      */
     void delete(String key);
+
+    /**
+     * hash get
+     *
+     * @param hkey
+     * @param key
+     * @return
+     */
+    T hget(String hkey, String key);
+
+    /**
+     * hash set
+     *
+     * @param hkey
+     * @param key
+     * @param value
+     */
+    void hset(String hkey, String key, T value);
+
 }

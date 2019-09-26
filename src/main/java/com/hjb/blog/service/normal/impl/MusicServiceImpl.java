@@ -3,10 +3,8 @@ package com.hjb.blog.service.normal.impl;
 import com.hjb.blog.entity.normal.Music;
 import com.hjb.blog.mapper.MusicMapper;
 import com.hjb.blog.service.base.impl.BaseServiceImpl;
-import com.hjb.blog.service.common.RedisService;
 import com.hjb.blog.service.normal.MusicService;
 import org.springframework.cache.annotation.Cacheable;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 

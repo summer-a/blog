@@ -8,7 +8,6 @@ import com.hjb.blog.entity.normal.*;
 import com.hjb.blog.mapper.*;
 import com.hjb.blog.service.base.impl.BaseServiceImpl;
 import com.hjb.blog.service.normal.ArticleService;
-import com.hjb.blog.util.CommonUtils;
 import org.jsoup.nodes.Document;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

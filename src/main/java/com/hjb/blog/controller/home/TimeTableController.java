@@ -1,7 +1,6 @@
 package com.hjb.blog.controller.home;
 
 import com.github.pagehelper.PageInfo;
-import com.hjb.blog.entity.dto.UserRobotDTO;
 import com.hjb.blog.entity.enums.OrderField;
 import com.hjb.blog.entity.normal.JvtcUser;
 import com.hjb.blog.entity.normal.Robot;
@@ -9,12 +8,10 @@ import com.hjb.blog.entity.vo.LayuiTableVO;
 import com.hjb.blog.entity.vo.ResultVO;
 import com.hjb.blog.service.normal.JvtcUserService;
 import com.hjb.blog.service.normal.RobotService;
-import com.hjb.blog.task.TimeTableTask;
 import com.hjb.blog.util.JvtcLoginUtils;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.util.CollectionUtils;
-import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 import us.codecraft.webmagic.selector.Html;
 
@@ -23,11 +20,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
-import java.util.concurrent.ScheduledFuture;
 
 /**
  * 机器人报课控制器
@@ -133,9 +127,6 @@ public class TimeTableController {
             }
             // 添加任务计划
             robotService.insertSelective(robot);
-            TimeTableTask timeTableTask = new TimeTableTask(robot.getRemindAm(), robot.getRemindPm(), robot.getRemindEve());
-            List<UserRobotDTO> userRobots = jvtcUserService.selectUserRobotList();
-            timeTableTask.startByList(userRobots);
 
         }
         return ResultVO.ok();
@@ -153,14 +144,6 @@ public class TimeTableController {
         robotService.deleteByPrimaryKey(id);
         // 移除消息队列(更改了实现方式)
         //...
-        // 当天的任务计划
-        List<ScheduledFuture> schedule = TimeTableTask.scheduleds.get(id);
-        if (!CollectionUtils.isEmpty(schedule)) {
-            for (ScheduledFuture scheduledFuture : schedule) {
-                // 设置为false是为了当天能执行完
-                scheduledFuture.cancel(false);
-            }
-        }
         return ResultVO.ok();
     }
 
@@ -176,25 +159,26 @@ public class TimeTableController {
      * @param request
      * @param response
      * @param id
-     * @param date
+     * @param weeks
      * @throws IOException
      */
     @GetMapping(value = "")
     public void page(HttpServletRequest request,
                      HttpServletResponse response,
                      String id,
-                     @RequestParam(required = false) String date) throws IOException {
+                     @RequestParam(required = false) Integer weeks) throws IOException {
+        // 设置编码
         request.setCharacterEncoding("GB2312");
         response.setCharacterEncoding("GB2312");
-
-        if (StringUtils.isEmpty(date)) {
-            date = LocalDate.now().format(DateTimeFormatter.ISO_LOCAL_DATE);
-        }
 
         JvtcUser userParam = new JvtcUser();
         userParam.setUsername(id);
         JvtcUser jvtcUser = jvtcUserService.selectOne(userParam);
-        Html timeTable = JvtcLoginUtils.getTimeTable(date, jvtcUser);
-        response.getWriter().write(timeTable.get());
+        if (jvtcUser == null) {
+            response.getWriter().write("<div style='width:100%;height:50px;line-height:50px;font-size: 36px;text-align: center;'>该用户不存在, 请先添加用户。<a href='https://www.chiyouyun.com/jvtc/page/login'>添加用户</a></div>");
+        } else {
+            Html timeTable = JvtcLoginUtils.getTimeTable(weeks == null ? JvtcLoginUtils.howWeeks(LocalDate.now()) : weeks, jvtcUser);
+            response.getWriter().write(timeTable.get());
+        }
     }
 }

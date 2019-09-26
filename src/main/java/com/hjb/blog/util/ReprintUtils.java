@@ -52,7 +52,18 @@ public class ReprintUtils {
             typeUrl = "/nav/" + type;
         }
 
-        ResponseVO responseVO = HttpUtils.get(CSDN_HOME + typeUrl, new Request.Builder());
+        Request.Builder request = new Request.Builder()
+                .addHeader("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8")
+                .addHeader("Accept-Language", "zh-CN,zh;q=0.9,en;q=0.8")
+                .addHeader("Connection", "keep-alive")
+                .addHeader("User-Agent", "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/71.0.3578.98 Safari/537.36")
+                .addHeader("Content-Type", "application/x-www-form-urlencoded")
+                .addHeader("Upgrade-Insecure-Requests", "1")
+                .addHeader("Host", "www.csdn.net")
+                .addHeader("Referer", CSDN_HOME + typeUrl)
+                .addHeader("Cache-Control", "max-age=0");
+
+        ResponseVO responseVO = HttpUtils.get(CSDN_HOME + typeUrl, request);
         Html html = responseVO.getHtml();
         List<String> liList = html.xpath("//ul[@id='feedlist_id']/li[@class='clearfix']").all();
         if (!CollectionUtils.isEmpty(liList)) {

@@ -1,9 +1,35 @@
 spring:
-  profiles:
-    active: dev
   elasticsearch:
     rest:
       uris: ${host.ip}:${host.es.rest-port}
+  datasource:
+    druid:
+      driver-class-name: com.mysql.jdbc.Driver
+      #      url: jdbc:mysql://localhost/hjb_blog?useSSL=false&serverTimezone=UTC
+      url: jdbc:mysql://${host.ip}:3309/hjb_blog?useSSL=false&serverTimezone=UTC
+      username: root
+      password: Hjb88619973.
+      initial-size: 1
+      min-idle: 1
+      max-active: 20
+      test-on-borrow: true
+  redis:
+    lettuce:
+      pool:
+        max-active: 8
+        max-idle: 8
+        max-wait: -1ms
+        min-idle: 0
+    port: 6336
+    host: ${host.ip}
+    password: 88619973
+  devtools:
+    restart:
+      enabled: true
+      additional-paths: src/main/java
+  banner:
+    charset: UTF-8
+
   # 当配置没有找到Controller时抛出异常
   mvc:
     throw-exception-if-no-handler-found: true
@@ -13,28 +39,6 @@ spring:
       max-file-size: 2MB
       # 多个文件的总大小
       max-request-size: 5MB
-#  quartz:
-#    #相关属性配置
-#    properties:
-#      org:
-#        quartz:
-#          scheduler:
-#            instanceName: singleScheduler
-#            instanceId: AUTO
-#          jobStore:
-#            class: org.quartz.impl.jdbcjobstore.JobStoreTX
-#            driverDelegateClass: org.quartz.impl.jdbcjobstore.StdJDBCDelegate
-#            tablePrefix: qrtz_
-#            isClustered: true
-#            clusterCheckinInterval: 10000
-#            useProperties: false
-#          threadPool:
-#            class: org.quartz.simpl.SimpleThreadPool
-#            threadCount: 10
-#            threadPriority: 5
-#            threadsInheritContextClassLoaderOfInitializingThread: true
-#    #数据库方式
-#    job-store-type: jdbc
   thymeleaf:
     mode: LEGACYHTML5
     cache: false
@@ -65,3 +69,16 @@ management:
       enabled: true
       path: /
       threshold: 0
+
+server:
+  port: 8084
+  servlet:
+    context-path: /
+logging:
+  path: /var/tomcat/blog/logs/
+  file: blog.log
+  level:
+    com:
+      hjb:
+        blog:
+          mapper: info

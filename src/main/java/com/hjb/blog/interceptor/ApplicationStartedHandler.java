@@ -1,8 +1,6 @@
 package com.hjb.blog.interceptor;
 
-import com.hjb.blog.entity.dto.UserRobotDTO;
 import com.hjb.blog.service.normal.JvtcUserService;
-import com.hjb.blog.task.TimeTableTask;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.ApplicationArguments;
@@ -10,7 +8,6 @@ import org.springframework.boot.ApplicationRunner;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
-import java.util.List;
 
 /**
  * 项目启动结束处理
@@ -32,8 +29,8 @@ public class ApplicationStartedHandler implements ApplicationRunner {
     @Override
     public void run(ApplicationArguments args) throws Exception {
         LOG.info("项目初始化");
-        List<UserRobotDTO> userRobotList = jvtcUserService.selectUserRobotList();
+        /*List<UserRobotDTO> userRobotList = jvtcUserService.selectUserRobotList();
         TimeTableTask timeTableTask = new TimeTableTask();
-        timeTableTask.startByList(userRobotList);
+        timeTableTask.startByList(userRobotList);*/
     }
 }

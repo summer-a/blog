@@ -1,10 +1,12 @@
 package com.hjb.blog.service.common.impl;
 
 import com.hjb.blog.service.common.RedisService;
+import org.springframework.data.redis.core.HashOperations;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @author 胡江斌
@@ -40,7 +42,7 @@ public class RedisServiceImpl<T> implements RedisService<T> {
      */
     @Override
     public void set(String key, T value, int seconds) {
-        redisTemplate.opsForValue().set(key, value, seconds);
+        redisTemplate.opsForValue().set(key, value, seconds, TimeUnit.SECONDS);
     }
 
     /**
@@ -64,4 +66,31 @@ public class RedisServiceImpl<T> implements RedisService<T> {
     public void delete(String key) {
         redisTemplate.delete(key);
     }
+
+    /**
+     * hash get
+     *
+     * @param hkey
+     * @param key
+     * @return
+     */
+    @Override
+    public T hget(String hkey, String key) {
+        HashOperations<String, String, T> operations = redisTemplate.opsForHash();
+        return operations.get(hkey, key);
+    }
+
+    /**
+     * hash set
+     *
+     * @param hkey
+     * @param key
+     * @param value
+     */
+    @Override
+    public void hset(String hkey, String key, T value) {
+        HashOperations<String, String, T> operations = redisTemplate.opsForHash();
+        operations.put(hkey, key, value);
+    }
+
 }

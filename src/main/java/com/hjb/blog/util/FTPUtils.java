@@ -3,10 +3,10 @@ package com.hjb.blog.util;
 import org.apache.commons.net.ftp.FTP;
 import org.apache.commons.net.ftp.FTPClient;
 import org.apache.commons.net.ftp.FTPReply;
-import org.springframework.context.annotation.PropertySource;
 
-import java.io.*;
-
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalTime;
 import java.util.Properties;

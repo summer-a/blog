@@ -3,7 +3,10 @@ package com.hjb.blog.controller.common;
 import com.hjb.blog.entity.vo.ResultVO;
 import com.hjb.blog.util.FTPUtils;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;

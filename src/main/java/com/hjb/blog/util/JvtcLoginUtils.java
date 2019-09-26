@@ -4,10 +4,7 @@ import com.hjb.blog.entity.normal.JvtcUser;
 import com.hjb.blog.entity.vo.ResponseVO;
 import com.hjb.blog.service.common.RedisService;
 import com.hjb.blog.service.normal.JvtcUserService;
-import com.xiaoleilu.hutool.Hutool;
-import com.xiaoleilu.hutool.http.HttpUtil;
 import okhttp3.FormBody;
-import okhttp3.Headers;
 import okhttp3.Request;
 import okhttp3.RequestBody;
 import org.jsoup.nodes.Document;
@@ -16,10 +13,14 @@ import us.codecraft.webmagic.selector.Html;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
+import java.time.Duration;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoField;
+import java.time.temporal.WeekFields;
+import java.util.Locale;
 import java.util.Objects;
 
 /**
@@ -49,11 +50,6 @@ public class JvtcLoginUtils {
      * 主页，包含用户信息
      */
     private static String infoPage = "http://jiaowu.jvtc.jx.cn/jsxsd/framework/xsMain_new.jsp";
-
-    /**
-     * 格式化器
-     */
-    private static DateTimeFormatter formatYMD = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
     /**
      * 配置
@@ -95,49 +91,38 @@ public class JvtcLoginUtils {
 
 
     /**
-     * 获取课程表<br>
-     * 该方法必须在已登录的状态下使用
-     *
-     * @param date
-     * @return
-     */
-    public static Html getTimeTable(String date) {
-        JvtcUser jvtcUser = JvtcLoginUtils.getJvtcUser();
-        if (jvtcUser != null) {
-            return getTimeTable(date, jvtcUser);
-        }
-        return null;
-    }
-
-    /**
      * 获取课程表
      *
-     * @param date     日期
+     * @param howWeeks 当前第几周(绝对周)
      * @param jvtcUser 用户
      * @return
      */
-    public static Html getTimeTable(String date, JvtcUser jvtcUser) {
+    public static Html getTimeTable(Integer howWeeks, JvtcUser jvtcUser) {
 
+        // 当前第几周
+        String url = kbPage + "?rq=" + LocalDate.now().plusWeeks(howWeeks == null ? 0 : howWeeks - howWeeks(LocalDate.now())).format(DateTimeFormatter.ISO_LOCAL_DATE);
         // 有缓存就根据缓存获取
         if (!StringUtils.isEmpty(jvtcUser.getCookie())) {
 
             // 根据班级获取该班级的课表（本周）
-            //RedisService<String> redisService = SpringUtils.getBean(RedisService.class);
-            /*String table = redisService.get("table-" + jvtcUser.getClazz());
+            RedisService<String> redisService = SpringUtils.getBean(RedisService.class);
+            // 0表示当前周, 要进行设置
+            howWeeks = howWeeks == 0 ? howWeeks(LocalDate.now()) : howWeeks;
+            String table = redisService.get(String.format("table::%s::%s", jvtcUser.getUsername(), howWeeks));
             if (!StringUtils.isEmpty(table)) {
                 return new Html(table);
-            }*/
+            }
 
             request.header(COOKIE, jvtcUser.getCookie());
             // 判断缓存是否过期
-            ResponseVO kbPageResponse = HttpUtils.get(kbPage + "?rq=" + date, request);
+            ResponseVO kbPageResponse = HttpUtils.get(url, request);
             Html kbHtml = kbPageResponse.getHtml();
             // 成功
             if (isLogined(kbHtml)) {
                 // 处理
-                processHtml(jvtcUser.getUsername(), date, kbHtml);
+                processHtml(jvtcUser.getUsername(), howWeeks, kbHtml);
                 // 存入redis
-                //saveToRedis(kbHtml.get(), jvtcUser.getClazz());
+                saveToRedis(jvtcUser.getUsername(), howWeeks, kbHtml.get());
                 return kbHtml;
             }
 
@@ -149,13 +134,13 @@ public class JvtcLoginUtils {
         }
 
         // 获取课表
-        ResponseVO result = HttpUtils.get(kbPage + "?rq=" + date, request);
+        ResponseVO result = HttpUtils.get(url, request);
         Html html = result.getHtml();
         if (result.getCode() == 200 && !StringUtils.isEmpty(html)) {
             // 处理
-            processHtml(jvtcUser.getUsername(), date, html);
+            processHtml(jvtcUser.getUsername(), howWeeks, html);
             // 存入redis
-            //saveToRedis(html.get(), jvtcUser.getClazz());
+            saveToRedis(jvtcUser.getUsername(), howWeeks, html.get());
             return html;
         }
 
@@ -164,41 +149,15 @@ public class JvtcLoginUtils {
 
     /**
      * html页面处理<br>
-     *     将源页面修改为通用页面
-     * @param date 日期
-     * @param html 代码体
+     * 将源页面修改为通用页面
+     *
+     * @param weeks 第几周(绝对周)
+     * @param html  代码体
      */
-    public static void processHtml(String id, String date, Html html) {
-        // 获取日期
-        LocalDate now = LocalDate.now();
+    public static void processHtml(String id, Integer weeks, Html html) {
 
-        // 根据条件获取
-        if (!StringUtils.isEmpty(date)) {
-            try {
-                now = LocalDate.parse(date);
-            } catch (Exception e) {
-                try {
-                    // 可以根据数字获取相对现在的第N周
-                    int weeks = Integer.parseInt(date);
-                    now = LocalDate.now().plusWeeks(weeks);
-                } catch (Exception e2) {
-                    now = LocalDate.now();
-                }
-            }
-        }
-        // 是否是周末
-        boolean isWeek = false;
-        // 格式化日期为字符串
-        date = now.format(formatYMD);
-        // 周末就直接显示下一周课表
-        if (now.getDayOfWeek().getValue() == 6 || now.getDayOfWeek().getValue() == 7) {
-            date = now.plusWeeks(1).format(formatYMD);
-            isWeek = true;
-        }
         Document doc = html.getDocument();
-        // 计算开学到现在多少周（减掉开学之前的时间）
-        String weekTitle = "第 " + (now.get(ChronoField.ALIGNED_WEEK_OF_YEAR) - (isWeek ? 34 : 35)) + " 周";
-        doc.title(weekTitle);
+        doc.title(String.format("第 %s 周", weeks));
         doc.select("table")
                 .attr("border", "1")
                 .attr("cellspacing", "0")
@@ -210,29 +169,36 @@ public class JvtcLoginUtils {
                 .forEach(element -> {
                     element.html(element.attr("title"));
                 });
-        doc.getElementsByTag("table").get(0).before(createPrevOrNextWeekNode(now, "/", weekTitle, id));
+        doc.getElementsByTag("table").get(0).before(createPrevOrNextWeekNode("/", weeks, id));
     }
 
     /**
      * 保存到redis
      *
+     * @param id    学号（根据学号存入表格，格式[table::学号::相对几周])
+     * @param weeks 相对几周
      * @param html  html代码
-     * @param clazz 班级（根据班级存入表格，格式[table-班级(如云计算1801)]）
      */
-    public static void saveToRedis(String html, String clazz) {
-        RedisService<String> redisService = SpringUtils.getBean(RedisService.class);
-        // 插入redis,在周日之前删除redis数据
-        if (!StringUtils.isEmpty(clazz)) {
-            // 周五晚上10点删除所有课表缓存，如果每周则添加多少周
-            // 暂时先10点删除
-            int timeOfTen = LocalTime.of(22, 0).toSecondOfDay();
-            int timeOfNow = LocalTime.now().toSecondOfDay();
-            int res = timeOfTen - timeOfNow;
-            // 超时
-            if (res <= 0) {
-                res += (24 * 60 * 60);
-            }
-            redisService.set("table-" + clazz, html, res);
+    public static void saveToRedis(String id, Integer weeks, String html) {
+        // 插入redis,在周6之前删除redis数据
+        if (!StringUtils.isEmpty(id)) {
+            RedisService<String> redisService = SpringUtils.getBean(RedisService.class);
+            // 周6晚0点过期
+            // 现在
+            LocalDateTime now = LocalDateTime.now();
+
+            // 失效时间,本周6晚0点
+            LocalDateTime expireTime =
+                    LocalDateTime.of(
+                            now.with(WeekFields.of(Locale.getDefault()).dayOfWeek(), 7).toLocalDate(),
+                            LocalTime.MIN
+                    );
+
+            // 时间差
+            Duration between = Duration.between(now, expireTime);
+
+            // 存入前清除\t\r\n
+            redisService.set(String.format("table::%s::%s", id, weeks == null ? 0 : weeks), html.replaceAll("[\t|\r|\n]", ""), (int) between.getSeconds());
         }
     }
 
@@ -399,24 +365,38 @@ public class JvtcLoginUtils {
     /**
      * 创建周期切换节点
      *
-     * @param date 日期
-     * @param host 主机地址
-     * @param week 周标题
-     * @param id 教务系统用户id
+     * @param host  主机地址
+     * @param weeks 多少周
+     * @param id    教务系统用户id
      * @return
      */
-    private static String createPrevOrNextWeekNode(LocalDate date, String host, String week, String id) {
+    private static String createPrevOrNextWeekNode(String host, int weeks, String id) {
         StringBuilder sb = new StringBuilder();
-        // 上一周
-        String prev = date.minusWeeks(1).format(formatYMD);
-        // 下一周
-        String next = date.plusWeeks(1).format(formatYMD);
-        sb.append("<div style=\"width: 100%;height: 70px;line-height: 70px;text-align: center;padding: 5px 0px;\">");
-        sb.append("	<a href=\"" + (host + "timetable?id=" + id + "&date=" + prev) + "\" style=\"text-decoration: none;font-size:35px;float: left;padding-left: 10px;padding-right: 5px;border-right: 3px solid burlywood;width:40%;border-top: 3px solid burlywood;\">上一周</a>");
-        sb.append(" <span style=\"font-size:35px;\"><b>" + week + "</b></span>");
-        sb.append("	<a href=\"" + (host + "timetable?id=" + id + "&date=" + next) + "\" style=\"text-decoration: none;font-size:35px;float: right;padding-right: 10px;padding-left: 5px;border-left: 3px solid burlywood;width:40%;border-top: 3px solid burlywood;\">下一周</a>");
+
+        int howWeeks = howWeeks(LocalDate.now());
+
+        sb.append("<div style='width: 100%;height: 70px;line-height: 70px;text-align: center;padding: 5px 0px;'>");
+        sb.append("	<a href='" + host + "timetable?id=" + id + "&weeks=" + (weeks - 1) + "' style='text-decoration: none;font-size:35px;float: left;padding-left: 10px;padding-right: 5px;border-right: 3px solid burlywood;width:40%;border-top: 3px solid burlywood;'>上一周</a>");
+        sb.append(" <span style='font-size:35px;'><b>" + String.format("第 %s 周", weeks) + "</b></span>");
+        sb.append("	<a href='" + host + "timetable?id=" + id + "&weeks=" + (weeks + 1) + "' style='text-decoration: none;font-size:35px;float: right;padding-right: 10px;padding-left: 5px;border-left: 3px solid burlywood;width:40%;border-top: 3px solid burlywood;'>下一周</a>");
         sb.append("</div>");
         return sb.toString();
+    }
+
+    /**
+     * 开学多少周
+     *
+     * @return
+     */
+    public static int howWeeks(LocalDate now) {
+        // 是否是周末
+        boolean isWeek = false;
+        // 周末就直接显示下一周课表
+        if (now.getDayOfWeek().getValue() == 6 || now.getDayOfWeek().getValue() == 7) {
+            isWeek = true;
+        }
+        // 计算开学到现在多少周（减掉开学之前的时间）
+        return now.get(ChronoField.ALIGNED_WEEK_OF_YEAR) - (isWeek ? 33 : 34);
     }
 
 }

@@ -1,10 +1,7 @@
 package com.hjb.blog.service.common;
 
 import com.github.pagehelper.PageInfo;
-import com.hjb.blog.entity.base.EsBaseEntity;
-import com.hjb.blog.entity.dto.ArticleSearchDTO;
 import com.hjb.blog.entity.vo.ResultVO;
-import org.elasticsearch.action.get.GetResponse;
 
 import java.io.IOException;
 import java.util.Map;

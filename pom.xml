@@ -14,7 +14,7 @@
     <name>驰游云校博客</name>
     <description>blog</description>
     <!-- tomcat用 -->
-    <packaging>jar</packaging>
+    <packaging>war</packaging>
 
     <properties>
         <java.version>1.8</java.version>
@@ -45,6 +45,22 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
+            <exclusions>
+                <exclusion>
+                    <groupId>ch.qos.logback</groupId>
+                    <artifactId>logback-classic</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>ch.qos.logback</groupId>
+                    <artifactId>logback-core</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-tomcat</artifactId>
+            <!-- war包不包含tomcat -->
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>tk.mybatis</groupId>
@@ -57,11 +73,11 @@
             <scope>test</scope>
         </dependency>
         <!-- hot reload -->
-        <!--<dependency>
+        <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-devtools</artifactId>
             <optional>true</optional>
-        </dependency>-->
+        </dependency>
         <!-- hot reload end -->
         <!-- elasticsearch start -->
         <dependency>
@@ -89,6 +105,12 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-thymeleaf</artifactId>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.slf4j</groupId>
+                    <artifactId>slf4j-api</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <!-- thymeleaf end -->
 
@@ -167,23 +189,6 @@
         </dependency>
         <!-- 酷Q机器人 end -->
 
-        <!-- quartz start -->
-        <!--<dependency>
-            <groupId>org.nutz</groupId>
-            <artifactId>nutz</artifactId>
-            <version>${nutz.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.nutz</groupId>
-            <artifactId>nutz-integration-quartz</artifactId>
-            <version>${nutz.version}</version>
-        </dependency>-->
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-quartz</artifactId>
-        </dependency>
-        <!-- quartz end -->
-
         <!-- 爬虫 start -->
         <dependency>
             <groupId>us.codecraft</groupId>
@@ -217,21 +222,6 @@
 
     <build>
 
-        <!--<resources>
-            <resource>
-                <directory>src/main/java</directory>
-                <excludes>
-                    <exclude>**/*.java</exclude>
-                </excludes>
-            </resource>
-            <resource>
-                <directory>src/main/resources</directory>
-                <includes>
-                    <include>**/*.*</include>
-                </includes>
-            </resource>
-        </resources>-->
-
         <plugins>
             <plugin>
                 <groupId>org.apache.tomcat.maven</groupId>
@@ -240,10 +230,14 @@
                     <port>8084</port>
                     <path>/</path>
                     <uriEncoding>UTF-8</uriEncoding>
-                    <url>http://blog.chiyouyun.com/manager/text</url>
+                    <url>https://www.chiyouyun.com/manager/text</url>
                     <username>admin</username>
                     <password>88619973</password>
                     <update>true</update>
+                    <excludes>
+                        <exclude>WEB-INF/lib/logback-classic-1.2.3.jar</exclude>
+                        <exclude>WEB-INF/lib/logback-core-1.2.3.jar</exclude>
+                    </excludes>
                 </configuration>
             </plugin>
 
@@ -256,6 +250,19 @@
                     <mainClass>com.hjb.blog.BlogApplication</mainClass>
                     <!-- 使用utf-8编码,解决添加热部署后控制台乱码 -->
                     <jvmArguments>-Dfile.encoding=UTF-8</jvmArguments>
+
+                    <fork>true</fork>
+
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-war-plugin</artifactId>
+                <configuration>
+                    <packagingExcludes>
+                        WEB-INF/lib/logback-classic-1.2.3.jar,
+                        WEB-INF/lib/logback-core-1.2.3.jar
+                    </packagingExcludes>
                 </configuration>
             </plugin>
 
