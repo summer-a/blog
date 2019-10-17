@@ -11,17 +11,15 @@ var musicList = [{
     poster: "http://p1.music.126.net/tg2zke_mrqwuOPlEIEUjGg==/18294773975127592.jpg?param=130y130"
 }];
 
-$(function(){
-    $.ajax({
-        url: '/music/list',
-        dataType: 'json',
-        async: false,
-        success: function (data) {
-            if (data) {
-                musicList = data;
-            }
+$.ajax({
+    url: '/music/list',
+    dataType: 'json',
+    async: false,
+    success: function (data) {
+        if (data) {
+            musicList = data;
         }
-    })
+    }
 })
 var myPlaylist = new jPlayerPlaylist({
     jPlayer: "#jquery_jplayer_N",

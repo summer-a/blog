@@ -15,7 +15,7 @@ import lombok.Data;
 @Data
 public class MessageInfo {
 
-    private Integer num;
+    private Long num;
 
     private QQType type;
 

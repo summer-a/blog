@@ -56,16 +56,14 @@ public class SendMessageJob {
     private static LocalTime[] time = {
             LocalTime.of(8, 5),
             LocalTime.of(10, 20),
-            LocalTime.of(14, 35),
-            LocalTime.of(16, 25),
-            LocalTime.of(18, 5),
-            LocalTime.of(19, 45)
+            LocalTime.of(14, 05),
+            LocalTime.of(16, 0),
+            LocalTime.of(17, 45),
+            LocalTime.of(19, 30)
     };
 
 
     private static DateTimeFormatter hhmm = DateTimeFormatter.ofPattern("HH:mm");
-
-    private static DateTimeFormatter yyyyMMdd = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
     private String line = "-------------------------------------------\n";
 
@@ -91,19 +89,25 @@ public class SendMessageJob {
     @Scheduled(cron = "0 10 7 ? * MON-FRI")
     public void sendInTheMorning() {
         log.info("发送课表(上午)");
-        send(1);
+        send(1, false);
     }
 
     @Scheduled(cron = "0 0 13 ? * MON-FRI")
     public void sendInTheNoon() {
         log.info("发送课表(中午)");
-        send(2);
+        send(2, false);
+    }
+
+    @Scheduled(cron = "0 0 17 ? * MON-FRI")
+    public void sendInTheAfterNoon() {
+        log.info("发送课表(下午)");
+        send(3, true);
     }
 
     @Scheduled(cron = "0 20 18 ? * MON-FRI")
     public void sendInTheEvening() {
-        log.info("发送课表(下午)");
-        send(3);
+        log.info("发送课表(晚上)");
+        send(3, false);
     }
 
     /**
@@ -111,8 +115,9 @@ public class SendMessageJob {
      *
      * @param interval 时间区(1早, 2中, 3晚)
      */
-    private void send(int interval) {
+    private void send(int interval, boolean isFifthLesson) {
 
+        log.info("开始发送课表");
         List<UserRobotDTO> userRobots = jvtcUserService.selectUserRobotList();
 
         List<MessageInfo> course = new ArrayList<>();
@@ -123,8 +128,9 @@ public class SendMessageJob {
             JvtcUser juser = userRobot.getJvtcUser();
             // 异常重试次数(3次)
             int count = 1;
-            Html timeTable = null;
+            Html timeTable = Html.create("");
             for (int i = 0; i < count && i < 3; i++) {
+                log.info("第" + (i + 1) + "次发送...");
                 try {
                     timeTable = JvtcLoginUtils.getTimeTable(0, juser);
                 } catch (Exception e) {
@@ -140,12 +146,17 @@ public class SendMessageJob {
                 Optional<TimeTablePerTime> t1 = courseOfDay.stream().filter(f -> f.getNo() == interval * 2 - 1).findFirst();
                 Optional<TimeTablePerTime> t2 = courseOfDay.stream().filter(f -> f.getNo() == interval * 2).findFirst();
 
+                if (interval == 3 && isFifthLesson && !t1.isPresent()) {
+                    continue;
+                }
+                // 如果是第五节大课,提前报课
                 String timeTableUrl = TABLE_URL + "?id=" + userRobot.getJvtcUser().getUsername();
                 //
                 if (t1.isPresent() || t2.isPresent()) {
                     String tableText = createTableText(t1, t2, timeTableUrl);
-                    appendInfo(course, tableText, userRobot);
+                    this.appendInfo(course, tableText, userRobot);
                 }
+
             }
         }
         // 发送

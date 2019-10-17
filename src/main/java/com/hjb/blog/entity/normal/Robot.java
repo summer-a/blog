@@ -5,7 +5,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.Column;
-import javax.validation.constraints.NotNull;
 import java.time.LocalTime;
 
 /**
@@ -21,20 +20,17 @@ import java.time.LocalTime;
 @NoArgsConstructor
 public class Robot extends BaseEntity {
 
-    @NotNull(message = "机器人名不能为空")
     @Column(name = "robot_name")
     private String robotName;
 
-    @NotNull(message = "用户id不能为空")
     @Column(name = "jvtc_user_id")
     private Integer jvtcUserId;
 
     @Column(name = "type")
     private String type;
 
-    @NotNull(message = "目标号码不能为空")
     @Column(name = "target")
-    private Integer target;
+    private Long target;
 
     @Column(name = "remind_am")
     private LocalTime remindAm;

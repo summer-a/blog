@@ -20,8 +20,11 @@ import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoField;
 import java.time.temporal.WeekFields;
+import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * jvtc登录工具
@@ -50,6 +53,8 @@ public class JvtcLoginUtils {
      * 主页，包含用户信息
      */
     private static String infoPage = "http://jiaowu.jvtc.jx.cn/jsxsd/framework/xsMain_new.jsp";
+
+    private static Pattern pattern = Pattern.compile("第([0-9]+)周");
 
     /**
      * 配置
@@ -136,7 +141,7 @@ public class JvtcLoginUtils {
         // 获取课表
         ResponseVO result = HttpUtils.get(url, request);
         Html html = result.getHtml();
-        if (result.getCode() == 200 && !StringUtils.isEmpty(html)) {
+        if (result.getCode() == 200 && !StringUtils.isEmpty(html) && isLogined(html)) {
             // 处理
             processHtml(jvtcUser.getUsername(), howWeeks, html);
             // 存入redis
@@ -144,11 +149,11 @@ public class JvtcLoginUtils {
             return html;
         }
 
-        return null;
+        return new Html("<div>获取失败,请刷新重试</div>");
     }
 
     /**
-     * html页面处理<br>
+     * html页面处理<br>@
      * 将源页面修改为通用页面
      *
      * @param weeks 第几周(绝对周)
@@ -156,20 +161,24 @@ public class JvtcLoginUtils {
      */
     public static void processHtml(String id, Integer weeks, Html html) {
 
-        Document doc = html.getDocument();
-        doc.title(String.format("第 %s 周", weeks));
-        doc.select("table")
-                .attr("border", "1")
-                .attr("cellspacing", "0")
-                .attr("cellpadding", "0")
-                .removeAttr("style")
-                .removeAttr("class")
-                // 将td补全
-                .select("td").select("p")
-                .forEach(element -> {
-                    element.html(element.attr("title"));
-                });
-        doc.getElementsByTag("table").get(0).before(createPrevOrNextWeekNode("/", weeks, id));
+        try {
+            Document doc = html.getDocument();
+            doc.title(String.format("第 %s 周", weeks));
+            doc.select("table")
+                    .attr("border", "1")
+                    .attr("cellspacing", "0")
+                    .attr("cellpadding", "0")
+                    .removeAttr("style")
+                    .removeAttr("class")
+                    // 将td补全
+                    .select("td").select("p")
+                    .forEach(element -> {
+                        element.html(element.attr("title"));
+                    });
+            doc.getElementsByTag("table").get(0).before(createPrevOrNextWeekNode("/", weeks, id));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     /**
@@ -183,9 +192,12 @@ public class JvtcLoginUtils {
         // 插入redis,在周6之前删除redis数据
         if (!StringUtils.isEmpty(id)) {
             RedisService<String> redisService = SpringUtils.getBean(RedisService.class);
+
             // 周6晚0点过期
-            // 现在
             LocalDateTime now = LocalDateTime.now();
+            int nowWeeks = howWeeks(now.toLocalDate());
+            // 超前多少周(单位(秒))
+            int exceedHowManyWeeks = ((weeks - nowWeeks) < 0 ? 0 : (weeks - nowWeeks)) * (7 * 24 * 60 * 60);
 
             // 失效时间,本周6晚0点
             LocalDateTime expireTime =
@@ -198,7 +210,7 @@ public class JvtcLoginUtils {
             Duration between = Duration.between(now, expireTime);
 
             // 存入前清除\t\r\n
-            redisService.set(String.format("table::%s::%s", id, weeks == null ? 0 : weeks), html.replaceAll("[\t|\r|\n]", ""), (int) between.getSeconds());
+            redisService.set(String.format("table::%s::%s", id, weeks == null ? 0 : weeks), html.replaceAll("[\t|\r|\n]", ""), ((int) between.getSeconds()) + exceedHowManyWeeks);
         }
     }
 
@@ -373,8 +385,6 @@ public class JvtcLoginUtils {
     private static String createPrevOrNextWeekNode(String host, int weeks, String id) {
         StringBuilder sb = new StringBuilder();
 
-        int howWeeks = howWeeks(LocalDate.now());
-
         sb.append("<div style='width: 100%;height: 70px;line-height: 70px;text-align: center;padding: 5px 0px;'>");
         sb.append("	<a href='" + host + "timetable?id=" + id + "&weeks=" + (weeks - 1) + "' style='text-decoration: none;font-size:35px;float: left;padding-left: 10px;padding-right: 5px;border-right: 3px solid burlywood;width:40%;border-top: 3px solid burlywood;'>上一周</a>");
         sb.append(" <span style='font-size:35px;'><b>" + String.format("第 %s 周", weeks) + "</b></span>");
@@ -389,14 +399,30 @@ public class JvtcLoginUtils {
      * @return
      */
     public static int howWeeks(LocalDate now) {
-        // 是否是周末
-        boolean isWeek = false;
-        // 周末就直接显示下一周课表
-        if (now.getDayOfWeek().getValue() == 6 || now.getDayOfWeek().getValue() == 7) {
-            isWeek = true;
-        }
+        int week = now.getDayOfWeek().getValue();
         // 计算开学到现在多少周（减掉开学之前的时间）
-        return now.get(ChronoField.ALIGNED_WEEK_OF_YEAR) - (isWeek ? 33 : 34);
+        return now.get(ChronoField.ALIGNED_WEEK_OF_YEAR) - ((week == 6 || week == 7) ? 34 : 35);
+    }
+
+    /**
+     * 开学多少周
+     *
+     * @param html
+     * @return
+     */
+    public static String howWeeks(Html html) {
+        List<String> timeTable = html.xpath("//p/@title").all();
+        if (timeTable != null) {
+            for (String table : timeTable) {
+                if (!StringUtils.isEmpty(table)) {
+                    Matcher matcher = pattern.matcher(table);
+                    if (matcher.find()) {
+                        return matcher.group();
+                    }
+                }
+            }
+        }
+        return "第 ? 周";
     }
 
 }

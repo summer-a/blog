@@ -61,7 +61,8 @@ public class ReprintUtils {
                 .addHeader("Upgrade-Insecure-Requests", "1")
                 .addHeader("Host", "www.csdn.net")
                 .addHeader("Referer", CSDN_HOME + typeUrl)
-                .addHeader("Cache-Control", "max-age=0");
+                .addHeader("Cache-Control", "max-age=0")
+                .addHeader("content-encoding", "gzip");
 
         ResponseVO responseVO = HttpUtils.get(CSDN_HOME + typeUrl, request);
         Html html = responseVO.getHtml();

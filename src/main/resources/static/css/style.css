@@ -54,6 +54,12 @@ section {
     display: block;
 }
 
+body {
+    -webkit-overflow-scrolling: touch;
+    overflow-scrolling: touch;
+}
+
+
 pre {
     border: 1px solid #d1d1d1;
     line-height: 190%;
