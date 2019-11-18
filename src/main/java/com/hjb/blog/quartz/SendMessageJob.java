@@ -146,8 +146,12 @@ public class SendMessageJob {
                 Optional<TimeTablePerTime> t1 = courseOfDay.stream().filter(f -> f.getNo() == interval * 2 - 1).findFirst();
                 Optional<TimeTablePerTime> t2 = courseOfDay.stream().filter(f -> f.getNo() == interval * 2).findFirst();
 
-                if (interval == 3 && isFifthLesson && !t1.isPresent()) {
-                    continue;
+                if (interval == 3) {
+                    if (isFifthLesson && !t1.isPresent()) {
+                        continue;
+                    } else if (!isFifthLesson && t1.isPresent()) {
+                        continue;
+                    }
                 }
                 // 如果是第五节大课,提前报课
                 String timeTableUrl = TABLE_URL + "?id=" + userRobot.getJvtcUser().getUsername();

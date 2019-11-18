@@ -163,10 +163,11 @@ public class TimeTableController {
      * @throws IOException
      */
     @GetMapping(value = "")
-    public void page(HttpServletRequest request,
-                     HttpServletResponse response,
-                     String id,
-                     @RequestParam(required = false) Integer weeks) throws IOException {
+    public String page(HttpServletRequest request,
+                       HttpServletResponse response,
+                       String id,
+                       Model model,
+                       @RequestParam(required = false) Integer weeks) throws IOException {
         // 设置编码
         request.setCharacterEncoding("GB2312");
         response.setCharacterEncoding("GB2312");
@@ -175,10 +176,11 @@ public class TimeTableController {
         userParam.setUsername(id);
         JvtcUser jvtcUser = jvtcUserService.selectOne(userParam);
         if (jvtcUser == null) {
-            response.getWriter().write("<div style='width:100%;height:50px;line-height:50px;font-size: 36px;text-align: center;'>该用户不存在, 请先添加用户。<a href='https://www.chiyouyun.com/jvtc/page/login'>添加用户</a></div>");
+            model.addAttribute("html", "<div style='width:100%;height:50px;line-height:50px;font-size: 36px;text-align: center;'>该用户不存在, 请先添加用户。<a href='https://www.chiyouyun.com/jvtc/page/login'>添加用户</a></div>");
         } else {
             Html timeTable = JvtcLoginUtils.getTimeTable(weeks == null ? JvtcLoginUtils.howWeeks(LocalDate.now()) : weeks, jvtcUser);
-            response.getWriter().write(timeTable.get());
+            model.addAttribute("html", timeTable.$("table").get());
         }
+        return "Home/Other/timeTable";
     }
 }

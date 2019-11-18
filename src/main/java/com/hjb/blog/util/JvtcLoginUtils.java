@@ -13,12 +13,8 @@ import us.codecraft.webmagic.selector.Html;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
-import java.time.Duration;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
+import java.time.*;
 import java.time.format.DateTimeFormatter;
-import java.time.temporal.ChronoField;
 import java.time.temporal.WeekFields;
 import java.util.List;
 import java.util.Locale;
@@ -401,7 +397,7 @@ public class JvtcLoginUtils {
     public static int howWeeks(LocalDate now) {
         int week = now.getDayOfWeek().getValue();
         // 计算开学到现在多少周（减掉开学之前的时间）
-        return now.get(ChronoField.ALIGNED_WEEK_OF_YEAR) - ((week == 6 || week == 7) ? 34 : 35);
+        return now.get(WeekFields.of(DayOfWeek.MONDAY, 1).weekOfYear()) - ((week == 6 || week == 7) ? 34 : 35);
     }
 
     /**

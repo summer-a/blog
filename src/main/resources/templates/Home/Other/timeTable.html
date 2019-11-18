@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/web/thymeleaf/layout"
+      layout:decorator="Home/Model/template">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="">
+    <title>课表</title>
+</head>
+<body>
+<th:block layout:fragment="breadcrumb">
+    <nav class="breadcrumb">
+        <div id="scrolldiv">
+            <a class="crumbs" href="/">
+                <i class="fa fa-home"></i>首页
+            </a>
+            <i class="fa fa-angle-right"></i>课表
+        </div>
+    </nav>
+</th:block>
+<th:block layout:fragment="index-left">
+    <iframe frameborder="0" th:srcdoc='${html}' style="height: fit-content; min-height: 1300px; max-height: 1500px;"
+            width="100%" seamless>
+        <p>您的浏览器不支持iFrame!</p>
+    </iframe>
+</th:block>
+</body>
+</html>
