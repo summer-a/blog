@@ -21,6 +21,26 @@
             c.category_pid ASC
     </select>
 
+    <sql id="articleField">
+        a.id,
+        a.article_user_id,
+        a.article_title,
+        a.article_is_original,
+        a.article_from,
+        a.article_from_url,
+        a.article_from_author,
+        a.article_from_author_url,
+        a.article_summary,
+        a.article_view_count,
+        a.article_comment_count,
+        a.article_like_count,
+        a.article_is_comment,
+        a.article_status,
+        a.article_order,
+        a.update_time,
+        a.create_time
+    </sql>
+
     <resultMap id="articleMap" type="com.hjb.blog.entity.normal.Article">
         <id property="id" column="id"/>
         <result property="articleUserId" column="article_user_id"/>
@@ -135,6 +155,31 @@
         WHERE
             acr.category_id = #{categoryId}
             AND a.article_status = #{status}
+    </select>
+
+    <select id="selectLikeArticlesByTitle" resultMap="articleMap">
+        SELECT
+            a.id,
+            a.article_user_id,
+            a.article_title,
+            a.article_is_original,
+            a.article_from,
+            a.article_from_url,
+            a.article_from_author,
+            a.article_from_author_url,
+            a.article_summary,
+            a.article_view_count,
+            a.article_comment_count,
+            a.article_like_count,
+            a.article_is_comment,
+            a.article_status,
+            a.article_order,
+            a.update_time,
+            a.create_time
+        FROM
+            article a
+        WHERE
+            a.article_title LIKE #{value}
     </select>
 
 </mapper>

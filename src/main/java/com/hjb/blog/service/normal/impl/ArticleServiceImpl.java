@@ -132,6 +132,19 @@ public class ArticleServiceImpl extends BaseServiceImpl<Article> implements Arti
     }
 
     /**
+     * 根据标题搜索文章列表
+     *
+     * @param title
+     * @return
+     */
+    @Override
+    public PageInfo<Article> selectLikeArticlesByTitle(String title, int pageNum, int pageSize) {
+        PageHelper.startPage(pageNum, pageSize);
+        List<Article> articles = articleMapper.selectLikeArticlesByTitle("%" + title + "%");
+        return new PageInfo<>(articles);
+    }
+
+    /**
      * 根据类型id分页文章
      *
      * @param pageNum    页码

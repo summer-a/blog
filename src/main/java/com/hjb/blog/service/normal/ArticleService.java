@@ -38,6 +38,16 @@ public interface ArticleService extends BaseService<Article> {
     boolean updateCommentCount(Integer articleId);
 
     /**
+     * 根据标题搜索文章列表
+     *
+     * @param title
+     * @param pageNum
+     * @param pageSize
+     * @return
+     */
+    PageInfo<Article> selectLikeArticlesByTitle(String title, int pageNum, int pageSize);
+
+    /**
      * 根据类型id分页文章
      * @param pageNum 页码
      * @param pageSize 每页数量

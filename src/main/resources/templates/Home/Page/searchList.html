@@ -19,6 +19,7 @@
 </th:block>
 <!-- nav end -->
 <th:block layout:fragment="index-left">
+    <th:div th:text="${articles.list[2]}"></th:div>
     <!-- 左侧区域 start -->
     <div th:fragment="left" id="primary" class="content-area a">
         <main id="main" class="site-main" role="main">
@@ -91,8 +92,10 @@
         <!-- 分页 -->
         /*<![CDATA[*/
         var pages = /*[[${articles.size}]]*/ 1;
-        var curr = /*[[${articles.number + 1}]]*/ 1;
-        var size = /*[[${articles.totalElements}]]*/ 10;
+        // var curr = /*[[${articles.number + 1}]]*/ 1;
+        var curr = /*[[${articles.pageNum}]]*/ 1;
+        // var size = /*[[${articles.totalElements}]]*/ 10;
+        var size = /*[[${articles.total}]]*/ 10;
         var keyword = /*[[${keyword}]]*/ 'java';
 
         layui.use(['layer','laypage'], function(){

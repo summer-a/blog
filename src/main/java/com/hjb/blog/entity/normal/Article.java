@@ -5,11 +5,13 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.Column;
+import javax.persistence.Table;
 import javax.persistence.Transient;
 import java.util.List;
 
 @Data
 @NoArgsConstructor
+@Table(name = "article")
 public class Article extends BaseEntity {
 
     /**

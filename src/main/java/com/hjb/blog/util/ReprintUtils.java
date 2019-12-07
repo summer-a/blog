@@ -65,7 +65,7 @@ public class ReprintUtils {
                 .addHeader("content-encoding", "gzip");
 
         ResponseVO responseVO = HttpUtils.get(CSDN_HOME + typeUrl, request);
-        Html html = responseVO.getHtml();
+        Html html = Html.create(responseVO.getHtml());
         List<String> liList = html.xpath("//ul[@id='feedlist_id']/li[@class='clearfix']").all();
         if (!CollectionUtils.isEmpty(liList)) {
             for (String liStr : liList) {
@@ -169,7 +169,7 @@ public class ReprintUtils {
             }
             // 获取文章详情
             ResponseVO responseVO = HttpUtils.get(url, new Request.Builder());
-            Html html = responseVO.getHtml();
+            Html html = Html.create(responseVO.getHtml());
 
             // 获取内容
             String articleContent = html.xpath("//div[@id='article_content']").get();

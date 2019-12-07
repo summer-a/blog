@@ -5,6 +5,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.Column;
+import javax.persistence.Table;
 import java.time.LocalDateTime;
 
 /**
@@ -18,6 +19,7 @@ import java.time.LocalDateTime;
  */
 @Data
 @NoArgsConstructor
+@Table(name = "jvtc_user")
 public class JvtcUser extends BaseEntity {
 
     @Column(name = "username")
@@ -40,5 +42,9 @@ public class JvtcUser extends BaseEntity {
 
     @Column(name = "cookie")
     private String cookie;
+
+    public JvtcUser(Integer id) {
+        super(id);
+    }
 
 }

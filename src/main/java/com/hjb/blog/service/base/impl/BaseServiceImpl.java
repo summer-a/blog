@@ -70,6 +70,7 @@ public class BaseServiceImpl<T extends BaseEntity> implements BaseService<T> {
      * @return
      */
     @Override
+    @Transactional(readOnly = false, rollbackFor = RuntimeException.class)
     public int updateByExampleSelective(T t, Example example) {
         t.setUpdateTime(LocalDateTime.now());
         return mapper.updateByExampleSelective(t, example);

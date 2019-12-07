@@ -5,6 +5,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.Column;
+import javax.persistence.Table;
 
 /**
  * 留言实体
@@ -17,6 +18,7 @@ import javax.persistence.Column;
  */
 @Data
 @NoArgsConstructor
+@Table(name = "leave_word")
 public class LeaveWord extends BaseEntity {
 
     @Column(name = "nick_name")

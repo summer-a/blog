@@ -5,9 +5,11 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.Column;
+import javax.persistence.Table;
 
 @Data
 @NoArgsConstructor
+@Table(name = "options")
 public class Options extends BaseEntity {
 
     /**

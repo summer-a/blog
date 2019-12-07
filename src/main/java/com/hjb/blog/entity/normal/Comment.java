@@ -5,10 +5,12 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.Column;
+import javax.persistence.Table;
 import javax.persistence.Transient;
 
 @Data
 @NoArgsConstructor
+@Table(name = "comment")
 public class Comment extends BaseEntity {
 
     /**

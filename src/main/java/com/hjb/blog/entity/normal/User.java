@@ -5,10 +5,12 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.Column;
+import javax.persistence.Table;
 import java.time.LocalDateTime;
 
 @Data
 @NoArgsConstructor
+@Table(name = "user")
 public class User extends BaseEntity {
 
     /**

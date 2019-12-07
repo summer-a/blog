@@ -42,7 +42,7 @@ public class RedisServiceImpl<T> implements RedisService<T> {
      */
     @Override
     public void set(String key, T value, int seconds) {
-        redisTemplate.opsForValue().set(key, value, seconds <= 0 ? (7 * 24 * 60 * 60) : seconds, TimeUnit.SECONDS);
+        redisTemplate.opsForValue().set(key, value, seconds <= 0 ? (1 * 24 * 60 * 60) : seconds, TimeUnit.SECONDS);
     }
 
     /**

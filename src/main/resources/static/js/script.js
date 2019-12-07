@@ -27,7 +27,7 @@ $(document).ready(function () {
         var keyword = $(this).val();
         if (keyword != null && keyword != "") {
             $.ajax({
-                url: '/search/droplist',
+                url: '/search/pullDownList',
                 data: {s: $("#s").val()},
                 //async: false,
                 success: function (data) {

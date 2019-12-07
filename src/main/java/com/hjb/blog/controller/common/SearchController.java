@@ -63,18 +63,19 @@ public class SearchController {
      * @param model
      * @param pageNum 当前页(es是从0页开始)
      * @param pageSize
-     * @param s
+     * @param keyword
      * @return
      */
-    @GetMapping("/")
+    @GetMapping("")
     public String getList(Model model,
                           @RequestParam(required = false, defaultValue = "0") Integer pageNum,
                           @RequestParam(required = false, defaultValue = "10") Integer pageSize,
-                          @RequestParam(required = true) String s) {
+                          @RequestParam(name = "s", required = true) String keyword) {
 
         // 开始搜索
-        PageInfo<Map<String, Object>> list = elasticsearchService.search(pageNum, pageSize, "article", "document", "title,content", "id,title,summary,viewCount,likeCount,commentCount,date", null, s);
-        model.addAttribute("articles", list);
+        // PageInfo<Map<String, Object>> list = elasticsearchService.search(pageNum, pageSize, "article", "document", "title,content", "id,title,summary,viewCount,likeCount,commentCount,date", null, keyword);
+        PageInfo<Article> articleList = articleService.selectLikeArticlesByTitle(keyword, pageNum, pageSize);
+        model.addAttribute("articles", articleList);
 
         // 获取通知
         Notice notice = new Notice();
@@ -98,11 +99,11 @@ public class SearchController {
         model.addAttribute("tags", allTagList);
 
         // 返回搜索关键字
-        model.addAttribute("keyword", s);
+        model.addAttribute("keyword", keyword);
         return "Home/Page/searchList";
     }
 
-    @GetMapping("/droplist")
+    @GetMapping("/pullDownList")
     @ResponseBody
     public List<EsBaseEntity> searchTitle(String s) {
         // 存储结果集

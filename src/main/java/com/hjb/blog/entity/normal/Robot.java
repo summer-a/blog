@@ -5,6 +5,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.Column;
+import javax.persistence.Table;
 import java.time.LocalTime;
 
 /**
@@ -18,6 +19,7 @@ import java.time.LocalTime;
  */
 @Data
 @NoArgsConstructor
+@Table(name = "robot")
 public class Robot extends BaseEntity {
 
     @Column(name = "robot_name")

@@ -6,6 +6,7 @@ import com.hjb.blog.entity.normal.JvtcUser;
 import com.hjb.blog.entity.normal.Robot;
 import com.hjb.blog.entity.vo.LayuiTableVO;
 import com.hjb.blog.entity.vo.ResultVO;
+import com.hjb.blog.service.common.CourseService;
 import com.hjb.blog.service.normal.JvtcUserService;
 import com.hjb.blog.service.normal.RobotService;
 import com.hjb.blog.util.JvtcLoginUtils;
@@ -41,6 +42,9 @@ public class TimeTableController {
 
     @Resource
     private JvtcUserService jvtcUserService;
+
+    @Resource
+    private CourseService courseService;
 
     /**
      * 管理页主页
@@ -159,18 +163,15 @@ public class TimeTableController {
      * @param request
      * @param response
      * @param id
-     * @param weeks
+     * @param week
      * @throws IOException
      */
-    @GetMapping(value = "")
+    @GetMapping(value = {"/{id}", "/{id}/{week}"})
     public String page(HttpServletRequest request,
                        HttpServletResponse response,
-                       String id,
                        Model model,
-                       @RequestParam(required = false) Integer weeks) throws IOException {
-        // 设置编码
-        request.setCharacterEncoding("GB2312");
-        response.setCharacterEncoding("GB2312");
+                       @PathVariable String id,
+                       @PathVariable(required = false) Integer week) throws IOException {
 
         JvtcUser userParam = new JvtcUser();
         userParam.setUsername(id);
@@ -178,8 +179,8 @@ public class TimeTableController {
         if (jvtcUser == null) {
             model.addAttribute("html", "<div style='width:100%;height:50px;line-height:50px;font-size: 36px;text-align: center;'>该用户不存在, 请先添加用户。<a href='https://www.chiyouyun.com/jvtc/page/login'>添加用户</a></div>");
         } else {
-            Html timeTable = JvtcLoginUtils.getTimeTable(weeks == null ? JvtcLoginUtils.howWeeks(LocalDate.now()) : weeks, jvtcUser);
-            model.addAttribute("html", timeTable.$("table").get());
+            Html timeTable = JvtcLoginUtils.getTimeTable(week == null ? JvtcLoginUtils.howWeeks(LocalDate.now()) : week, jvtcUser, 3);
+            model.addAttribute("html", timeTable.get());
         }
         return "Home/Other/timeTable";
     }

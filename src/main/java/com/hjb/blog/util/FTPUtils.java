@@ -4,7 +4,6 @@ import org.apache.commons.net.ftp.FTP;
 import org.apache.commons.net.ftp.FTPClient;
 import org.apache.commons.net.ftp.FTPReply;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
@@ -265,16 +264,4 @@ public class FTPUtils {
         return "" + now.toNanoOfDay() + i + suffix;
     }
 
-    public static void main(String[] args) throws FileNotFoundException {
-        String fileName = createFileName(".jpg");
-        System.out.println(fileName);
-        /*FTPUtils client = new FTPUtils("ftpuser", "88619973", "120.77.215.148", 21);
-
-        FileInputStream inputStream = new FileInputStream(new File("C:\\Users\\h1525\\Desktop\\process.png"));
-
-        String s = client.uploadFile("/demo", "demo.jpg", inputStream);
-        System.out.println(s);
-        client.logout();
-        System.out.println("success");*/
-    }
 }

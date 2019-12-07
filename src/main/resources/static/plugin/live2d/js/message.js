@@ -262,11 +262,14 @@ function initLive2d (){
 }
 
 var status = localStorage.getItem("live2d-status");
-if (status && status == "show") {
-    $('#landlord').animate({bottom:'0px'},50)
-    window.setTimeout(function(){$('#landlord').css("opacity", 1);},300);
-} else {
+if (status === "hide") {
     $('#landlord').animate({bottom:'-400px'},50)
     window.setTimeout(function(){$('#landlord').css("opacity", 0);},300);
+} else {
+    $('#landlord').animate({bottom: '0px'}, 50)
+    window.setTimeout(function () {
+        $('#landlord').css("opacity", 1);
+    }, 300);
 }
+// 初始化
 initLive2d ();

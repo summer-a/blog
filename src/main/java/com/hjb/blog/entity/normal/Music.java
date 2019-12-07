@@ -5,6 +5,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.Column;
+import javax.persistence.Table;
 
 /**
  * @author 胡江斌
@@ -16,6 +17,7 @@ import javax.persistence.Column;
  */
 @Data
 @NoArgsConstructor
+@Table(name = "music")
 public class Music extends BaseEntity {
 
     @Column(name = "title")

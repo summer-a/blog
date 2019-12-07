@@ -8,16 +8,17 @@ import okhttp3.FormBody;
 import okhttp3.Request;
 import okhttp3.RequestBody;
 import org.jsoup.nodes.Document;
+import org.springframework.http.HttpStatus;
 import org.springframework.util.StringUtils;
 import us.codecraft.webmagic.selector.Html;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
-import java.time.*;
+import java.time.DayOfWeek;
+import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.WeekFields;
 import java.util.List;
-import java.util.Locale;
 import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -96,9 +97,10 @@ public class JvtcLoginUtils {
      *
      * @param howWeeks 当前第几周(绝对周)
      * @param jvtcUser 用户
+     * @param retryCount 重试次数
      * @return
      */
-    public static Html getTimeTable(Integer howWeeks, JvtcUser jvtcUser) {
+    public static Html getTimeTable(Integer howWeeks, JvtcUser jvtcUser, int retryCount) {
 
         // 当前第几周
         String url = kbPage + "?rq=" + LocalDate.now().plusWeeks(howWeeks == null ? 0 : howWeeks - howWeeks(LocalDate.now())).format(DateTimeFormatter.ISO_LOCAL_DATE);
@@ -111,43 +113,45 @@ public class JvtcLoginUtils {
             howWeeks = howWeeks == 0 ? howWeeks(LocalDate.now()) : howWeeks;
             String table = redisService.get(String.format("table::%s::%s", jvtcUser.getUsername(), howWeeks));
             if (!StringUtils.isEmpty(table)) {
-                return new Html(table);
+                return Html.create(table);
             }
-
             request.header(COOKIE, jvtcUser.getCookie());
             // 判断缓存是否过期
             ResponseVO kbPageResponse = HttpUtils.get(url, request);
-            Html kbHtml = kbPageResponse.getHtml();
+            Html kbHtml = Html.create(kbPageResponse.getHtml());
             // 成功
             if (isLogined(kbHtml)) {
-                // 处理
-                processHtml(jvtcUser.getUsername(), howWeeks, kbHtml);
-                // 存入redis
-                saveToRedis(jvtcUser.getUsername(), howWeeks, kbHtml.get());
-                return kbHtml;
+                return processAndSaveToRedis(jvtcUser.getUsername(), howWeeks, kbHtml);
             }
 
         }
         // 未登录则进行登录,根据缓存获取页面失败了，表示缓存过期了
         ResponseVO loginResult = loginByUserNameAndEncode(jvtcUser.getUsername(), jvtcUser.getPassword());
-        if (loginResult != null && loginResult.getCode() == 200) {
-            request.header(COOKIE, loginResult.getCookie());
+        if (loginResult != null && loginResult.getCode() == HttpStatus.FOUND.value()) {
+            request.header(COOKIE, loginResult.getHeaders().get(SET_COOKIE));
         }
 
         // 获取课表
         ResponseVO result = HttpUtils.get(url, request);
-        Html html = result.getHtml();
-        if (result.getCode() == 200 && !StringUtils.isEmpty(html) && isLogined(html)) {
-            // 处理
-            processHtml(jvtcUser.getUsername(), howWeeks, html);
-            // 存入redis
-            saveToRedis(jvtcUser.getUsername(), howWeeks, html.get());
-            return html;
+        Html html = Html.create(result.getHtml());
+        if (result.getCode() == HttpStatus.OK.value() && isLogined(html)) {
+            return processAndSaveToRedis(jvtcUser.getUsername(), howWeeks, html);
         }
 
-        return new Html("<div>获取失败,请刷新重试</div>");
+        if (retryCount >= 1) {
+            return getTimeTable(howWeeks, jvtcUser, --retryCount);
+        }
+
+        return Html.create("<div>获取失败,请刷新重试</div>");
     }
 
+    private static Html processAndSaveToRedis(String id, Integer weeks, Html html) {
+        // 处理
+        Html newHtml = processHtml(id, weeks, html);
+        // 存入redis
+        saveToRedis(id, weeks, newHtml.get());
+        return newHtml;
+    }
     /**
      * html页面处理<br>@
      * 将源页面修改为通用页面
@@ -155,7 +159,7 @@ public class JvtcLoginUtils {
      * @param weeks 第几周(绝对周)
      * @param html  代码体
      */
-    public static void processHtml(String id, Integer weeks, Html html) {
+    public static Html processHtml(String id, Integer weeks, Html html) {
 
         try {
             Document doc = html.getDocument();
@@ -172,9 +176,16 @@ public class JvtcLoginUtils {
                         element.html(element.attr("title"));
                     });
             doc.getElementsByTag("table").get(0).before(createPrevOrNextWeekNode("/", weeks, id));
+            return html;
         } catch (Exception e) {
             e.printStackTrace();
+            try {
+                return html;
+            } catch (Exception e2) {
+                e2.printStackTrace();
+            }
         }
+        return Html.create("");
     }
 
     /**
@@ -185,28 +196,11 @@ public class JvtcLoginUtils {
      * @param html  html代码
      */
     public static void saveToRedis(String id, Integer weeks, String html) {
-        // 插入redis,在周6之前删除redis数据
+        // 插入redis
         if (!StringUtils.isEmpty(id)) {
             RedisService<String> redisService = SpringUtils.getBean(RedisService.class);
-
-            // 周6晚0点过期
-            LocalDateTime now = LocalDateTime.now();
-            int nowWeeks = howWeeks(now.toLocalDate());
-            // 超前多少周(单位(秒))
-            int exceedHowManyWeeks = ((weeks - nowWeeks) < 0 ? 0 : (weeks - nowWeeks)) * (7 * 24 * 60 * 60);
-
-            // 失效时间,本周6晚0点
-            LocalDateTime expireTime =
-                    LocalDateTime.of(
-                            now.with(WeekFields.of(Locale.getDefault()).dayOfWeek(), 7).toLocalDate(),
-                            LocalTime.MIN
-                    );
-
-            // 时间差
-            Duration between = Duration.between(now, expireTime);
-
             // 存入前清除\t\r\n
-            redisService.set(String.format("table::%s::%s", id, weeks == null ? 0 : weeks), html.replaceAll("[\t|\r|\n]", ""), ((int) between.getSeconds()) + exceedHowManyWeeks);
+            redisService.set(String.format("table::%s::%s", id, weeks == null ? 0 : weeks), html.replaceAll("[\t|\r|\n]", ""), 1 * 24 * 60 * 60);
         }
     }
 
@@ -221,7 +215,7 @@ public class JvtcLoginUtils {
 
         JvtcUserService jvtcUserService = SpringUtils.getBean(JvtcUserService.class);
 
-        // 第一遍非缓存登录
+        // 非缓存登录(设置禁用临时重定向后一次就行)
         ResponseVO jvtcResponse = loginRequest(loginUrl, username, encoded);
         String cookie = jvtcResponse.getHeaders().get(SET_COOKIE);
         if (StringUtils.isEmpty(cookie)) {
@@ -230,16 +224,17 @@ public class JvtcLoginUtils {
 
         // 清除cookie后其他内容
         cookie = cookie.split(";")[0];
+        jvtcResponse.setCookie(cookie);
 
-        // 第二遍缓存登录
-        ResponseVO loginResponse = loginRequest(loginUrl, username, encoded, cookie);
         // 插入或更新数据库缓存
         JvtcUser user = new JvtcUser();
         user.setUsername(username);
         JvtcUser jvtcUser = jvtcUserService.selectOne(user);
 
-        if (loginResponse != null && isLogined(loginResponse.getHtml())) {
-            loginResponse.setCookie(cookie);
+        if (jvtcResponse != null &&
+                (jvtcResponse.getCode() == HttpStatus.OK.value()
+                        || jvtcResponse.getCode() == HttpStatus.FOUND.value()
+                )) {
             // 插入/更新cookie
             if (jvtcUser == null) {
                 jvtcUser = new JvtcUser();
@@ -263,13 +258,13 @@ public class JvtcLoginUtils {
                     Request.Builder builder = JvtcLoginUtils.initParam();
                     builder.addHeader(COOKIE, cookie);
                     ResponseVO userInfo = HttpUtils.get(infoPage, builder);
-                    Html userInfoHtml = userInfo.getHtml();
+                    Html userInfoHtml = Html.create(userInfo.getHtml());
                     juser.setClazz(userInfoHtml.xpath("//div[@class='middletopttxlr']/div[6]/div[2]/text()").get());
                     jvtcUserService.update(juser);
                 }
             }
 
-            return loginResponse;
+            return jvtcResponse;
         }
         return new ResponseVO(401, null, null);
     }
@@ -286,6 +281,8 @@ public class JvtcLoginUtils {
         }
         if (Objects.equals(html.getDocument().title(), LOGIN_TITLE_TEXT)) {
             return false;
+        } else if (StringUtils.isEmpty(html.getDocument().tagName("tbody").text().trim())) {
+            return false;
         }
         return true;
     }
@@ -299,7 +296,7 @@ public class JvtcLoginUtils {
     public static boolean isLogined(String cookie) {
         Request.Builder builder = initParam().addHeader(COOKIE, cookie);
         ResponseVO resp = HttpUtils.get(kbPage, builder);
-        return isLogined(resp.getHtml());
+        return isLogined(Html.create(resp.getHtml()));
     }
 
     /**
@@ -366,8 +363,7 @@ public class JvtcLoginUtils {
                 .addHeader("Referer", "http://jiaowu.jvtc.jx.cn/jsxsd/")
                 .addHeader("Upgrade-Insecure-Requests", "1")
                 .addHeader("Host", "jiaowu.jvtc.jx.cn")
-                .addHeader("Origin", "http://jiaowu.jvtc.jx.cn")
-                .addHeader("Cache-Control", "max-age=0");
+                .addHeader("Origin", "http://jiaowu.jvtc.jx.cn");
     }
 
     /**
@@ -382,9 +378,9 @@ public class JvtcLoginUtils {
         StringBuilder sb = new StringBuilder();
 
         sb.append("<div style='width: 100%;height: 70px;line-height: 70px;text-align: center;padding: 5px 0px;'>");
-        sb.append("	<a href='" + host + "timetable?id=" + id + "&weeks=" + (weeks - 1) + "' style='text-decoration: none;font-size:35px;float: left;padding-left: 10px;padding-right: 5px;border-right: 3px solid burlywood;width:40%;border-top: 3px solid burlywood;'>上一周</a>");
+        sb.append("	<a href='" + host + "timetable/" + id + "/" + (weeks - 1) + "' style='text-decoration: none;font-size:35px;float: left;padding-left: 10px;padding-right: 5px;border-right: 3px solid burlywood;width:40%;border-top: 3px solid burlywood;' target='_parent'>上一周</a>");
         sb.append(" <span style='font-size:35px;'><b>" + String.format("第 %s 周", weeks) + "</b></span>");
-        sb.append("	<a href='" + host + "timetable?id=" + id + "&weeks=" + (weeks + 1) + "' style='text-decoration: none;font-size:35px;float: right;padding-right: 10px;padding-left: 5px;border-left: 3px solid burlywood;width:40%;border-top: 3px solid burlywood;'>下一周</a>");
+        sb.append("	<a href='" + host + "timetable/" + id + "/" + (weeks + 1) + "' style='text-decoration: none;font-size:35px;float: right;padding-right: 10px;padding-left: 5px;border-left: 3px solid burlywood;width:40%;border-top: 3px solid burlywood;' target='_parent'>下一周</a>");
         sb.append("</div>");
         return sb.toString();
     }

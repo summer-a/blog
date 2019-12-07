@@ -43,4 +43,12 @@ public interface ArticleMapper extends MyMapper<Article> {
      * @return
      */
     List<Article> selectArticleByCategoryId(@Param("categoryId") Integer categoryId, @Param("status") Integer status);
+
+    /**
+     * 根据标题模糊查询
+     *
+     * @param title
+     * @return
+     */
+    List<Article> selectLikeArticlesByTitle(String title);
 }

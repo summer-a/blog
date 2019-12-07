@@ -31,7 +31,7 @@ import java.util.List;
 import java.util.Optional;
 
 /**
- * 早课表
+ * 早课表(弃用,改成使用从app接口获取)
  *
  * @author 胡江斌
  * @version 1.0
@@ -73,16 +73,18 @@ public class SendMessageJob {
     @Resource
     private JvtcUserService jvtcUserService;
 
-    @Scheduled(cron = "0 0 0 ? * MON-FRI")
+    /**
+     * 每天获取一遍课表,获取失败则每天实时生成
+     */
+    @Scheduled(cron = "0 0 6 ? * MON-FRI")
     public void insertToRedis() {
 
         log.info("更新课表");
 
         List<UserRobotDTO> userRobots = jvtcUserService.selectUserRobotList();
-
         // 更新没存入redis的课表
         for (UserRobotDTO userRobot : userRobots) {
-            JvtcLoginUtils.getTimeTable(0, userRobot.getJvtcUser());
+            JvtcLoginUtils.getTimeTable(JvtcLoginUtils.howWeeks(LocalDate.now()), userRobot.getJvtcUser(), 3);
         }
     }
 
@@ -126,18 +128,8 @@ public class SendMessageJob {
         // 拿到所有有效用户的课表, 根据班级从缓存获取
         for (UserRobotDTO userRobot : userRobots) {
             JvtcUser juser = userRobot.getJvtcUser();
-            // 异常重试次数(3次)
-            int count = 1;
-            Html timeTable = Html.create("");
-            for (int i = 0; i < count && i < 3; i++) {
-                log.info("第" + (i + 1) + "次发送...");
-                try {
-                    timeTable = JvtcLoginUtils.getTimeTable(0, juser);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                    count++;
-                }
-            }
+            // 异常重试
+            Html timeTable = JvtcLoginUtils.getTimeTable(0, juser, 3);
             // 转成对象(一天)
             List<TimeTablePerTime> courseOfDay = htmlToBeen(timeTable, LocalDate.now().getDayOfWeek().getValue());
             // 获取课程表
@@ -154,7 +146,7 @@ public class SendMessageJob {
                     }
                 }
                 // 如果是第五节大课,提前报课
-                String timeTableUrl = TABLE_URL + "?id=" + userRobot.getJvtcUser().getUsername();
+                String timeTableUrl = TABLE_URL + "/" + userRobot.getJvtcUser().getUsername();
                 //
                 if (t1.isPresent() || t2.isPresent()) {
                     String tableText = createTableText(t1, t2, timeTableUrl);
