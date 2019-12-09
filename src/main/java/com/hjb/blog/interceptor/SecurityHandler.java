@@ -46,7 +46,8 @@ public class SecurityHandler extends HandlerInterceptorAdapter {
             // 如果没有ADMIN_USER_ID的cookie和session,清除掉用户
             AdminUserUtils.logoutCurrentUser();
         }
-        session.setAttribute("request_url", request.getRequestURI());
+        // 跳转请求地址有点问题, 暂时搁着
+        //session.setAttribute("request_url", request.getRequestURI());
         response.sendRedirect("/login");
         return false;
     }
