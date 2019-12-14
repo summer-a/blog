@@ -283,6 +283,8 @@ public class JvtcLoginUtils {
             return false;
         } else if (StringUtils.isEmpty(html.getDocument().tagName("tbody").text().trim())) {
             return false;
+        } else if (html.get().contains("重新登录")) {
+            return false;
         }
         return true;
     }
