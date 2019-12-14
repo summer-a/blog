@@ -6,7 +6,6 @@ import com.hjb.blog.entity.normal.JvtcUser;
 import com.hjb.blog.entity.normal.Robot;
 import com.hjb.blog.entity.vo.LayuiTableVO;
 import com.hjb.blog.entity.vo.ResultVO;
-import com.hjb.blog.service.common.CourseService;
 import com.hjb.blog.service.normal.JvtcUserService;
 import com.hjb.blog.service.normal.RobotService;
 import com.hjb.blog.util.JvtcLoginUtils;
@@ -18,7 +17,6 @@ import us.codecraft.webmagic.selector.Html;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.io.IOException;
 import java.time.LocalDate;
@@ -42,9 +40,6 @@ public class TimeTableController {
 
     @Resource
     private JvtcUserService jvtcUserService;
-
-    @Resource
-    private CourseService courseService;
 
     /**
      * 管理页主页
@@ -160,16 +155,12 @@ public class TimeTableController {
 
     /**
      * 课表页面
-     * @param request
-     * @param response
      * @param id
      * @param week
      * @throws IOException
      */
     @GetMapping(value = {"/{id}", "/{id}/{week}"})
-    public String page(HttpServletRequest request,
-                       HttpServletResponse response,
-                       Model model,
+    public String page(Model model,
                        @PathVariable String id,
                        @PathVariable(required = false) Integer week) throws IOException {
 
