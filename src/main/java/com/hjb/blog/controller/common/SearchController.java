@@ -73,8 +73,7 @@ public class SearchController {
                           @RequestParam(name = "s", required = true) String keyword) {
 
         // 开始搜索
-        // PageInfo<Map<String, Object>> list = elasticsearchService.search(pageNum, pageSize, "article", "document", "title,content", "id,title,summary,viewCount,likeCount,commentCount,date", null, keyword);
-        PageInfo<Article> articleList = articleService.selectLikeArticlesByTitle(keyword, pageNum, pageSize);
+        PageInfo<Map<String, Object>> articleList = articleService.selectLikeArticlesByTitleReturnMap(keyword, pageNum, pageSize);
         model.addAttribute("articles", articleList);
 
         // 获取通知
@@ -109,7 +108,7 @@ public class SearchController {
         // 存储结果集
         List<EsBaseEntity> result = new ArrayList<>(10);
 
-        PageInfo<Map<String, Object>> searchResult = elasticsearchService.search(0, 10, "article", "document", "title", "id,title", null, s);
+        PageInfo<Map<String, Object>> searchResult = articleService.selectLikeArticlesByTitleReturnMap(s, 0, 10);
         List<Map<String, Object>> list = searchResult.getList();
         if (!CollectionUtils.isEmpty(list)) {
             list.forEach(res -> result.add(new EsBaseEntity(Long.parseLong(res.get("id").toString()), res.get("title").toString())));
