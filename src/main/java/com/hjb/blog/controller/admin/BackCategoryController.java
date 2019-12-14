@@ -1,47 +1,51 @@
 package com.hjb.blog.controller.admin;
 
 
+import com.hjb.blog.entity.normal.ArticleCategoryRef;
 import com.hjb.blog.entity.normal.Category;
+import com.hjb.blog.service.normal.ArticleCategoryRefService;
 import com.hjb.blog.service.normal.ArticleService;
 import com.hjb.blog.service.normal.CategoryService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.servlet.ModelAndView;
 
+import javax.annotation.Resource;
 import java.util.List;
 
-
 /**
- * @author
+ * 分类
+ * @author h1525
  */
 @Controller
 @RequestMapping("/admin/category")
 public class BackCategoryController {
 
-    @Autowired
+    @Resource
     private ArticleService articleService;
 
-
-    @Autowired
+    @Resource
     private CategoryService categoryService;
 
+    @Resource
+    private ArticleCategoryRefService articleCategoryRefService;
+    
     /**
      * 后台分类列表显示
      *
      * @return
      */
     @GetMapping(value = "")
-    public ModelAndView categoryList()  {
-        ModelAndView modelandview = new ModelAndView();
+    public String categoryList(Model model) {
         List<Category> categoryList = categoryService.selectAll();
-        modelandview.addObject("categoryList",categoryList);
-        modelandview.setViewName("Admin/Category/index");
-        return modelandview;
-
+        // 更新文章/子类型数量
+        updateArticleOrCategoryCount(categoryList);
+        model.addAttribute("categoryList", categoryList);
+        return "Admin/Category/index";
     }
 
 
@@ -65,11 +69,23 @@ public class BackCategoryController {
      */
     @RequestMapping(value = "/delete/{id}")
     public String deleteCategory(@PathVariable("id") Integer id)  {
-        //禁止删除有文章的分类
-        /*int count = articleService.countArticleByCategoryId(id);
-        if (count == 0) {
-            categoryService.deleteCategory(id);
-        }*/
+        Category category = categoryService.selectById(id);
+        // 根判断
+        if (category.getCategoryPid() == 0) {
+            Category cate = new Category();
+            cate.setCategoryPid(id);
+            int categoryCount = categoryService.selectCount(cate);
+            // 无子类型的根才可以删除
+            if (categoryCount == 0) {
+                categoryService.deleteCategory(id);
+            }
+        } else {
+            // 禁止删除有文章的分类
+            int count = articleService.countArticleByCategoryId(id);
+            if (count == 0) {
+                categoryService.deleteCategory(id);
+            }
+        }
         return "redirect:/admin/category";
     }
 
@@ -87,6 +103,8 @@ public class BackCategoryController {
         modelAndView.addObject("category",category);
 
         List<Category> categoryList = categoryService.selectAll();
+        // 更新文章/子类型数量
+        updateArticleOrCategoryCount(categoryList);
         modelAndView.addObject("categoryList",categoryList);
 
         modelAndView.setViewName("Admin/Category/edit");
@@ -103,5 +121,26 @@ public class BackCategoryController {
     public String editCategorySubmit(Category category)  {
         categoryService.update(category);
         return "redirect:/admin/category";
+    }
+
+    /**
+     * 更新文章/子类型数量
+     *
+     * @param categoryList
+     */
+    private void updateArticleOrCategoryCount(List<Category> categoryList) {
+        for (Category cate : categoryList) {
+            if (cate.getCategoryPid() == 0) {
+                Category t = new Category();
+                t.setCategoryPid(cate.getId());
+                int count = categoryService.selectCount(t);
+                cate.setCategoryCount(count);
+            } else {
+                ArticleCategoryRef acr = new ArticleCategoryRef();
+                acr.setCategoryId(cate.getId());
+                int count = articleCategoryRefService.selectCount(acr);
+                cate.setCategoryCount(count);
+            }
+        }
     }
 }
