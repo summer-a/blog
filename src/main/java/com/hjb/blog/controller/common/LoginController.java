@@ -4,6 +4,7 @@ import com.hjb.blog.entity.normal.JvtcUser;
 import com.hjb.blog.entity.vo.ResponseVO;
 import com.hjb.blog.service.normal.JvtcUserService;
 import com.hjb.blog.util.JvtcLoginUtils;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -58,7 +59,7 @@ public class LoginController {
             ResponseVO jResponse = JvtcLoginUtils.loginByUserNameAndEncode(username, encoded);
             // 有则直接获取
             // 登录失败
-            if (jResponse.getCode() == 401) {
+            if (jResponse.getCode() == HttpStatus.UNAUTHORIZED.value()) {
                 redirectAttributes.addFlashAttribute("message", "登录失败，请检查用户名或密码");
                 return "redirect:/jvtc/page/login";
             }
@@ -73,6 +74,16 @@ public class LoginController {
                     jvtcUserService.update(t);
                 }
                 session.setAttribute("jvtc_user", jvtcUserOnline);
+                // 存入cookie和session
+                String jvtcUserId = UUID.randomUUID().toString();
+                session.setAttribute("JVTC_USER_ID", jvtcUserId);
+                // 过期时间7天，单位=秒
+                session.setMaxInactiveInterval(24 * 60 * 60 * 7);
+                Cookie jvtcUserIdCookie = new Cookie("JVTC_USER_ID", jvtcUserId);
+                jvtcUserIdCookie.setMaxAge(24 * 60 * 60 * 7);
+                jvtcUserIdCookie.setPath("/");
+                response.addCookie(jvtcUserIdCookie);
+                return "redirect:/timetable/index";
             }
 
         } else {
