@@ -2,6 +2,8 @@ package com.hjb.blog.util;
 
 import com.hjb.blog.entity.normal.JvtcUser;
 import com.hjb.blog.entity.vo.ResponseVO;
+import com.hjb.blog.field.CommonFields;
+import com.hjb.blog.field.RedisFields;
 import com.hjb.blog.service.common.RedisService;
 import com.hjb.blog.service.normal.JvtcUserService;
 import okhttp3.FormBody;
@@ -111,7 +113,7 @@ public class JvtcLoginUtils {
             RedisService<String> redisService = SpringUtils.getBean(RedisService.class);
             // 0表示当前周, 要进行设置
             howWeeks = howWeeks == 0 ? howWeeks(LocalDate.now()) : howWeeks;
-            String table = redisService.get(String.format("table::%s::%s", jvtcUser.getUsername(), howWeeks));
+            String table = redisService.get(String.format(RedisFields.TABLE, jvtcUser.getUsername(), howWeeks));
             if (!StringUtils.isEmpty(table)) {
                 return Html.create(table);
             }
@@ -175,7 +177,8 @@ public class JvtcLoginUtils {
                     .forEach(element -> {
                         element.html(element.attr("title"));
                     });
-            doc.getElementsByTag("table").get(0).before(createPrevOrNextWeekNode("/", weeks, id));
+            doc.getElementsByTag("table").get(0)
+                    .before(createPrevOrNextWeekNode("/", weeks, id));
             return html;
         } catch (Exception e) {
             e.printStackTrace();
@@ -200,7 +203,7 @@ public class JvtcLoginUtils {
         if (!StringUtils.isEmpty(id)) {
             RedisService<String> redisService = SpringUtils.getBean(RedisService.class);
             // 存入前清除\t\r\n
-            redisService.set(String.format("table::%s::%s", id, weeks == null ? 0 : weeks), html.replaceAll("[\t|\r|\n]", ""), 1 * 24 * 60 * 60);
+            redisService.set(String.format(RedisFields.TABLE, id, weeks == null ? 0 : weeks), html.replaceAll("[\t|\r|\n]", ""), CommonFields.ONE_DAY_SEC);
         }
     }
 

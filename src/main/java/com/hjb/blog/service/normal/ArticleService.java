@@ -6,6 +6,7 @@ import com.hjb.blog.entity.normal.Article;
 import com.hjb.blog.service.base.BaseService;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * 文章服务
@@ -48,6 +49,16 @@ public interface ArticleService extends BaseService<Article> {
     PageInfo<Article> selectLikeArticlesByTitle(String title, int pageNum, int pageSize);
 
     /**
+     * 根据标题搜索文章列表
+     *
+     * @param title
+     * @param pageNum
+     * @param pageSize
+     * @return
+     */
+    PageInfo<Map<String, Object>> selectLikeArticlesByTitleReturnMap(String title, int pageNum, int pageSize);
+
+    /**
      * 根据类型id分页文章
      * @param pageNum 页码
      * @param pageSize 每页数量
@@ -56,4 +67,20 @@ public interface ArticleService extends BaseService<Article> {
      * @return
      */
     PageInfo<Article> pageArticleByCategoryId(int pageNum, int pageSize, Integer categoryId, ArticleStatus status);
+
+    /**
+     * 统计该分类下的文章数,层级统计
+     *
+     * @param id 类型id
+     * @return
+     */
+    int countArticleByCategoryId(int id);
+
+    /**
+     * 统计该标签下的文章数,层级统计
+     *
+     * @param id 类型id
+     * @return
+     */
+    int countArticleByTagId(int id);
 }

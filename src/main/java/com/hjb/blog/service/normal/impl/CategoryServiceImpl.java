@@ -45,6 +45,18 @@ public class CategoryServiceImpl extends BaseServiceImpl<Category> implements Ca
         return categorysToLayerMenu(categories, 0);
     }
 
+    /**
+     * 根据id删除分类
+     *
+     * @param id
+     * @return
+     */
+    @Override
+    @Transactional(readOnly = false, rollbackFor = RuntimeException.class)
+    public int deleteCategory(int id) {
+        return categoryMapper.deleteByPrimaryKey(id);
+    }
+
     private List<LayerMenuDTO<Category>> categorysToLayerMenu(List<Category> categories, int parentId) {
         List<LayerMenuDTO<Category>> layerMenus = new ArrayList<>();
 

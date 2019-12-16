@@ -2,11 +2,13 @@ package com.hjb.blog.controller.home;
 
 import com.hjb.blog.entity.enums.Role;
 import com.hjb.blog.entity.normal.Comment;
+import com.hjb.blog.entity.normal.User;
 import com.hjb.blog.entity.vo.ResultVO;
 import com.hjb.blog.service.normal.ArticleService;
 import com.hjb.blog.service.normal.CommentService;
 import com.hjb.blog.util.CodeFilterUtils;
 import com.hjb.blog.util.CommonUtils;
+import com.hjb.blog.util.SpringUtils;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -14,7 +16,6 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
 import java.time.LocalDateTime;
 
 /**
@@ -42,13 +43,13 @@ public class CommentController {
      */
     @PostMapping(value = "/submit")
     @ResponseBody
-    public ResultVO submitComment(Comment comment,
-                                  HttpServletRequest request) {
+    public ResultVO submitComment(Comment comment, HttpServletRequest request) {
 
-        HttpSession session = request.getSession();
         comment.setCreateTime(LocalDateTime.now());
         comment.setCommentIp(CommonUtils.getIpAddr(request));
-        if (session.getAttribute("user") != null) {
+
+        User user = SpringUtils.getCurrentUser();
+        if (user != null) {
             comment.setCommentRole(Role.ADMIN.getValue());
         } else {
             comment.setCommentRole(Role.VISITOR.getValue());

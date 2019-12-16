@@ -2,6 +2,7 @@ package com.hjb.blog.controller.common;
 
 import com.hjb.blog.geetest.GeetestLib;
 import com.hjb.blog.util.CommonUtils;
+import org.springframework.http.HttpHeaders;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -48,7 +49,7 @@ public class GeetestController {
         // 网站用户id
         param.put("user_id", userEmail);
         // web:电脑上的浏览器；h5:手机上的浏览器，包括移动应用内完全内置的web_view；native：通过原生SDK植入APP应用的方式
-        String userAgent = request.getHeader("User-Agent");
+        String userAgent = request.getHeader(HttpHeaders.USER_AGENT);
         param.put("client_type", userAgent.contains("Windows") ? "web" : "h5");
         // 请求的用户的ip
         param.put("ip_address", CommonUtils.getIpAddr(request));

@@ -1,5 +1,6 @@
 package com.hjb.blog.service.normal;
 
+import com.hjb.blog.entity.normal.JvtcUser;
 import com.hjb.blog.entity.normal.User;
 import com.hjb.blog.service.base.BaseService;
 
@@ -13,4 +14,12 @@ import com.hjb.blog.service.base.BaseService;
  * @date 2019/6/9 10:07
  */
 public interface UserService extends BaseService<User> {
+
+    /**
+     * 根据机器人目标号码找对应的用户
+     *
+     * @param target
+     * @return
+     */
+    JvtcUser selectUserByRobotTarget(String target);
 }

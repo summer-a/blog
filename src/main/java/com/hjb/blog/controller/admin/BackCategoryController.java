@@ -3,6 +3,7 @@ package com.hjb.blog.controller.admin;
 
 import com.hjb.blog.entity.normal.ArticleCategoryRef;
 import com.hjb.blog.entity.normal.Category;
+import com.hjb.blog.field.SessionFields;
 import com.hjb.blog.service.normal.ArticleCategoryRefService;
 import com.hjb.blog.service.normal.ArticleService;
 import com.hjb.blog.service.normal.CategoryService;
@@ -19,6 +20,7 @@ import java.util.List;
 
 /**
  * 分类
+ *
  * @author h1525
  */
 @Controller
@@ -33,7 +35,7 @@ public class BackCategoryController {
 
     @Resource
     private ArticleCategoryRefService articleCategoryRefService;
-    
+
     /**
      * 后台分类列表显示
      *
@@ -44,7 +46,7 @@ public class BackCategoryController {
         List<Category> categoryList = categoryService.selectAll();
         // 更新文章/子类型数量
         updateArticleOrCategoryCount(categoryList);
-        model.addAttribute("categoryList", categoryList);
+        model.addAttribute(SessionFields.BLOG_CATEGORY_LIST, categoryList);
         return "Admin/Category/index";
     }
 
@@ -55,8 +57,8 @@ public class BackCategoryController {
      * @param category
      * @return
      */
-    @RequestMapping(value = "/insertSubmit",method = RequestMethod.POST)
-    public String insertCategorySubmit(Category category)  {
+    @RequestMapping(value = "/insertSubmit", method = RequestMethod.POST)
+    public String insertCategorySubmit(Category category) {
         categoryService.insertSelective(category);
         return "redirect:/admin/category";
     }
@@ -68,7 +70,7 @@ public class BackCategoryController {
      * @return
      */
     @RequestMapping(value = "/delete/{id}")
-    public String deleteCategory(@PathVariable("id") Integer id)  {
+    public String deleteCategory(@PathVariable("id") Integer id) {
         Category category = categoryService.selectById(id);
         // 根判断
         if (category.getCategoryPid() == 0) {
@@ -96,16 +98,16 @@ public class BackCategoryController {
      * @return
      */
     @RequestMapping(value = "/edit/{id}")
-    public ModelAndView editCategoryView(@PathVariable("id") Integer id)  {
+    public ModelAndView editCategoryView(@PathVariable("id") Integer id) {
         ModelAndView modelAndView = new ModelAndView();
 
-        Category category =  categoryService.selectById(id);
-        modelAndView.addObject("category",category);
+        Category category = categoryService.selectById(id);
+        modelAndView.addObject(SessionFields.BLOG_CATEGORY, category);
 
         List<Category> categoryList = categoryService.selectAll();
         // 更新文章/子类型数量
         updateArticleOrCategoryCount(categoryList);
-        modelAndView.addObject("categoryList",categoryList);
+        modelAndView.addObject(SessionFields.BLOG_CATEGORY_LIST, categoryList);
 
         modelAndView.setViewName("Admin/Category/edit");
         return modelAndView;
@@ -117,8 +119,8 @@ public class BackCategoryController {
      * @param category 分类
      * @return 重定向
      */
-    @RequestMapping(value = "/editSubmit",method = RequestMethod.POST)
-    public String editCategorySubmit(Category category)  {
+    @RequestMapping(value = "/editSubmit", method = RequestMethod.POST)
+    public String editCategorySubmit(Category category) {
         categoryService.update(category);
         return "redirect:/admin/category";
     }

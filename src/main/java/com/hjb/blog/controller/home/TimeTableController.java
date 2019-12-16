@@ -6,12 +6,18 @@ import com.hjb.blog.entity.normal.JvtcUser;
 import com.hjb.blog.entity.normal.Robot;
 import com.hjb.blog.entity.vo.LayuiTableVO;
 import com.hjb.blog.entity.vo.ResultVO;
+import com.hjb.blog.field.HTMLFields;
+import com.hjb.blog.field.RedisFields;
+import com.hjb.blog.field.SessionFields;
+import com.hjb.blog.field.UrlFields;
+import com.hjb.blog.service.common.RedisService;
 import com.hjb.blog.service.normal.JvtcUserService;
 import com.hjb.blog.service.normal.RobotService;
 import com.hjb.blog.util.JvtcLoginUtils;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.util.CollectionUtils;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 import us.codecraft.webmagic.selector.Html;
 
@@ -41,6 +47,9 @@ public class TimeTableController {
     @Resource
     private JvtcUserService jvtcUserService;
 
+    @Resource
+    private RedisService redisService;
+
     /**
      * 管理页主页
      * @return
@@ -60,7 +69,7 @@ public class TimeTableController {
                                 Model model) {
         if (id != null) {
             Robot robot = robotService.selectOne(new Robot(id));
-            model.addAttribute("robot_info", robot);
+            model.addAttribute(SessionFields.JVTC_ROBOT_INFO, robot);
         }
 
         return "Home/Model/addOrEditRobot";
@@ -148,30 +157,41 @@ public class TimeTableController {
 
     @GetMapping(value = "/logout")
     public String logout(HttpSession session) {
-        session.removeAttribute("jvtc_user");
+        session.removeAttribute(SessionFields.JVTC_USER);
         session.invalidate();
         return "redirect:/jvtc/page/login";
     }
 
     /**
      * 课表页面
-     * @param id
-     * @param week
+     * @param id id
+     * @param week 周次
+     * @param refresh 是否强制刷新
      * @throws IOException
      */
-    @GetMapping(value = {"/{id}", "/{id}/{week}"})
+    @GetMapping(value = {"/{id}", "/{id}/{week}", "/{id}/{week}/{refresh}"})
     public String page(Model model,
                        @PathVariable String id,
-                       @PathVariable(required = false) Integer week) throws IOException {
+                       @PathVariable(required = false) Integer week,
+                       @PathVariable(required = false) Boolean refresh) {
+
+        // 默认本周
+        week = week == null ? JvtcLoginUtils.howWeeks(LocalDate.now()) : week;
 
         JvtcUser userParam = new JvtcUser();
         userParam.setUsername(id);
         JvtcUser jvtcUser = jvtcUserService.selectOne(userParam);
         if (jvtcUser == null) {
-            model.addAttribute("html", "<div style='width:100%;height:50px;line-height:50px;font-size: 36px;text-align: center;'>该用户不存在, 请先添加用户。<a href='https://www.chiyouyun.com/jvtc/page/login'>添加用户</a></div>");
+            model.addAttribute(SessionFields.TABLE_HTML, HTMLFields.ADD_USER_IF_NOT_EXISTS);
         } else {
-            Html timeTable = JvtcLoginUtils.getTimeTable(week == null ? JvtcLoginUtils.howWeeks(LocalDate.now()) : week, jvtcUser, 3);
-            model.addAttribute("html", timeTable.get());
+            // 删除缓存
+            if (refresh != null && refresh) {
+                redisService.delete(String.format(RedisFields.TABLE, id, StringUtils.isEmpty(week) ? JvtcLoginUtils.howWeeks(LocalDate.now()) : week));
+            }
+            Html timeTable = JvtcLoginUtils.getTimeTable(week, jvtcUser, 3);
+            // 强制刷新链接
+            model.addAttribute(SessionFields.TABLE_REFRESH_URL, String.format(UrlFields.TABLE_REFRESH, id, week));
+            model.addAttribute(SessionFields.TABLE_HTML, timeTable.get());
         }
         return "Home/Other/timeTable";
     }

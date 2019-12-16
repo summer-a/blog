@@ -1,13 +1,11 @@
 package com.hjb.blog.config;
 
+import com.hjb.blog.util.LoggerUtils;
 import org.apache.http.HttpHost;
 import org.elasticsearch.client.RestClient;
 import org.elasticsearch.client.RestClientBuilder;
 import org.elasticsearch.client.RestHighLevelClient;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import java.util.Arrays;
@@ -24,8 +22,6 @@ import java.util.stream.Collectors;
  */
 @Configuration
 public class ElasticsearchConfig {
-
-    private final Logger LOGGER = LoggerFactory.getLogger(ElasticsearchConfig.class);
 
     /**
      * 集群地址，多个用,隔开
@@ -64,9 +60,13 @@ public class ElasticsearchConfig {
      */
     private int maxConnectPerRoute = 100;
 
-    @Bean
+    /**
+     * 暂时不需要es
+     *
+     * @return
+     */
+    //@Bean
     public RestHighLevelClient client() {
-        LOGGER.info("Es配置...");
         // 封装
         List<HttpHost> hostList = Arrays.asList(hosts.split(",")).stream().map(r -> new HttpHost(r, port, schema)).collect(Collectors.toList());
         RestClientBuilder builder = RestClient.builder(hostList.toArray(new HttpHost[0]));
@@ -83,6 +83,7 @@ public class ElasticsearchConfig {
             httpClientBuilder.setMaxConnPerRoute(maxConnectPerRoute);
             return httpClientBuilder;
         });
+        LoggerUtils.getLogger().info("ElasticSearch 初始化完成 ");
         return new RestHighLevelClient(builder);
     }
 

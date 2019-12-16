@@ -6,6 +6,8 @@ import com.hjb.blog.entity.normal.Article;
 import com.hjb.blog.entity.normal.Comment;
 import com.hjb.blog.entity.normal.User;
 import com.hjb.blog.entity.vo.ResultVO;
+import com.hjb.blog.field.CommonFields;
+import com.hjb.blog.field.SessionFields;
 import com.hjb.blog.service.normal.ArticleService;
 import com.hjb.blog.service.normal.CommentService;
 import com.hjb.blog.service.normal.UserService;
@@ -46,11 +48,6 @@ public class AdminController {
     private CommentService commentService;
 
     /**
-     * 超时时间
-     */
-    private static final int TIME_OUT = 7 * 24 * 60 * 60;
-
-    /**
      * 后台首页
      *
      * @return
@@ -59,7 +56,7 @@ public class AdminController {
     public String index(Model model) {
         //文章列表
         PageInfo<Article> articleList = articleService.page(1, 5, new Article(), OrderField.orderByDesc("createTime"));
-        model.addAttribute("articleList", articleList.getList());
+        model.addAttribute(SessionFields.BLOG_ARTICLE_LIST, articleList.getList());
         //评论列表
         PageInfo<Comment> commentList = commentService.page(1, 5, new Comment(), OrderField.orderByDesc("createTime"));
         List<Comment> list = commentList.getList();
@@ -74,7 +71,7 @@ public class AdminController {
                 }
             }
         }
-        model.addAttribute("commentList", list);
+        model.addAttribute(SessionFields.BLOG_COMMENT_LIST, list);
         return "Admin/index";
     }
 
@@ -122,18 +119,18 @@ public class AdminController {
             return ResultVO.build(0, "密码错误!", null);
         } else {
             // 添加session
-            session.setAttribute("user", user);
-            session.setMaxInactiveInterval(TIME_OUT);
+            session.setAttribute(SessionFields.USER, user);
+            session.setMaxInactiveInterval(CommonFields.ONE_DAY_SEC * 7);
             // 添加cookie
             if (rememberMe != null && rememberMe) {
                 // 生成随机id
                 String userId = UUID.randomUUID().toString();
                 // 创建Cookie对象
-                Cookie cookie = new Cookie("ADMIN_USER_ID", userId);
+                Cookie cookie = new Cookie(SessionFields.ADMIN_USER_ID, userId);
                 // 创建session
-                session.setAttribute("ADMIN_USER_ID", userId);
+                session.setAttribute(SessionFields.ADMIN_USER_ID, userId);
                 // 设置Cookie的有效期为7天
-                cookie.setMaxAge(TIME_OUT);
+                cookie.setMaxAge(CommonFields.ONE_DAY_SEC * 7);
                 cookie.setPath("/");
                 response.addCookie(cookie);
             }
@@ -143,7 +140,7 @@ public class AdminController {
             userUpdate.setUserLastLoginIp(CommonUtils.getIpAddr(request));
             userService.update(userUpdate);
             // 登录成功,返回请求url
-            return ResultVO.build(1, "登录成功", session.getAttribute("request_url"));
+            return ResultVO.build(1, "登录成功", session.getAttribute(SessionFields.REQUEST_URL));
         }
     }
 
@@ -155,7 +152,7 @@ public class AdminController {
      */
     @GetMapping(value = "/admin/logout")
     public String logout(HttpSession session) {
-        session.removeAttribute("user");
+        session.removeAttribute(SessionFields.USER);
         session.invalidate();
         return "redirect:/login";
     }

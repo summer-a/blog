@@ -8,6 +8,7 @@ import com.hjb.blog.entity.normal.Article;
 import com.hjb.blog.entity.normal.Category;
 import com.hjb.blog.entity.normal.Tag;
 import com.hjb.blog.entity.normal.User;
+import com.hjb.blog.field.SessionFields;
 import com.hjb.blog.service.normal.ArticleService;
 import com.hjb.blog.service.normal.CategoryService;
 import com.hjb.blog.service.normal.TagService;
@@ -18,14 +19,14 @@ import org.springframework.ui.Model;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.*;
 
-import javax.servlet.http.HttpSession;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
 
 /**
- * @author liuyanzhao
+ * 文章后台
+ * @author
  */
 @Controller
 @RequestMapping("/admin/article")
@@ -55,14 +56,14 @@ public class BackArticleController {
 
         if (status == null) {
             // 设置分页时当前的url
-            model.addAttribute("pageUrlPrefix", "/admin/article?pageIndex");
+            model.addAttribute(SessionFields.PAGE_URL_PREFIX, "/admin/article?pageIndex");
         } else {
             articleParam.setArticleStatus(status);
-            model.addAttribute("pageUrlPrefix", "/admin/article?status=" + status + "&pageIndex");
+            model.addAttribute(SessionFields.PAGE_URL_PREFIX, "/admin/article?status=" + status + "&pageIndex");
         }
 
         PageInfo<Article> articlePageInfo = articleService.page(pageIndex, pageSize, articleParam, OrderField.NONE);
-        model.addAttribute("pageInfo", articlePageInfo);
+        model.addAttribute(SessionFields.BLOG_PAGE_INFO, articlePageInfo);
         return "Admin/Article/index";
     }
 
@@ -76,8 +77,8 @@ public class BackArticleController {
     public String insertArticleView(Model model) {
         List<Category> categoryList = categoryService.selectAll();
         List<Tag> tagList = tagService.selectAll();
-        model.addAttribute("categoryList", categoryList);
-        model.addAttribute("tagList", tagList);
+        model.addAttribute(SessionFields.BLOG_CATEGORY_LIST, categoryList);
+        model.addAttribute(SessionFields.BLOG_TAG_LIST, tagList);
         return "Admin/Article/insert";
     }
 
@@ -88,7 +89,7 @@ public class BackArticleController {
      * @return
      */
     @PostMapping(value = "/insertSubmit")
-    public String insertArticleSubmit(HttpSession session, Article articleParam) {
+    public String insertArticleSubmit(Article articleParam) {
         Article article = new Article();
         //用户ID
         User currentUser = AdminUserUtils.getCurrentUser();
@@ -150,7 +151,7 @@ public class BackArticleController {
 
 
         Article article = articleService.selectOneForFullArticle(new Article(id));
-        model.addAttribute("article", article);
+        model.addAttribute(SessionFields.BLOG_ARTICLE, article);
 
         List<Tag> tagList = tagService.selectAll();
         List<Tag> tagSelecteds = article.getTagList();
@@ -166,10 +167,10 @@ public class BackArticleController {
                 }
             }
         }
-        model.addAttribute("tagList", tagList);
+        model.addAttribute(SessionFields.BLOG_TAG_LIST, tagList);
 
         List<Category> categoryList = categoryService.selectAll();
-        model.addAttribute("categoryList", categoryList);
+        model.addAttribute(SessionFields.BLOG_CATEGORY_LIST, categoryList);
 
         return "Admin/Article/edit";
     }

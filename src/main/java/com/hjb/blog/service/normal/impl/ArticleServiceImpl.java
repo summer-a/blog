@@ -8,6 +8,8 @@ import com.hjb.blog.entity.normal.*;
 import com.hjb.blog.mapper.*;
 import com.hjb.blog.service.base.impl.BaseServiceImpl;
 import com.hjb.blog.service.normal.ArticleService;
+import com.hjb.blog.util.CommonUtils;
+import com.hjb.blog.util.LoggerUtils;
 import org.jsoup.nodes.Document;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -17,8 +19,8 @@ import us.codecraft.webmagic.selector.Html;
 
 import javax.annotation.Resource;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
+import java.time.format.DateTimeFormatter;
+import java.util.*;
 
 /**
  * @author 胡江斌
@@ -48,6 +50,11 @@ public class ArticleServiceImpl extends BaseServiceImpl<Article> implements Arti
 
     @Resource
     private CommentMapper commentMapper;
+
+    @Resource
+    private TagMapper tagMapper;
+
+    private static Properties properties = CommonUtils.getProperties();
 
     @Transactional(readOnly = true, rollbackFor = RuntimeException.class)
     @Override
@@ -140,9 +147,42 @@ public class ArticleServiceImpl extends BaseServiceImpl<Article> implements Arti
     @Override
     public PageInfo<Article> selectLikeArticlesByTitle(String title, int pageNum, int pageSize) {
         PageHelper.startPage(pageNum, pageSize);
-        List<Article> articles = articleMapper.selectLikeArticlesByTitle("%" + title + "%");
-        return new PageInfo<>(articles);
+        Example articleExample = new Example(Article.class);
+        articleExample.createCriteria().andLike("articleTitle", "%" + title + "%");
+        // 将Elasticsearch更换为普通模糊查询, Elasticsearch服务器起不来, 内存不够
+        List<Article> articles = articleMapper.selectByExample(articleExample);
+        return PageInfo.of(articles);
     }
+
+    /**
+     * 根据标题搜索文章列表
+     *
+     * @param title
+     * @param pageNum
+     * @param pageSize
+     * @return
+     */
+    @Override
+    public PageInfo<Map<String, Object>> selectLikeArticlesByTitleReturnMap(String title, int pageNum, int pageSize) {
+        PageHelper.startPage(pageNum, pageSize);
+        Example articleExample = new Example(Article.class);
+        articleExample.createCriteria().andLike("articleTitle", "%" + title + "%");
+        // 将Elasticsearch更换为普通模糊查询, Elasticsearch服务器起不来, 内存不够
+        List<Article> articles = articleMapper.selectByExample(articleExample);
+        List<Map<String, Object>> res = new ArrayList<>();
+        for (Article article : articles) {
+            Map<String, Object> map = new HashMap<>();
+            map.put("id", article.getId());
+            map.put("title", article.getArticleTitle());
+            map.put("summary", article.getArticleSummary());
+            map.put("date", article.getCreateTime().format(DateTimeFormatter.ISO_DATE));
+            map.put("viewCount", article.getArticleViewCount());
+            map.put("commentCount", article.getArticleCommentCount());
+            res.add(map);
+        }
+        return PageInfo.of(res);
+    }
+
 
     /**
      * 根据类型id分页文章
@@ -161,6 +201,46 @@ public class ArticleServiceImpl extends BaseServiceImpl<Article> implements Arti
         PageInfo<Article> articlePageInfo = new PageInfo<>(articleList);
 
         return articlePageInfo;
+    }
+
+    /**
+     * 统计该分类下的文章数,层级统计
+     *
+     * @param id 类型id
+     * @return
+     */
+    @Override
+    public int countArticleByCategoryId(int id) {
+        ArticleCategoryRef articleCategoryRef = new ArticleCategoryRef();
+        articleCategoryRef.setCategoryId(id);
+        try {
+            return articleCategoryRefMapper.selectCount(articleCategoryRef);
+        } catch (Exception e) {
+            LoggerUtils.getLogger().error("获取分类下的文章数失败, id:{} 原因:{}", id, e);
+        }
+        return 0;
+    }
+
+    /**
+     * 统计该标签下的文章数,层级统计
+     *
+     * @param id 类型id
+     * @return
+     */
+    @Override
+    public int countArticleByTagId(int id) {
+
+        List<Tag> tags = tagMapper.selectAll();
+        for (Tag tag : tags) {
+            try {
+                Example example = new Example(ArticleTagRef.class);
+                example.createCriteria().andEqualTo("tagId", tag.getId());
+                return articleTagRefMapper.selectCountByExample(example);
+            } catch (Exception e) {
+                LoggerUtils.getLogger().error("统计标签下文章数失败, id{} 原因:{}", id, e);
+            }
+        }
+        return 0;
     }
 
     /**
@@ -281,11 +361,16 @@ public class ArticleServiceImpl extends BaseServiceImpl<Article> implements Arti
                 }
             }
             // 更新摘要
-            int size = 140;
+            int size = 130;
+            try {
+                size = Integer.parseInt(properties.getProperty("article.summary.count", "130"));
+            } catch (Exception e) {
+                LoggerUtils.getLogger().error("获取文章摘要字数配置失败, 原因:{}", e);
+            }
             Document doc = new Html(articleContent).getDocument();
             String text = doc.text();
             int txtLength = text.length();
-            String summary = text.substring(0, txtLength < 140 ? txtLength : size);
+            String summary = text.substring(0, txtLength < size ? txtLength : size);
             article.setArticleSummary(summary);
             return super.update(article);
         }

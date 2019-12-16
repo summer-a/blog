@@ -5,10 +5,12 @@ import com.hjb.blog.entity.normal.Category;
 import com.hjb.blog.entity.normal.JvtcUser;
 import com.hjb.blog.entity.normal.Menu;
 import com.hjb.blog.entity.normal.Options;
+import com.hjb.blog.field.SessionFields;
 import com.hjb.blog.service.normal.CategoryService;
 import com.hjb.blog.service.normal.MenuService;
 import com.hjb.blog.service.normal.OptionsService;
 import com.hjb.blog.util.AdminUserUtils;
+import com.hjb.blog.util.CommonUtils;
 import com.hjb.blog.util.JvtcLoginUtils;
 import com.hjb.blog.util.TimeTableUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,6 +24,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.util.List;
+import java.util.Properties;
 
 /**
  * 公用资源拦截器
@@ -43,6 +46,8 @@ public class CommonResourceHandler extends HandlerInterceptorAdapter {
     @Autowired
     private OptionsService optionsService;
 
+    private static Properties properties = CommonUtils.getProperties();
+
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
 
@@ -50,22 +55,22 @@ public class CommonResourceHandler extends HandlerInterceptorAdapter {
 
         // 菜单分类
         List<LayerMenuDTO<Category>> layerMenuDTOS = categoryService.selectCategoryToLayerMenu(new Category());
-        session.setAttribute("categories", layerMenuDTOS);
+        session.setAttribute(SessionFields.CATEGORIES, layerMenuDTOS);
 
         // 其他菜单
         Menu menu = new Menu();
         menu.setMenuStatus(true);
         List<Menu> menus = menuService.select(menu);
-        session.setAttribute("menus", menus);
+        session.setAttribute(SessionFields.MENUS, menus);
 
         // 获取网站通用信息
         Options option = new Options();
         option.setOptionStatus(1);
         Options op = optionsService.selectOne(option);
-        session.setAttribute("option", op);
+        session.setAttribute(SessionFields.OPTION, op);
 
         // 随机图片数量
-        session.setAttribute("images_quantity", 15);
+        session.setAttribute(SessionFields.IMAGES_QUANTITY, properties.getProperty("image.random.count", "15"));
 
         // 菜单列表获取
         String uri = request.getRequestURI();
@@ -79,12 +84,12 @@ public class CommonResourceHandler extends HandlerInterceptorAdapter {
                         return false;
                     } else {
                         // cookie
-                        String jvtcUserId = session.getAttribute("JVTC_USER_ID") + "";
+                        String jvtcUserId = session.getAttribute(SessionFields.JVTC_USER_ID) + "";
                         // 获取用户cookie
                         Cookie[] cookies = request.getCookies();
                         for (Cookie cookie : cookies) {
                             String name = cookie.getName();
-                            if (name.equals("JVTC_USER_ID")) {
+                            if (name.equals(SessionFields.JVTC_USER_ID)) {
                                 if (cookie.getValue().equals(jvtcUserId)) {
                                     return true;
                                 }

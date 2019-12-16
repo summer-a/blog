@@ -5,6 +5,7 @@ import com.github.pagehelper.PageInfo;
 import com.hjb.blog.entity.base.EsBaseEntity;
 import com.hjb.blog.entity.vo.ResultVO;
 import com.hjb.blog.service.common.ElasticsearchService;
+import com.hjb.blog.util.LoggerUtils;
 import org.elasticsearch.action.delete.DeleteRequest;
 import org.elasticsearch.action.delete.DeleteResponse;
 import org.elasticsearch.action.get.GetRequest;
@@ -25,8 +26,6 @@ import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.SearchHits;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
@@ -50,8 +49,6 @@ import java.util.Map;
 @Service
 public class ElasticsearchServiceImpl<T extends EsBaseEntity> implements ElasticsearchService<T> {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(ElasticsearchServiceImpl.class);
-
     @Resource
     private RestHighLevelClient client;
 
@@ -65,7 +62,7 @@ public class ElasticsearchServiceImpl<T extends EsBaseEntity> implements Elastic
     public ResultVO createIndex(String index) throws IOException {
         CreateIndexRequest createIndexRequest = new CreateIndexRequest(index);
         CreateIndexResponse response = client.indices().create(createIndexRequest, RequestOptions.DEFAULT);
-        LOGGER.info(JSON.toJSONString(response));
+        LoggerUtils.getLogger().info(JSON.toJSONString(response));
         return ResultVO.ok();
     }
 
@@ -85,7 +82,7 @@ public class ElasticsearchServiceImpl<T extends EsBaseEntity> implements Elastic
         request.source(JSON.toJSONString(t), XContentType.JSON);
         // 存如
         IndexResponse response = client.index(request, RequestOptions.DEFAULT);
-        LOGGER.info(JSON.toJSONString(response));
+        LoggerUtils.getLogger().info(JSON.toJSONString(response));
         return ResultVO.ok();
     }
 
@@ -101,7 +98,7 @@ public class ElasticsearchServiceImpl<T extends EsBaseEntity> implements Elastic
     public ResultVO delete(String index, String type, Long id) throws IOException {
         DeleteRequest request = new DeleteRequest(index, type, id.toString());
         DeleteResponse response = client.delete(request, RequestOptions.DEFAULT);
-        LOGGER.info(JSON.toJSONString(response));
+        LoggerUtils.getLogger().info(JSON.toJSONString(response));
         return ResultVO.ok();
     }
 
@@ -117,7 +114,7 @@ public class ElasticsearchServiceImpl<T extends EsBaseEntity> implements Elastic
     public ResultVO update(String index, String type, T t) throws IOException {
         UpdateRequest request = new UpdateRequest(index, type, t.getId().toString());
         UpdateResponse response = client.update(request, RequestOptions.DEFAULT);
-        LOGGER.info(JSON.toJSONString(response));
+        LoggerUtils.getLogger().info(JSON.toJSONString(response));
         return ResultVO.ok();
     }
 

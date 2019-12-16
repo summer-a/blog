@@ -2,13 +2,12 @@ package com.hjb.blog.service.common.impl;
 
 import com.hjb.blog.entity.jvtc.JvtcCourse;
 import com.hjb.blog.entity.normal.JvtcUser;
-import com.hjb.blog.quartz.SendMessageFromAppJob;
 import com.hjb.blog.service.common.CourseService;
 import com.hjb.blog.service.normal.JvtcUserService;
 import com.hjb.blog.util.JvtcAppApiUtils;
+import com.hjb.blog.util.LoggerUtils;
 import com.xiaoleilu.hutool.json.JSONArray;
 import com.xiaoleilu.hutool.json.JSONObject;
-import org.apache.log4j.Logger;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
@@ -30,8 +29,6 @@ import java.util.Objects;
 @Service
 public class CourseServiceImpl implements CourseService {
 
-    private Logger logger = Logger.getLogger(SendMessageFromAppJob.class);
-
     @Resource
     private JvtcUserService jvtcUserService;
 
@@ -51,7 +48,7 @@ public class CourseServiceImpl implements CourseService {
             unless = "#result == null or #result.size() <= 1"
     )
     public List<JvtcCourse> selectCourseIfSignedOrNot(JvtcUser user, String date, int retryCounts) {
-        logger.info(user.getUsername() + "->获取课程表");
+        LoggerUtils.getLogger().info(user.getUsername() + "->获取课程表");
         String success = "success";
         String token = "token";
         String xnxqh = "xnxqh";
@@ -87,7 +84,7 @@ public class CourseServiceImpl implements CourseService {
             user.setCookie(userToken);
 
             if (retryCounts >= 1) {
-                logger.info(user.getUsername() + "->获取课表失败, 进行重试");
+                LoggerUtils.getLogger().info(user.getUsername() + "->获取课表失败, 进行重试");
                 return selectCourseIfSignedOrNot(user, date, --retryCounts);
             }
         }

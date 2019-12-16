@@ -2,8 +2,10 @@ package com.hjb.blog.controller.admin;
 
 
 import com.hjb.blog.entity.normal.Tag;
+import com.hjb.blog.field.SessionFields;
 import com.hjb.blog.service.normal.ArticleService;
 import com.hjb.blog.service.normal.TagService;
+import com.xiaoleilu.hutool.json.JSONArray;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -30,17 +32,23 @@ public class BackTagController {
 
     /**
      * 后台标签列表显示
+     *
      * @return
      */
     @GetMapping(value = "")
-    public ModelAndView index()  {
+    public ModelAndView index() {
         ModelAndView modelandview = new ModelAndView();
-        List<Tag> tagList = tagService.selectAll();
-        modelandview.addObject("tagList",tagList);
+        List<Tag> tags = tagService.selectAll();
+        List<Tag> newTags = new JSONArray(tags).toList(Tag.class);
+        // 更新文章数
+        for (Tag tag : newTags) {
+            int count = articleService.countArticleByTagId(tag.getId());
+            tag.setArticleCount(count);
+        }
+        modelandview.addObject(SessionFields.BLOG_TAG_LIST, newTags);
 
         modelandview.setViewName("Admin/Tag/index");
         return modelandview;
-
     }
 
 
@@ -51,7 +59,7 @@ public class BackTagController {
      * @return
      */
     @PostMapping(value = "/insertSubmit")
-    public String insertTagSubmit(Tag tag)  {
+    public String insertTagSubmit(Tag tag) {
         tagService.insertSelective(tag);
         return "redirect:/admin/tag";
     }
@@ -63,7 +71,7 @@ public class BackTagController {
      * @return
      */
     @PostMapping(value = "/delete/{id}")
-    public String deleteTag(@PathVariable("id") Integer id)  {
+    public String deleteTag(@PathVariable("id") Integer id) {
         /*Integer count = articleService.countArticleByTagId(id);
         if (count == 0) {
             tagService.deleteTag(id);
@@ -78,14 +86,14 @@ public class BackTagController {
      * @return
      */
     @PostMapping(value = "/edit/{id}")
-    public ModelAndView editTagView(@PathVariable("id") Integer id)  {
+    public ModelAndView editTagView(@PathVariable("id") Integer id) {
         ModelAndView modelAndView = new ModelAndView();
 
-        Tag tag =  tagService.selectById(id);
-        modelAndView.addObject("tag",tag);
+        Tag tag = tagService.selectById(id);
+        modelAndView.addObject(SessionFields.BLOG_TAG, tag);
 
         List<Tag> tagList = tagService.selectAll();
-        modelAndView.addObject("tagList",tagList);
+        modelAndView.addObject(SessionFields.BLOG_TAG_LIST, tagList);
 
         modelAndView.setViewName("Admin/Tag/edit");
         return modelAndView;
@@ -99,7 +107,7 @@ public class BackTagController {
      * @return
      */
     @PostMapping(value = "/editSubmit")
-    public String editTagSubmit(Tag tag)  {
+    public String editTagSubmit(Tag tag) {
         tagService.update(tag);
         return "redirect:/admin/tag";
     }

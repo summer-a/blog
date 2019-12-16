@@ -42,6 +42,11 @@ public class Category extends BaseEntity {
     @Column(name = "category_icon")
     private String categoryIcon;
 
+    /**
+     * 分类下文章数/其他类目数
+     */
+    private int categoryCount;
+
     public Category(Integer id) {
         super(id);
     }

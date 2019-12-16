@@ -4,8 +4,7 @@ import com.alibaba.fastjson.JSON;
 import com.hjb.blog.entity.normal.JvtcUser;
 import com.hjb.blog.util.CommonUtils;
 import com.hjb.blog.util.JvtcLoginUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import com.hjb.blog.util.LoggerUtils;
 import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
 
 import javax.servlet.http.HttpServletRequest;
@@ -22,9 +21,6 @@ import java.util.Map;
  * @date 2019/7/19 12:13
  */
 public class LogInterceptor extends HandlerInterceptorAdapter {
-
-    /** 日志 */
-    private Logger log = LoggerFactory.getLogger(LogInterceptor.class);
 
     /**
      * This implementation always returns {@code true}.
@@ -54,7 +50,7 @@ public class LogInterceptor extends HandlerInterceptorAdapter {
         Long startTime = (Long) request.getAttribute("request_start_time");
         // 请求结束时间
         long endTime = System.currentTimeMillis();
-        log.info("本次请求耗时：" + (endTime - startTime) + "毫秒；" + getRequestInfo(request).toString());
+        LoggerUtils.getLogger().info("本次请求耗时：" + (endTime - startTime) + "毫秒；" + getRequestInfo(request).toString());
     }
 
     /**

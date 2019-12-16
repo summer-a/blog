@@ -11,6 +11,6 @@ package com.hjb.blog.entity.enums;
  */
 public enum QQType {
 
-    QQ, QUN, GROUP
+    QQ, GROUP, DISCUSS
 
 }

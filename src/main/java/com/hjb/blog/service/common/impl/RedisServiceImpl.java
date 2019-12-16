@@ -1,8 +1,10 @@
 package com.hjb.blog.service.common.impl;
 
+import com.hjb.blog.field.CommonFields;
 import com.hjb.blog.service.common.RedisService;
 import org.springframework.data.redis.core.HashOperations;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -42,7 +44,8 @@ public class RedisServiceImpl<T> implements RedisService<T> {
      */
     @Override
     public void set(String key, T value, int seconds) {
-        redisTemplate.opsForValue().set(key, value, seconds <= 0 ? (1 * 24 * 60 * 60) : seconds, TimeUnit.SECONDS);
+        ValueOperations<String, T> valueOperations = redisTemplate.opsForValue();
+        valueOperations.set(key, value, seconds <= 0 ? CommonFields.ONE_DAY_SEC : seconds, TimeUnit.SECONDS);
     }
 
     /**
@@ -53,7 +56,8 @@ public class RedisServiceImpl<T> implements RedisService<T> {
      */
     @Override
     public T get(String key) {
-        return redisTemplate.opsForValue().get(key);
+        ValueOperations<String, T> valueOperations = redisTemplate.opsForValue();
+        return valueOperations.get(key);
     }
 
 

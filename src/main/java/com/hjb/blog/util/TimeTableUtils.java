@@ -2,8 +2,6 @@ package com.hjb.blog.util;
 
 import com.hjb.blog.entity.enums.QQType;
 import com.hjb.blog.entity.timetable.MessageInfo;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.util.CollectionUtils;
 
 import java.time.LocalTime;
@@ -26,17 +24,6 @@ import java.util.concurrent.TimeUnit;
  * @date 2019/7/9 17:13
  */
 public class TimeTableUtils {
-
-
-    /**
-     * 日志
-     */
-    private static Logger log = LoggerFactory.getLogger(TimeTableUtils.class);
-
-    /**
-     * 一天的秒数
-     */
-    public static int oneDaySeconds = 1 * 60 * 60 * 24;
 
     /**
      * 每天执行时间 (6:00)
@@ -63,7 +50,7 @@ public class TimeTableUtils {
                 // 根据类型发送消息
                 if (type.equals(QQType.QQ)) {
                     CoolqUtils.getInstance().sendPrivateMsg(num, message);
-                } else if (type.equals(QQType.QUN)) {
+                } else if (type.equals(QQType.GROUP)) {
                     CoolqUtils.getInstance().sendGroupMsg(num, message);
                 } else {
                     // 讨论组消息
@@ -71,10 +58,10 @@ public class TimeTableUtils {
                 }
             } catch (Exception e) {
                 e.printStackTrace();
-                log.error("任务计划创建失败。原因：{}", e.getMessage());
+                LoggerUtils.getLogger().error("任务计划创建失败。原因：{}", e.getMessage());
             }
         }, delay, TimeUnit.SECONDS);
-        log.info("已创建定时! 该任务将在{}小时后执行！", (delay / 3600));
+        LoggerUtils.getLogger().info("已创建定时! 该任务将在{}小时后执行！", (delay / 3600));
         return schedule;
     }
 
@@ -93,7 +80,7 @@ public class TimeTableUtils {
                     // 发送
                     send(messageInfos);
                 }, delay, TimeUnit.SECONDS);
-                log.info("已创建定时! 该任务将在{}执行！", LocalTime.now().plusSeconds(delay).format(DateTimeFormatter.ISO_LOCAL_TIME));
+                LoggerUtils.getLogger().info("已创建定时! 该任务将在{}执行！", LocalTime.now().plusSeconds(delay).format(DateTimeFormatter.ISO_LOCAL_TIME));
                 return schedule;
             }
         }
@@ -114,7 +101,7 @@ public class TimeTableUtils {
                 if (messageInfo.getType().equals(QQType.QQ)) {
                     // QQ消息
                     CoolqUtils.getInstance().sendPrivateMsg(messageInfo.getNum(), messageInfo.getMessage());
-                } else if (messageInfo.getType().equals(QQType.QUN)) {
+                } else if (messageInfo.getType().equals(QQType.GROUP)) {
                     // 群聊消息
                     CoolqUtils.getInstance().sendGroupMsg(messageInfo.getNum(), messageInfo.getMessage());
                 } else {
@@ -124,7 +111,7 @@ public class TimeTableUtils {
             }
         } catch (Exception e) {
             e.printStackTrace();
-            log.error("任务计划创建失败。原因：{}", e.getMessage());
+            LoggerUtils.getLogger().error("任务计划创建失败。原因：{}", e.getMessage());
         }
     }
 }

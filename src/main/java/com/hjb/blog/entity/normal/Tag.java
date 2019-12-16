@@ -27,6 +27,11 @@ public class Tag extends BaseEntity {
     @Column(name = "status")
     private Boolean status;
 
+    /**
+     * 非数据库字段,指定属于该标签的文章的数量
+     */
+    private int articleCount;
+
     public Tag(Integer id) {
         super(id);
     }

@@ -19,6 +19,14 @@
     </nav>
 </th:block>
 <th:block layout:fragment="index-left">
+    <p style="margin-top: 15px;">
+        &nbsp;&nbsp;课表不准确？
+        <a th:href="${refreshUrl}">
+            <button type="button" class="layui-btn">
+                <i class="layui-icon">&#xe669;</i> 强制刷新
+            </button>
+        </a>
+    </p>
     <iframe frameborder="0" th:srcdoc='${html}' style="height: fit-content; min-height: 1300px; max-height: 1500px;"
             width="100%" seamless>
         <p>您的浏览器不支持iFrame!</p>

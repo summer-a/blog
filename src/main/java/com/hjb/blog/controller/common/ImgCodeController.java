@@ -1,5 +1,6 @@
 package com.hjb.blog.controller.common;
 
+import com.hjb.blog.field.SessionFields;
 import com.xiaoleilu.hutool.captcha.CaptchaUtil;
 import com.xiaoleilu.hutool.captcha.LineCaptcha;
 import org.springframework.stereotype.Controller;
@@ -39,7 +40,7 @@ public class ImgCodeController {
         try (ServletOutputStream outputStream = response.getOutputStream()) {
             LineCaptcha lineCaptcha = CaptchaUtil.createLineCaptcha(width, height, 4, 150);
             String code = lineCaptcha.getCode();
-            session.setAttribute("imgcode", code);
+            session.setAttribute(SessionFields.IMG_CODE, code);
             session.setMaxInactiveInterval(120);
             lineCaptcha.write(outputStream);
         } catch (IOException e) {

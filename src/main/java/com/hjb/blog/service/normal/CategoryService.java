@@ -23,4 +23,12 @@ public interface CategoryService extends BaseService<Category> {
      * @return
      */
     List<LayerMenuDTO<Category>> selectCategoryToLayerMenu(Category category);
+
+    /**
+     * 根据id删除分类
+     *
+     * @param id
+     * @return
+     */
+    int deleteCategory(int id);
 }

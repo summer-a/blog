@@ -2,6 +2,20 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.hjb.blog.mapper.JvtcUserMapper">
 
+    <resultMap id="jvtcUserMap" type="com.hjb.blog.entity.normal.JvtcUser">
+        <id property="id" column="id"/>
+        <result property="username" column="username"/>
+        <result property="password" column="password"/>
+        <result property="truename" column="truename"/>
+        <result property="vip" column="vip"/>
+        <result property="durationEndTime" column="duration_end_time"/>
+        <result property="clazz" column="clazz"/>
+        <result property="cookie" column="cookie"/>
+        <result property="createTime" column="create_time"/>
+        <result property="updateTime" column="update_time"/>
+    </resultMap>
+
+
     <resultMap id="userRobot" type="com.hjb.blog.entity.dto.UserRobotDTO">
         <id column="id" property="jvtcUser.id"/>
         <result column="username" property="jvtcUser.username"/>
@@ -37,5 +51,12 @@
             LEFT JOIN robot r ON ( u.id = r.jvtc_user_id )
         where
             r.status = 1
+    </select>
+
+    <select id="selectUserByRobotTarget" resultMap="jvtcUserMap">
+        select u.*
+        from robot r
+               left join jvtc_user u on (r.jvtc_user_id = u.id)
+        where r.target = #{value}
     </select>
 </mapper>

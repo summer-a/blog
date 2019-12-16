@@ -2,7 +2,9 @@ package com.hjb.blog.controller.admin;
 
 
 import com.hjb.blog.entity.normal.User;
+import com.hjb.blog.field.SessionFields;
 import com.hjb.blog.service.normal.UserService;
+import com.hjb.blog.util.SpringUtils;
 import com.xiaoleilu.hutool.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -10,11 +12,9 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
 import java.time.LocalDateTime;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
+import java.util.Objects;
 
 
 /**
@@ -37,7 +37,7 @@ public class BackUserController {
         ModelAndView modelandview = new ModelAndView();
 
         List<User> userList = userService.selectAll();
-        modelandview.addObject("userList", userList);
+        modelandview.addObject(SessionFields.BLOG_USER_LIST, userList);
 
         modelandview.setViewName("Admin/User/index");
         return modelandview;
@@ -59,27 +59,27 @@ public class BackUserController {
     /**
      * 检查用户名是否存在
      *
-     * @param request
+     * @param id
+     * @param username
      * @return
      */
     @PostMapping(value = "/checkUserName")
     @ResponseBody
-    public String checkUserName(HttpServletRequest request, Integer id, String username) {
-        Map<String, Object> map = new HashMap<>(2);
+    public JSONObject checkUserName(Integer id, String username) {
+        JSONObject result = new JSONObject();
         User param = new User();
         param.setUserName(username);
         User user = userService.selectOne(param);
         //用户名已存在,但不是当前用户(编辑用户的时候，不提示)
         if (user != null) {
-            if (user.getId() != id) {
-                map.put("code", 1);
-                map.put("msg", "用户名已存在！");
+            if (!Objects.equals(user.getId(), id)) {
+                result.put("code", 1);
+                result.put("msg", "用户名已存在！");
             }
         } else {
-            map.put("code", 0);
-            map.put("msg", "");
+            result.put("code", 0);
+            result.put("msg", "");
         }
-        String result = new JSONObject(map).toString();
         return result;
     }
 
@@ -91,22 +91,21 @@ public class BackUserController {
      */
     @PostMapping(value = "/checkUserEmail")
     @ResponseBody
-    public String checkUserEmail(HttpServletRequest request, Integer id, String email) {
-        Map<String, Object> map = new HashMap<>(2);
+    public JSONObject checkUserEmail(HttpServletRequest request, Integer id, String email) {
+        JSONObject result = new JSONObject();
         User param = new User();
         param.setUserEmail(email);
         User user = userService.selectOne(param);
         //用户名已存在,但不是当前用户(编辑用户的时候，不提示)
         if (user != null) {
-            if (user.getId() != id) {
-                map.put("code", 1);
-                map.put("msg", "电子邮箱已存在！");
+            if (!Objects.equals(user.getId(), id)) {
+                result.put("code", 1);
+                result.put("msg", "电子邮箱已存在！");
             }
         } else {
-            map.put("code", 0);
-            map.put("msg", "");
+            result.put("code", 0);
+            result.put("msg", "");
         }
-        String result = new JSONObject(map).toString();
         return result;
     }
 
@@ -179,12 +178,12 @@ public class BackUserController {
      * @return
      */
     @GetMapping(value = "/profile")
-    public ModelAndView userProfileView(HttpSession session) {
+    public ModelAndView userProfileView() {
 
         ModelAndView modelAndView = new ModelAndView();
-        User sessionUser = (User) session.getAttribute("user");
+        User sessionUser = SpringUtils.getCurrentUser();
         User user = userService.selectById(sessionUser.getId());
-        modelAndView.addObject("user", user);
+        modelAndView.addObject(SessionFields.USER, user);
 
         modelAndView.setViewName("Admin/User/profile");
         return modelAndView;

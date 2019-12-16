@@ -1,28 +1,18 @@
-<%@ page language="java" contentType="text/html; charset=UTF-8"
-         pageEncoding="UTF-8" %>
-<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
-<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
-<%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %>
-<%@ taglib prefix="rapid" uri="http://www.rapid-framework.org.cn/rapid" %>
-
-    <rapid:override name="title">
-        - 分类列表
-    </rapid:override>
-<rapid:override name="header-style">
-    <style>
-        .layui-input-block {
-            margin:0px 10px;
-        }
-    </style>
-</rapid:override>
-
-<rapid:override name="content">
-
-
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/web/thymeleaf/layout"
+      layout:decorator="Admin/Public/framework">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="">
+    <title>分类列表</title>
+</head>
+<body>
+<th:block layout:fragment="content">
     <blockquote class="layui-elem-quote">
-        <span class="layui-breadcrumb" lay-separator="/">
-              <a th:href="@{/admin}">首页</a>
-              <a th:href="@{/admin/category}">分类列表</a>
+        <span class="layui-breadcrumb" lay-separator=" / ">
+              <a th:href="@{'/admin'}">首页</a>
+              <a th:href="@{'/admin/category'}">分类列表</a>
               <a><cite>编辑分类</cite></a>
         </span>
     </blockquote>
@@ -33,39 +23,34 @@
                     <div class="layui-input-block">
                         <strong>修改分类</strong>
                     </div>
-                    <input type="hidden" name="categoryId" value="${category.categoryId}">
+                    <input type="hidden" name="id" th:value="${category.id}">
                     <div class="layui-input-block">
                         名称 <span style="color: #FF5722; ">*</span>
-                        <input type="text" name="categoryName" value="${category.categoryName}" placeholder="" autocomplete="off" class="layui-input" required>
+                        <input type="text" name="categoryName" th:value="${category.categoryName}" placeholder=""
+                               autocomplete="off" class="layui-input" required>
                     </div>
                     <br>
                     <div class="layui-input-block">
                         父节点 <span style="color: #FF5722; ">*</span>
                         <select name="categoryPid" class="layui-input" required>
-                            <c:forEach items="${categoryList}" var="c">
-                                <c:choose>
-                                    <c:when test="${c.categoryId==category.categoryPid}">
-                                        <option value="${c.categoryId}" selected>${c.categoryName}</option>
-                                    </c:when>
-                                    <c:otherwise>
-                                        <c:if test="${c.categoryPid==0}">
-                                            <option value="${c.categoryId}">${c.categoryName}</option>
-                                        </c:if>
-                                    </c:otherwise>
-                                </c:choose>
-                            </c:forEach>
-                            <option value="0" <c:if test="${category.categoryPid==0}">selected</c:if> >无</option>
+                            <th:block th:each="c : ${category}">
+                                <option th:value="${c.categoryPid}" th:selected="${c.id == category.categoryPid}"
+                                        th:text="${c.categoryName}">无
+                                </option>
+                            </th:block>
+                            <option value="0" th:selected="${category.categoryPid == 0}">无</option>
                         </select>
                     </div>
                     <br>
                     <div class="layui-input-block">
                         分类描述
-                        <input type="text" name="categoryDescription" value="${category.categoryDescription}"  class="layui-input" >
+                        <input type="text" name="categoryDescription" th:value="${category.categoryDescription}"
+                               class="layui-input">
                     </div>
                     <br>
                     <div class="layui-input-block">
                         图标样式
-                        <input type="text" name="categoryIcon" value="${category.categoryIcon}"class="layui-input" >
+                        <input type="text" name="categoryIcon" th:value="${category.categoryIcon}" class="layui-input">
                     </div>
                     <br>
                     <br>
@@ -79,65 +64,66 @@
         <div class="layui-col-md8" >
             <table class="layui-table" >
                 <colgroup>
+                    <col width="30">
+                    <col width="30">
                     <col width="300">
                     <col width="100">
-                    <col width="100">
-                    <col width="100">
-                    <col width="50">
-                    <col width="50">
+                    <col width="140">
                 </colgroup>
                 <thead>
                 <tr>
-                    <th>名称</th>
-                    <th>文章数</th>
-                    <th>操作</th>
                     <th>ID</th>
-                    <th>pid</th>
+                    <th>PID</th>
+                    <th>名称</th>
+                    <th>文章/子节点数</th>
+                    <th>操作</th>
                 </tr>
                 </thead>
                 <tbody>
-                <c:forEach items="${categoryList}" var="c">
-                    <c:if test="${c.categoryPid==0}">
+                <th:block th:each="c : ${categoryList}" th:if="${c.categoryPid == 0}">
+                    <tr>
+                        <td th:text="${c.id}">id</td>
+                        <td th:text="${c.categoryPid}">pid</td>
+                        <td>
+                            <a th:href="@{'/category/' + ${c.id}}" target="_blank" style="color: #FF5722;"
+                               th:text="${c.categoryName}">分类名</a>
+                        </td>
+                        <td>
+                            <a th:href="@{'/category/' + ${c.id}}" target="_blank" th:text="${c.categoryCount}">文章数</a>
+                        </td>
+                        <td>
+                            <a th:href="@{'/admin/category/edit/' + ${c.id}}" class="layui-btn layui-btn-mini">编辑</a>
+                            <!--<c:if test="${c.articleCount==0}">-->
+                            <a th:href="@{'/admin/category/delete/' + ${c.id}}"
+                               class="layui-btn layui-btn-danger layui-btn-mini" onclick="return confirmDelete()"
+                               th:if="${c.categoryCount == 0}">删除</a>
+                            <!--</c:if>-->
+                        </td>
+                    </tr>
+                    <th:block th:each="c2 : ${categoryList}" th:if="${c2.categoryPid == c.id}">
                         <tr>
+                            <td class="cate-parent" th:text="${c2.id}">id</td>
+                            <td th:text="${c2.categoryPid}">类型父id</td>
                             <td>
-                                <a th:href="@{/category/${c.categoryId}}" target="_blank">${c.categoryName}</a>
+                                <a th:href="@{'/category/' + ${c2.id}}" target="_blank"
+                                   th:text="'——' + ${c2.categoryName}">——子类型</a>
                             </td>
                             <td>
-                                <a th:href="@{/category/${c.categoryId}}" target="_blank">${c.articleCount}</a>
+                                <a th:href="@{'/category/' + ${c2.id}}" target="_blank" th:text="${c2.categoryCount}">文章数</a>
                             </td>
                             <td>
-                                <a th:href="@{/admin/category/edit/${c.categoryId}}" class="layui-btn layui-btn-mini">编辑</a>
-                                <c:if test="${c.articleCount==0}">
-                                    <a th:href="@{/admin/category/delete/${c.categoryId}}" class="layui-btn layui-btn-danger layui-btn-mini" onclick="return confirmDelete()">删除</a>
-                                </c:if>
+                                <a th:href="@{'/admin/category/edit/' + ${c2.id}}"
+                                   class="layui-btn layui-btn-mini">编辑</a>
+                                <!--<c:if test="${c2.articleCount==0}">-->
+                                <a th:href="@{'/admin/category/delete/' + ${c2.id}}"
+                                   class="layui-btn layui-btn-danger layui-btn-mini" onclick="return confirmDelete()"
+                                   th:if="${c2.categoryCount == 0}">删除</a>
+                                <!--</c:if>-->
                             </td>
-                            <td>${c.categoryId}</td>
-                            <td>${c.categoryPid}</td>
                         </tr>
-                        <c:forEach items="${categoryList}" var="c2">
-                            <c:if test="${c2.categoryPid==c.categoryId}">
-                                <tr>
-                                    <td>
-                                        <a th:href="@{/category/${c2.categoryId}}" target="_blank">——${c2.categoryName}</a>
-                                    </td>
-                                    <td>
-                                        <a th:href="@{/category/${c2.categoryId}}" target="_blank">${c2.articleCount}</a>
-                                    </td>
-                                    <td>
-                                        <a th:href="@{/admin/category/edit/${c2.categoryId}}" class="layui-btn layui-btn-mini">编辑</a>
-                                        <c:if test="${c2.articleCount==0}">
-                                            <a th:href="@{/admin/category/delete/${c2.categoryId}}" class="layui-btn layui-btn-danger layui-btn-mini" onclick="return confirmDelete()">删除</a>
-                                        </c:if>
-                                    </td>
-                                    <td class="cate-parent">${c2.categoryId}</td>
-                                    <td>${c2.categoryPid}</td>
-                                </tr>
-                            </c:if>
-                        </c:forEach>
-                    </c:if>
+                    </th:block>
+                </th:block>
 
-
-                </c:forEach>
                 </tbody>
             </table>
             <blockquote class="layui-elem-quote layui-quote-nm">
@@ -150,15 +136,6 @@
         </div>
 
     </div>
-
-
-
-
-
-
-</rapid:override>
-<rapid:override name="footer-script">
-
-</rapid:override>
-
-<%@ include file="../Public/framework.jsp"%>
+</th:block>
+</body>
+</html>

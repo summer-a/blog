@@ -1,6 +1,7 @@
 package com.hjb.blog.interceptor;
 
 import com.hjb.blog.entity.normal.User;
+import com.hjb.blog.field.SessionFields;
 import com.hjb.blog.util.AdminUserUtils;
 import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
 
@@ -33,12 +34,12 @@ public class SecurityHandler extends HandlerInterceptorAdapter {
         HttpSession session = request.getSession();
         User user = AdminUserUtils.getCurrentUser();
         if (user != null) {
-            String adminUserId = session.getAttribute("ADMIN_USER_ID") + "";
+            String adminUserId = session.getAttribute(SessionFields.ADMIN_USER_ID) + "";
             // 判断cookie和session是否对应
             Cookie[] cookies = request.getCookies();
             if (cookies != null) {
                 for (Cookie cookie : cookies) {
-                    if (Objects.equals(cookie.getName(), "ADMIN_USER_ID") && Objects.equals(cookie.getValue(), adminUserId)) {
+                    if (Objects.equals(cookie.getName(), SessionFields.ADMIN_USER_ID) && Objects.equals(cookie.getValue(), adminUserId)) {
                         return true;
                     }
                 }

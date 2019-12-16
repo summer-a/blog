@@ -8,13 +8,12 @@ import com.hjb.blog.entity.timetable.MessageInfo;
 import com.hjb.blog.entity.timetable.TimeTablePerTime;
 import com.hjb.blog.service.normal.JvtcUserService;
 import com.hjb.blog.util.JvtcLoginUtils;
+import com.hjb.blog.util.LoggerUtils;
 import com.hjb.blog.util.TimeTableUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -43,11 +42,6 @@ import java.util.Optional;
 @Component
 @EnableScheduling
 public class SendMessageJob {
-
-    /**
-     * 日志
-     */
-    private Logger log = LoggerFactory.getLogger(SendMessageJob.class);
 
     /**
      * 每节课上课时间，记录的是每天经过的时间（单位秒,0为第一大节课）
@@ -79,7 +73,7 @@ public class SendMessageJob {
     @Scheduled(cron = "0 0 6 ? * MON-FRI")
     public void insertToRedis() {
 
-        log.info("更新课表");
+        LoggerUtils.getLogger().info("更新课表");
 
         List<UserRobotDTO> userRobots = jvtcUserService.selectUserRobotList();
         // 更新没存入redis的课表
@@ -90,25 +84,25 @@ public class SendMessageJob {
 
     @Scheduled(cron = "0 10 7 ? * MON-FRI")
     public void sendInTheMorning() {
-        log.info("发送课表(上午)");
+        LoggerUtils.getLogger().info("发送课表(上午)");
         send(1, false);
     }
 
     @Scheduled(cron = "0 0 13 ? * MON-FRI")
     public void sendInTheNoon() {
-        log.info("发送课表(中午)");
+        LoggerUtils.getLogger().info("发送课表(中午)");
         send(2, false);
     }
 
     @Scheduled(cron = "0 0 17 ? * MON-FRI")
     public void sendInTheAfterNoon() {
-        log.info("发送课表(下午)");
+        LoggerUtils.getLogger().info("发送课表(下午)");
         send(3, true);
     }
 
     @Scheduled(cron = "0 20 18 ? * MON-FRI")
     public void sendInTheEvening() {
-        log.info("发送课表(晚上)");
+        LoggerUtils.getLogger().info("发送课表(晚上)");
         send(3, false);
     }
 
@@ -119,7 +113,7 @@ public class SendMessageJob {
      */
     private void send(int interval, boolean isFifthLesson) {
 
-        log.info("开始发送课表");
+        LoggerUtils.getLogger().info("开始发送课表");
         List<UserRobotDTO> userRobots = jvtcUserService.selectUserRobotList();
 
         List<MessageInfo> course = new ArrayList<>();
@@ -128,7 +122,7 @@ public class SendMessageJob {
         // 拿到所有有效用户的课表, 根据班级从缓存获取
         for (UserRobotDTO userRobot : userRobots) {
             JvtcUser juser = userRobot.getJvtcUser();
-            // 异常重试
+            //
             Html timeTable = JvtcLoginUtils.getTimeTable(0, juser, 3);
             // 转成对象(一天)
             List<TimeTablePerTime> courseOfDay = htmlToBeen(timeTable, LocalDate.now().getDayOfWeek().getValue());

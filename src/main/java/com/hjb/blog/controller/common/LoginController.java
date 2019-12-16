@@ -2,6 +2,8 @@ package com.hjb.blog.controller.common;
 
 import com.hjb.blog.entity.normal.JvtcUser;
 import com.hjb.blog.entity.vo.ResponseVO;
+import com.hjb.blog.field.CommonFields;
+import com.hjb.blog.field.SessionFields;
 import com.hjb.blog.service.normal.JvtcUserService;
 import com.hjb.blog.util.JvtcLoginUtils;
 import org.springframework.http.HttpStatus;
@@ -60,7 +62,7 @@ public class LoginController {
             // 有则直接获取
             // 登录失败
             if (jResponse.getCode() == HttpStatus.UNAUTHORIZED.value()) {
-                redirectAttributes.addFlashAttribute("message", "登录失败，请检查用户名或密码");
+                redirectAttributes.addFlashAttribute(SessionFields.MESSAGE, "登录失败，请检查用户名或密码");
                 return "redirect:/jvtc/page/login";
             }
             // 登录成功
@@ -73,14 +75,14 @@ public class LoginController {
                     t.setId(jvtcUser.getId());
                     jvtcUserService.update(t);
                 }
-                session.setAttribute("jvtc_user", jvtcUserOnline);
+                session.setAttribute(SessionFields.JVTC_USER, jvtcUserOnline);
                 // 存入cookie和session
                 String jvtcUserId = UUID.randomUUID().toString();
-                session.setAttribute("JVTC_USER_ID", jvtcUserId);
+                session.setAttribute(SessionFields.JVTC_USER_ID, jvtcUserId);
                 // 过期时间7天，单位=秒
-                session.setMaxInactiveInterval(24 * 60 * 60 * 7);
-                Cookie jvtcUserIdCookie = new Cookie("JVTC_USER_ID", jvtcUserId);
-                jvtcUserIdCookie.setMaxAge(24 * 60 * 60 * 7);
+                session.setMaxInactiveInterval(CommonFields.ONE_DAY_SEC * 7);
+                Cookie jvtcUserIdCookie = new Cookie(SessionFields.JVTC_USER_ID, jvtcUserId);
+                jvtcUserIdCookie.setMaxAge(CommonFields.ONE_DAY_SEC * 7);
                 jvtcUserIdCookie.setPath("/");
                 response.addCookie(jvtcUserIdCookie);
                 return "redirect:/timetable/index";
@@ -95,21 +97,21 @@ public class LoginController {
                         // 过期，更新缓存
                         JvtcLoginUtils.loginByUserNameAndEncode(username, encoded);
                     }
-                    session.setAttribute("jvtc_user", jvtcUser);
+                    session.setAttribute(SessionFields.JVTC_USER, jvtcUser);
                     // 存入cookie和session
                     String jvtcUserId = UUID.randomUUID().toString();
-                    session.setAttribute("JVTC_USER_ID", jvtcUserId);
+                    session.setAttribute(SessionFields.JVTC_USER_ID, jvtcUserId);
                     // 过期时间7天，单位=秒
-                    session.setMaxInactiveInterval(24 * 60 * 60 * 7);
+                    session.setMaxInactiveInterval(CommonFields.ONE_DAY_SEC * 7);
                     Cookie jvtcUserIdCookie = new Cookie("JVTC_USER_ID", jvtcUserId);
-                    jvtcUserIdCookie.setMaxAge(24 * 60 * 60 * 7);
+                    jvtcUserIdCookie.setMaxAge(CommonFields.ONE_DAY_SEC * 7);
                     jvtcUserIdCookie.setPath("/");
                     response.addCookie(jvtcUserIdCookie);
 
                     return "redirect:/timetable/index";
                 }
             } else {
-                redirectAttributes.addFlashAttribute("message", "账号密码有误");
+                redirectAttributes.addFlashAttribute(SessionFields.MESSAGE, "账号密码有误");
             }
         }
 

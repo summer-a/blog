@@ -255,19 +255,12 @@ public class GeetestLib {
      * @return
      */
     protected boolean objIsEmpty(Object gtObj) {
-
         if (gtObj == null) {
-
             return true;
-
         }
-
         if (gtObj.toString().trim().length() == 0) {
-
             return true;
-
         }
-
         return false;
     }
 
@@ -280,25 +273,15 @@ public class GeetestLib {
      * @return
      */
     private boolean resquestIsLegal(String challenge, String validate, String seccode) {
-
         if (objIsEmpty(challenge)) {
-
             return false;
-
         }
-
         if (objIsEmpty(validate)) {
-
             return false;
-
         }
-
         if (objIsEmpty(seccode)) {
-
             return false;
-
         }
-
         return true;
     }
 
@@ -312,13 +295,9 @@ public class GeetestLib {
      * @return 验证结果, 1表示验证成功0表示验证失败
      */
     public int enhencedValidateRequest(String challenge, String validate, String seccode, HashMap<String, String> data) throws UnsupportedEncodingException {
-
         if (!resquestIsLegal(challenge, validate, seccode)) {
-
             return 0;
-
         }
-
         gtlog("request legitimate");
 
         String userId = URLEncoder.encode(data.get("user_id"), "utf-8");
@@ -343,17 +322,11 @@ public class GeetestLib {
 
         String response = "";
         try {
-
             if (validate.length() <= 0) {
-
                 return 0;
-
             }
-
             if (!checkResultByPrivate(challenge, validate)) {
-
                 return 0;
-
             }
 
             gtlog("checkResultByPrivate");
@@ -363,9 +336,7 @@ public class GeetestLib {
             gtlog("response: " + response);
 
         } catch (Exception e) {
-
             e.printStackTrace();
-
         }
 
         String return_seccode = "";
@@ -385,10 +356,7 @@ public class GeetestLib {
                 return 0;
 
             }
-
         } catch (JSONException e) {
-
-
             gtlog("json load error");
             return 0;
 

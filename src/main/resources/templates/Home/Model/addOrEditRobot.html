@@ -30,13 +30,13 @@
             <div class="layui-input-block">
             <th:block th:if="${robot_info == null}">
                 <input type="radio" name="type" value="QQ" title="QQ号" checked="true">
-                <input type="radio" name="type" value="QUN" title="群号">
-                <input type="radio" name="type" value="GROUP" title="讨论组">
+                <input type="radio" name="type" value="GROUP" title="群号">
+                <input type="radio" name="type" value="DISCUSS" title="讨论组">
             </th:block>
             <th:block th:if="${robot_info != null}">
                 <input th:field="*{robot_info.type}" type="radio" name="type" value="QQ" title="QQ号" checked="true">
-                <input th:field="*{robot_info.type}" type="radio" name="type" value="QUN" title="群号">
-                <input th:field="*{robot_info.type}" type="radio" name="type" value="GROUP" title="讨论组">
+                <input th:field="*{robot_info.type}" type="radio" name="type" value="GROUP" title="群号">
+                <input th:field="*{robot_info.type}" type="radio" name="type" value="DISCUSS" title="讨论组">
             </th:block>
             </div>
         </div>

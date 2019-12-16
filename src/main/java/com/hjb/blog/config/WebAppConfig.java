@@ -3,6 +3,7 @@ package com.hjb.blog.config;
 import com.hjb.blog.interceptor.CommonResourceHandler;
 import com.hjb.blog.interceptor.LogInterceptor;
 import com.hjb.blog.interceptor.SecurityHandler;
+import com.hjb.blog.util.LoggerUtils;
 import com.hjb.blog.util.SpringUtils;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -33,6 +34,7 @@ public class WebAppConfig implements WebMvcConfigurer {
 
     @Bean
     public SpringUtils getSpringUtils() {
+        LoggerUtils.getLogger().info("SpringUtils 初始化完成 ");
         return new SpringUtils();
     }
     /**
@@ -41,6 +43,7 @@ public class WebAppConfig implements WebMvcConfigurer {
      */
     @Bean
     CommonResourceHandler getCommonResourceHandler() {
+        LoggerUtils.getLogger().info("公共资源拦截器 初始化完成 ");
         return new CommonResourceHandler();
     }
 
