@@ -70,7 +70,7 @@ public class CommonResourceHandler extends HandlerInterceptorAdapter {
         session.setAttribute(SessionFields.OPTION, op);
 
         // 随机图片数量
-        session.setAttribute(SessionFields.IMAGES_QUANTITY, properties.getProperty("image.random.count", "15"));
+        session.setAttribute(SessionFields.IMAGES_QUANTITY, Integer.parseInt(properties.getProperty("image.random.count", "15")));
 
         // 菜单列表获取
         String uri = request.getRequestURI();
