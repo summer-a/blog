@@ -22,6 +22,11 @@ public final class HTMLFields {
      */
     public static final String TABLE_NO_TABLE_MESSAGE = "未找到用户,如未注册请先在https://www.chiyouyun.com/jvtc/page/login网站注册并添加机器人\n询问课表请在机器人设置对应的群或QQ进行课表询问";
 
+    /**
+     * 获取失败
+     */
+    public static final String GET_TABLE_FAIL = "<div>获取失败,请刷新重试</div>";
+
     private HTMLFields() {
 
     }

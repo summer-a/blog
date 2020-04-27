@@ -53,6 +53,7 @@ public class FTPUtils {
      */
     private static final String FTP_BASE_PATH = "/";
 
+
     public FTPUtils() {
         String username = properties.getProperty("ftp.username");
         String password = properties.getProperty("ftp.password");

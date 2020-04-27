@@ -21,7 +21,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
-import java.time.LocalDate;
 import java.util.List;
 import java.util.Objects;
 import java.util.regex.Matcher;
@@ -126,7 +125,7 @@ public class QQMessageController {
                 Matcher nextCourseMatcher = nextCourse.matcher(rawMessage);
                 // 下一周
                 if (nextCourseMatcher.find()) {
-                    int howWeeks = JvtcLoginUtils.howWeeks(LocalDate.now());
+                    int howWeeks = JvtcLoginUtils.nowWeek();
                     return setReplayMessage(data, response, (howWeeks + 1));
                 }
                 // 本周

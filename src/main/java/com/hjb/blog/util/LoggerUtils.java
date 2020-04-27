@@ -21,7 +21,6 @@ public class LoggerUtils {
     private static Logger logger = LoggerFactory.getLogger(LoggerUtils.class);
 
     private LoggerUtils() {
-
     }
 
     public static Logger getLogger() {

@@ -6,9 +6,9 @@ import com.hjb.blog.entity.normal.User;
 import com.hjb.blog.entity.vo.ResultVO;
 import com.hjb.blog.service.normal.ArticleService;
 import com.hjb.blog.service.normal.CommentService;
+import com.hjb.blog.util.AdminUserUtils;
 import com.hjb.blog.util.CodeFilterUtils;
 import com.hjb.blog.util.CommonUtils;
-import com.hjb.blog.util.SpringUtils;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -48,7 +48,7 @@ public class CommentController {
         comment.setCreateTime(LocalDateTime.now());
         comment.setCommentIp(CommonUtils.getIpAddr(request));
 
-        User user = SpringUtils.getCurrentUser();
+        User user = AdminUserUtils.getCurrentUser();
         if (user != null) {
             comment.setCommentRole(Role.ADMIN.getValue());
         } else {
@@ -58,6 +58,8 @@ public class CommentController {
 
         // 过滤尖括号
         comment.setCommentContent(CodeFilterUtils.replaceGtAndLt(comment.getCommentContent()));
+
+        comment.setCommentStatus(true);
 
         commentService.insert(comment);
 

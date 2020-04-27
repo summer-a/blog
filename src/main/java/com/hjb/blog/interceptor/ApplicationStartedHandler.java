@@ -20,8 +20,5 @@ public class ApplicationStartedHandler implements ApplicationRunner {
     @Override
     public void run(ApplicationArguments args) throws Exception {
         LoggerUtils.getLogger().info("项目初始化");
-        /*List<UserRobotDTO> userRobotList = jvtcUserService.selectUserRobotList();
-        TimeTableTask timeTableTask = new TimeTableTask();
-        timeTableTask.startByList(userRobotList);*/
     }
 }

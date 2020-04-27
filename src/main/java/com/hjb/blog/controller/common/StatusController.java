@@ -17,11 +17,12 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/status")
 public class StatusController {
 
+    private Runtime runtime = Runtime.getRuntime();
+
     @GetMapping("/memory")
     public JSONObject showMemoryStatus() {
         JSONObject memoryStatus = new JSONObject();
 
-        Runtime runtime = Runtime.getRuntime();
         long maxMemory = runtime.maxMemory();
         long freeMemory = runtime.freeMemory();
         long totalMemory = runtime.totalMemory();

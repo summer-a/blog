@@ -119,8 +119,7 @@ public class BaseServiceImpl<T extends BaseEntity> implements BaseService<T> {
 
         example.createCriteria().andEqualTo(t);
         List<T> list = mapper.selectByExample(example);
-        PageInfo<T> pageInfo = new PageInfo<>(list);
-        return pageInfo;
+        return PageInfo.of(list);
     }
 
     @Override

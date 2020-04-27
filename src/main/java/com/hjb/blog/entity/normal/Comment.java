@@ -88,4 +88,8 @@ public class Comment extends BaseEntity {
     @Column(name = "comment_status")
     private Boolean commentStatus;
 
+    /**
+     * 文章内容， 非数据库字段
+     */
+    private Article article;
 }

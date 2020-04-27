@@ -6,10 +6,16 @@ import com.hjb.blog.entity.normal.JvtcUser;
 import com.hjb.blog.entity.normal.Robot;
 import com.hjb.blog.entity.timetable.MessageInfo;
 import com.hjb.blog.entity.timetable.TimeTablePerTime;
+import com.hjb.blog.entity.vo.ResponseVO;
+import com.hjb.blog.field.RedisFields;
+import com.hjb.blog.field.UrlFields;
+import com.hjb.blog.service.common.RedisService;
 import com.hjb.blog.service.normal.JvtcUserService;
+import com.hjb.blog.util.HttpUtils;
 import com.hjb.blog.util.JvtcLoginUtils;
 import com.hjb.blog.util.LoggerUtils;
 import com.hjb.blog.util.TimeTableUtils;
+import okhttp3.Request;
 import org.apache.commons.lang3.StringUtils;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -28,9 +34,10 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.regex.Matcher;
 
 /**
- * 早课表(弃用,改成使用从app接口获取)
+ * 早课表
  *
  * @author 胡江斌
  * @version 1.0
@@ -64,46 +71,97 @@ public class SendMessageJob {
     @Value("${host.tableUrl}")
     private String TABLE_URL;
 
+    @Value("${course.push}")
+    private Boolean COURSE_PUSH;
+
     @Resource
     private JvtcUserService jvtcUserService;
+
+    @Resource
+    private RedisService<Integer> redisService;
 
     /**
      * 每天获取一遍课表,获取失败则每天实时生成
      */
     @Scheduled(cron = "0 0 6 ? * MON-FRI")
     public void insertToRedis() {
-
         LoggerUtils.getLogger().info("更新课表");
 
         List<UserRobotDTO> userRobots = jvtcUserService.selectUserRobotList();
         // 更新没存入redis的课表
         for (UserRobotDTO userRobot : userRobots) {
-            JvtcLoginUtils.getTimeTable(JvtcLoginUtils.howWeeks(LocalDate.now()), userRobot.getJvtcUser(), 3);
+            JvtcLoginUtils.getTimeTable(JvtcLoginUtils.nowWeek(), userRobot.getJvtcUser(), 3);
         }
     }
 
     @Scheduled(cron = "0 10 7 ? * MON-FRI")
     public void sendInTheMorning() {
-        LoggerUtils.getLogger().info("发送课表(上午)");
-        send(1, false);
+        if (COURSE_PUSH != null && COURSE_PUSH) {
+            LoggerUtils.getLogger().info("发送课表(上午)");
+            send(1, false);
+        }
     }
 
     @Scheduled(cron = "0 0 13 ? * MON-FRI")
     public void sendInTheNoon() {
-        LoggerUtils.getLogger().info("发送课表(中午)");
-        send(2, false);
+        if (COURSE_PUSH != null && COURSE_PUSH) {
+            LoggerUtils.getLogger().info("发送课表(中午)");
+            send(2, false);
+        }
     }
 
     @Scheduled(cron = "0 0 17 ? * MON-FRI")
     public void sendInTheAfterNoon() {
-        LoggerUtils.getLogger().info("发送课表(下午)");
-        send(3, true);
+        if (COURSE_PUSH != null && COURSE_PUSH) {
+            LoggerUtils.getLogger().info("发送课表(下午)");
+            send(3, true);
+        }
     }
 
     @Scheduled(cron = "0 20 18 ? * MON-FRI")
     public void sendInTheEvening() {
-        LoggerUtils.getLogger().info("发送课表(晚上)");
-        send(3, false);
+        if (COURSE_PUSH != null && COURSE_PUSH) {
+            LoggerUtils.getLogger().info("发送课表(晚上)");
+            send(3, false);
+        }
+    }
+
+    @Scheduled(cron = "0 01 0 ? * MON")
+    public void getWeek() {
+        LoggerUtils.getLogger().info("每周一0点过一分更新周次");
+        Request.Builder builder = JvtcLoginUtils.request;
+
+        int i = 0;
+        boolean flag = false;
+        do {
+            // 获取表中第一个用户
+            JvtcUser user = new JvtcUser();
+            user.setId(1);
+            JvtcUser jvtcUser = jvtcUserService.selectOne(user);
+            ResponseVO result = HttpUtils.get(UrlFields.GET_NOW_WEEK, builder.addHeader(UrlFields.COOKIE, jvtcUser.getCookie()));
+
+            Matcher matcher = JvtcLoginUtils.pattern.matcher(result.getHtml());
+
+            if (matcher.find()) {
+                // success
+                String week = matcher.group(1);
+                redisService.set(RedisFields.WEEK, Integer.parseInt(week));
+                flag = true;
+                break;
+            } else {
+                JvtcLoginUtils.loginByUserNameAndEncode(jvtcUser.getUsername(), jvtcUser.getPassword());
+            }
+        } while (++i < 3);
+
+        // fail
+        if (!flag) {
+            LoggerUtils.getLogger().error("获取周次失败, 进行默认处理, + 1 周");
+            try {
+                redisService.set(RedisFields.WEEK, redisService.get(RedisFields.WEEK) + 1);
+            } catch (Exception e) {
+                LoggerUtils.getLogger().error("获取周次默认处理失败", e);
+            }
+        }
     }
 
     /**

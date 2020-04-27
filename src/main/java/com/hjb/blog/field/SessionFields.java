@@ -15,12 +15,16 @@ public final class SessionFields {
     /**
      * 后台用户
      */
-    public static final String USER = "user";
+    public static final String ADMIN_USER = "user";
     /**
      * 后台用户id
      */
     public static final String ADMIN_USER_ID = "ADMIN_USER_ID";
 
+    /**
+     * 前台用户
+     */
+    public static final String BLOG_USER = "blogUser";
 
     /**
      * 登录前的请求地址
@@ -123,6 +127,19 @@ public final class SessionFields {
      * 异常信息
      */
     public static final String EXCEPTION_MSG = "exception_msg";
+    /**
+     * 教务处cookie
+     */
+    public static final String JVTC_COOKIE = "cookie";
+    /**
+     * 职教云验证码
+     */
+    public static final String VERIFY_CODE_COOKIE = "verify_code_cookie";
+
+    /**
+     * 职教云登录cookie
+     */
+    public static final String ICVE_COOKIE = "icve_cookie";
 
 
     private SessionFields() {

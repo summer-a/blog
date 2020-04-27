@@ -1,6 +1,7 @@
 package com.hjb.blog.util;
 
 import com.hjb.blog.entity.normal.User;
+import com.hjb.blog.field.SessionFields;
 
 import javax.servlet.http.HttpSession;
 
@@ -23,7 +24,7 @@ public class AdminUserUtils {
      */
     public static User getCurrentUser() {
         HttpSession currentSession = SpringUtils.getCurrentSession();
-        return (User) currentSession.getAttribute("user");
+        return (User) currentSession.getAttribute(SessionFields.ADMIN_USER);
     }
 
     /**
@@ -31,7 +32,6 @@ public class AdminUserUtils {
      */
     public static void logoutCurrentUser() {
         HttpSession session = SpringUtils.getCurrentSession();
-        session.removeAttribute("user");
-        session.invalidate();
+        session.removeAttribute(SessionFields.ADMIN_USER);
     }
 }

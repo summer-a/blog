@@ -5,11 +5,11 @@ spring:
   datasource:
     druid:
       driver-class-name: com.mysql.jdbc.Driver
-      #      url: jdbc:mysql://${host.ip}:3309/hjb_blog?useSSL=false&serverTimezone=UTC
-      url: jdbc:mysql://localhost:3306/hjb_blog?useSSL=false&serverTimezone=UTC
+      url: jdbc:mysql://${host.ip}:3309/hjb_blog?useSSL=false&serverTimezone=UTC
+      #      url: jdbc:mysql://localhost:3306/hjb_blog?useSSL=false&serverTimezone=UTC
       username: root
-      #      password: Hjb88619973.
-      password: 123456
+      password:
+      #      password: 123456
       initial-size: 1
       min-idle: 1
       max-active: 20
@@ -25,14 +25,13 @@ spring:
         min-idle: 0
     port: 6336
     host: ${host.ip}
-    password: 88619973
+    password:
   devtools:
     restart:
       enabled: true
       additional-paths: src/main/java
   banner:
     charset: UTF-8
-
   # 当配置没有找到Controller时抛出异常
   mvc:
     throw-exception-if-no-handler-found: true
@@ -50,7 +49,7 @@ spring:
       content-type: text/html
     prefix: classpath:/templates/
 host:
-  ip: 120.77.215.148
+  ip:
   indexUrl: https://www.chiyouyun.com/
   tableUrl: https://www.chiyouyun.com/timetable
   imageUrl: http://image.chiyouyun.com/
@@ -72,16 +71,13 @@ management:
       enabled: true
       path: /
       threshold: 0
-
+#课程推送和课程表页面开启选项
+course:
+  push: false
+  page: false
 server:
   port: 8080
   servlet:
     context-path: /
 logging:
-  path: /var/tomcat/blog/logs/
-  file: blog.log
-  level:
-    com:
-      hjb:
-        blog:
-          mapper: debug
+  config: classpath:log4j.xml

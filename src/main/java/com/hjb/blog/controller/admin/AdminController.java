@@ -119,7 +119,7 @@ public class AdminController {
             return ResultVO.build(0, "密码错误!", null);
         } else {
             // 添加session
-            session.setAttribute(SessionFields.USER, user);
+            session.setAttribute(SessionFields.ADMIN_USER, user);
             session.setMaxInactiveInterval(CommonFields.ONE_DAY_SEC * 7);
             // 添加cookie
             if (rememberMe != null && rememberMe) {
@@ -152,7 +152,7 @@ public class AdminController {
      */
     @GetMapping(value = "/admin/logout")
     public String logout(HttpSession session) {
-        session.removeAttribute(SessionFields.USER);
+        session.removeAttribute(SessionFields.ADMIN_USER);
         session.invalidate();
         return "redirect:/login";
     }

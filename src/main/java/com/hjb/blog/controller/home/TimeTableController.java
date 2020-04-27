@@ -25,7 +25,6 @@ import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import java.io.IOException;
-import java.time.LocalDate;
 import java.util.List;
 
 /**
@@ -158,7 +157,6 @@ public class TimeTableController {
     @GetMapping(value = "/logout")
     public String logout(HttpSession session) {
         session.removeAttribute(SessionFields.JVTC_USER);
-        session.invalidate();
         return "redirect:/jvtc/page/login";
     }
 
@@ -176,7 +174,7 @@ public class TimeTableController {
                        @PathVariable(required = false) Boolean refresh) {
 
         // 默认本周
-        week = week == null ? JvtcLoginUtils.howWeeks(LocalDate.now()) : week;
+        week = week == null ? JvtcLoginUtils.nowWeek() : week;
 
         JvtcUser userParam = new JvtcUser();
         userParam.setUsername(id);
@@ -186,7 +184,7 @@ public class TimeTableController {
         } else {
             // 删除缓存
             if (refresh != null && refresh) {
-                redisService.delete(String.format(RedisFields.TABLE, id, StringUtils.isEmpty(week) ? JvtcLoginUtils.howWeeks(LocalDate.now()) : week));
+                redisService.delete(String.format(RedisFields.TABLE, id, StringUtils.isEmpty(week) ? JvtcLoginUtils.nowWeek() : week));
             }
             Html timeTable = JvtcLoginUtils.getTimeTable(week, jvtcUser, 3);
             // 强制刷新链接

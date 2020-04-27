@@ -1,7 +1,5 @@
 package com.hjb.blog.util;
 
-import com.hjb.blog.entity.normal.User;
-import com.hjb.blog.field.SessionFields;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
@@ -54,13 +52,4 @@ public class SpringUtils implements ApplicationContextAware {
         return applicationContext.getBean(clazz, beanId);
     }
 
-    /**
-     * 获取当前前台用户
-     *
-     * @return
-     */
-    public static User getCurrentUser() {
-        HttpSession currentSession = getCurrentSession();
-        return (User) currentSession.getAttribute(SessionFields.USER);
-    }
 }

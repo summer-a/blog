@@ -4,10 +4,11 @@ package com.hjb.blog.controller.admin;
 import com.hjb.blog.entity.normal.User;
 import com.hjb.blog.field.SessionFields;
 import com.hjb.blog.service.normal.UserService;
-import com.hjb.blog.util.SpringUtils;
 import com.xiaoleilu.hutool.json.JSONObject;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
@@ -18,7 +19,7 @@ import java.util.Objects;
 
 
 /**
- * @author liuyanzhao
+ * @author
  */
 @Controller
 @RequestMapping("/admin/user")
@@ -120,6 +121,9 @@ public class BackUserController {
     public String insertUserSubmit(User user) {
         User paramByName = new User();
         paramByName.setUserName(user.getUserName());
+        if (StringUtils.isEmpty(user.getUserAvatar())) {
+            user.setUserAvatar("http://image.chiyouyun.com/image/default/user.png");
+        }
         User userByName = userService.selectOne(paramByName);
 
         if (userByName == null) {
@@ -177,15 +181,13 @@ public class BackUserController {
      *
      * @return
      */
-    @GetMapping(value = "/profile")
-    public ModelAndView userProfileView() {
+    @GetMapping(value = "/profile/{userId}")
+    public String userProfileView(Model model, @PathVariable(value = "userId") Integer userId) {
 
-        ModelAndView modelAndView = new ModelAndView();
-        User sessionUser = SpringUtils.getCurrentUser();
-        User user = userService.selectById(sessionUser.getId());
-        modelAndView.addObject(SessionFields.USER, user);
+        User user = userService.selectById(userId);
 
-        modelAndView.setViewName("Admin/User/profile");
-        return modelAndView;
+        model.addAttribute(SessionFields.ADMIN_USER, user);
+
+        return "Admin/User/profile";
     }
 }

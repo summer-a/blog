@@ -5,6 +5,8 @@ import com.hjb.blog.entity.normal.Article;
 import com.hjb.blog.entity.normal.Tag;
 import com.hjb.blog.service.base.BaseService;
 
+import java.util.List;
+
 /**
  * 标签服务
  * @author 胡江斌
@@ -25,4 +27,11 @@ public interface TagService extends BaseService<Tag> {
      * @return
      */
     PageInfo<Article> pageArticleByTagId(int pageNum, int pageSize, int tagId);
+
+    /**
+     * 查询所有标签，带文章数量
+     *
+     * @return
+     */
+    List<Tag> selectAllAndArticleCount();
 }

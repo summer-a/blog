@@ -13,4 +13,11 @@ import java.util.List;
 public interface TagMapper extends MyMapper<Tag> {
 
     List<Article> selectArticleByTagId(Integer tagId);
+
+    /**
+     * 查询所有标签，带文章数量
+     *
+     * @return
+     */
+    List<Tag> selectTagsAndArticleCount();
 }

@@ -8,12 +8,15 @@ import com.hjb.blog.service.normal.TagService;
 import com.xiaoleilu.hutool.json.JSONArray;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.ModelAndView;
 
+import java.util.LinkedHashMap;
 import java.util.List;
 
 
@@ -36,19 +39,15 @@ public class BackTagController {
      * @return
      */
     @GetMapping(value = "")
-    public ModelAndView index() {
-        ModelAndView modelandview = new ModelAndView();
-        List<Tag> tags = tagService.selectAll();
-        List<Tag> newTags = new JSONArray(tags).toList(Tag.class);
-        // 更新文章数
-        for (Tag tag : newTags) {
-            int count = articleService.countArticleByTagId(tag.getId());
-            tag.setArticleCount(count);
+    public String index(Model model) {
+        List<Tag> tags = tagService.selectAllAndArticleCount();
+        if (!CollectionUtils.isEmpty(tags)) {
+            if ((Object) tags.get(0) instanceof LinkedHashMap) {
+                tags = new JSONArray(tags).toList(Tag.class);
+            }
         }
-        modelandview.addObject(SessionFields.BLOG_TAG_LIST, newTags);
-
-        modelandview.setViewName("Admin/Tag/index");
-        return modelandview;
+        model.addAttribute(SessionFields.BLOG_TAG_LIST, tags);
+        return "Admin/Tag/index";
     }
 
 
@@ -70,12 +69,12 @@ public class BackTagController {
      * @param id 标签ID
      * @return
      */
-    @PostMapping(value = "/delete/{id}")
+    @GetMapping(value = "/delete/{id}")
     public String deleteTag(@PathVariable("id") Integer id) {
-        /*Integer count = articleService.countArticleByTagId(id);
+        Integer count = articleService.countArticleByTagId(id);
         if (count == 0) {
-            tagService.deleteTag(id);
-        }*/
+            tagService.deleteByPrimaryKey(id);
+        }
         return "redirect:/admin/tag";
     }
 
@@ -85,7 +84,7 @@ public class BackTagController {
      * @param id
      * @return
      */
-    @PostMapping(value = "/edit/{id}")
+    @GetMapping(value = "/edit/{id}")
     public ModelAndView editTagView(@PathVariable("id") Integer id) {
         ModelAndView modelAndView = new ModelAndView();
 

@@ -14,7 +14,7 @@
     <name>驰游云校博客</name>
     <description>blog</description>
     <!-- tomcat用 -->
-    <packaging>war</packaging>
+    <!--<packaging>war</packaging>-->
 
     <properties>
         <java.version>1.8</java.version>
@@ -34,6 +34,9 @@
         <elasticsearch.version>6.8.1</elasticsearch.version>
         <fileupload.version>1.3.1</fileupload.version>
         <commons-net.version>3.3</commons-net.version>
+
+        <!-- dockerhub 用户名 -->
+        <docker.image.prefix>hjb</docker.image.prefix>
     </properties>
 
     <dependencies>
@@ -41,26 +44,44 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-thymeleaf</artifactId>
+            <exclusions>
+                <exclusion>
+                    <artifactId>thymeleaf-extras-java8time</artifactId>
+                    <groupId>org.thymeleaf.extras</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>spring-boot-starter-logging</artifactId>
+                    <groupId>org.springframework.boot</groupId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
             <exclusions>
                 <exclusion>
-                    <groupId>ch.qos.logback</groupId>
-                    <artifactId>logback-classic</artifactId>
+                    <groupId>org.springframework.boot</groupId>
+                    <artifactId>spring-boot-starter-logging</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.slf4j</groupId>
+                    <artifactId>slf4j-log4j12</artifactId>
                 </exclusion>
                 <exclusion>
                     <groupId>ch.qos.logback</groupId>
-                    <artifactId>logback-core</artifactId>
+                    <artifactId>logback-classic</artifactId>
                 </exclusion>
             </exclusions>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-log4j2</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-tomcat</artifactId>
             <!-- war包不包含tomcat -->
-            <scope>provided</scope>
+            <!--<scope>provided</scope>-->
         </dependency>
         <dependency>
             <groupId>tk.mybatis</groupId>
@@ -71,6 +92,10 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
             <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.logging.log4j</groupId>
+            <artifactId>log4j-slf4j-impl</artifactId>
         </dependency>
         <!-- hot reload -->
         <dependency>
@@ -107,8 +132,12 @@
             <artifactId>spring-boot-starter-thymeleaf</artifactId>
             <exclusions>
                 <exclusion>
-                    <groupId>org.slf4j</groupId>
-                    <artifactId>slf4j-api</artifactId>
+                    <artifactId>thymeleaf-extras-java8time</artifactId>
+                    <groupId>org.thymeleaf.extras</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>spring-boot-starter-logging</artifactId>
+                    <groupId>org.springframework.boot</groupId>
                 </exclusion>
             </exclusions>
         </dependency>
@@ -181,19 +210,29 @@
         </dependency>
         <!-- 健康状态监控 end -->
 
-        <!-- 酷Q机器人 相关jar start -->
+        <!-- 工具集 start -->
         <dependency>
             <groupId>com.xiaoleilu</groupId>
             <artifactId>hutool-all</artifactId>
             <version>${hutool-all.version}</version>
         </dependency>
-        <!-- 酷Q机器人 end -->
+        <!-- 工具集 end -->
 
         <!-- 爬虫 start -->
         <dependency>
             <groupId>us.codecraft</groupId>
             <artifactId>webmagic-extension</artifactId>
             <version>${webmagic.version}</version>
+            <exclusions>
+                <exclusion>
+                    <artifactId>fastjson</artifactId>
+                    <groupId>com.alibaba</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>commons-io</artifactId>
+                    <groupId>commons-io</groupId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <!-- 爬虫 end -->
 
@@ -243,14 +282,10 @@
                     <username>admin</username>
                     <password>88619973</password>
                     <update>true</update>
-                    <excludes>
-                        <exclude>WEB-INF/lib/logback-classic-1.2.3.jar</exclude>
-                        <exclude>WEB-INF/lib/logback-core-1.2.3.jar</exclude>
-                    </excludes>
                 </configuration>
             </plugin>
 
-            <!-- maven插件 -->
+            <!-- maven插件,可以将项目打包成jar包 -->
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
@@ -264,7 +299,7 @@
 
                 </configuration>
             </plugin>
-            <plugin>
+            <!--<plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-war-plugin</artifactId>
                 <configuration>
@@ -273,7 +308,7 @@
                         WEB-INF/lib/logback-core-1.2.3.jar
                     </packagingExcludes>
                 </configuration>
-            </plugin>
+            </plugin>-->
 
             <!-- mybatis逆向工程插件 -->
             <plugin>
@@ -299,7 +334,49 @@
                 </dependencies>
             </plugin>
 
+            <!-- docker部署支持 -->
+            <plugin>
+                <groupId>com.spotify</groupId>
+                <artifactId>docker-maven-plugin</artifactId>
+                <version>1.0.0</version>
+                <configuration>
+                    <!--镜像名称  hjb/blog-->
+                    <imageName>${docker.image.prefix}/${project.artifactId}</imageName>
+                    <!--指定标签  java版本-->
+                    <imageTags>
+                        <imageTag>latest</imageTag>
+                    </imageTags>
+                    <!-- 基础镜像jdk1.8  指定基础镜像 -->
+                    <baseImage>java</baseImage>
+                    <!-- 制作者信息 -->
+                    <maintainer>hujiangbing 1525947163@qq.com</maintainer>
+                    <!-- 切换目录/ROOT -->
+                    <workdir>/ROOT</workdir>
+                    <!-- 运行命令 -->
+                    <!--<cmd>["java", "-version"]</cmd>-->
+                    <!-- 执行jar  这里的finalName是打包后的jar文件名 -->
+                    <entryPoint>["java", "-jar", "${project.build.finalName}.jar"]</entryPoint>
+
+                    <!-- 指定dockerfile路径 -->
+                    <!--<dockerDirectory>${project.basedir}/src/main/resources/docker</dockerDirectory>-->
+                    <!--指定pem证书文件路径地址 -->
+                    <dockerCertPath>${project.basedir}/src/main/resources/docker/pem</dockerCertPath>
+                    <!--指定远程docker api地址-->
+                    <dockerHost>https://120.77.215.148:2375</dockerHost>
+                    <!--复制jar包到docker容器指定目录配置-->
+                    <resources>
+                        <resource>
+                            <targetPath>/ROOT</targetPath>
+                            <!-- 用于指定需要复制的根目录。${project.build.directory}表示target目录 -->
+                            <directory>${project.build.directory}</directory>
+                            <!-- 用于指定需要复制的文件。${project.build.finalName}.jar 指打包后的jar文件名 -->
+                            <include>${project.build.finalName}.jar</include>
+                        </resource>
+                    </resources>
+                </configuration>
+            </plugin>
         </plugins>
+
     </build>
 
 </project>

@@ -14,4 +14,5 @@ import com.hjb.blog.service.base.BaseService;
  */
 
 public interface CommentService extends BaseService<Comment> {
+
 }

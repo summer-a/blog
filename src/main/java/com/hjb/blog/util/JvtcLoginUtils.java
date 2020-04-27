@@ -2,8 +2,7 @@ package com.hjb.blog.util;
 
 import com.hjb.blog.entity.normal.JvtcUser;
 import com.hjb.blog.entity.vo.ResponseVO;
-import com.hjb.blog.field.CommonFields;
-import com.hjb.blog.field.RedisFields;
+import com.hjb.blog.field.*;
 import com.hjb.blog.service.common.RedisService;
 import com.hjb.blog.service.normal.JvtcUserService;
 import okhttp3.FormBody;
@@ -16,13 +15,9 @@ import us.codecraft.webmagic.selector.Html;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
-import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.time.temporal.WeekFields;
-import java.util.List;
 import java.util.Objects;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
@@ -37,32 +32,21 @@ import java.util.regex.Pattern;
  */
 public class JvtcLoginUtils {
 
-    /**
-     * 处理页面<br>
-     * 参数rq=日期
-     */
-    private static String kbPage = "http://jiaowu.jvtc.jx.cn/jsxsd/framework/main_index_loadkb.jsp";
-
-    /**
-     * 登录连接
-     */
-    private static String loginUrl = "http://jiaowu.jvtc.jx.cn/jsxsd/xk/LoginToXk";
-
-    /**
-     * 主页，包含用户信息
-     */
-    private static String infoPage = "http://jiaowu.jvtc.jx.cn/jsxsd/framework/xsMain_new.jsp";
-
-    private static Pattern pattern = Pattern.compile("第([0-9]+)周");
+    public static Pattern pattern = Pattern.compile("第([0-9]+)周");
 
     /**
      * 配置
      */
-    private static Request.Builder request = initParam();
-
-    public static final String COOKIE = "Cookie";
-
-    public static final String SET_COOKIE = "Set-Cookie";
+    public static Request.Builder request = new Request.Builder()
+            .addHeader("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8")
+            .addHeader("Accept-Language", "zh-CN,zh;q=0.9,en;q=0.8")
+            .addHeader("Connection", "keep-alive")
+            .addHeader("User-Agent", "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/71.0.3578.98 Safari/537.36")
+            .addHeader("Content-Type", "application/x-www-form-urlencoded")
+            .addHeader("Referer", "http://jiaowu.jvtc.jx.cn/jsxsd/")
+            .addHeader("Upgrade-Insecure-Requests", "1")
+            .addHeader("Host", "jiaowu.jvtc.jx.cn")
+            .addHeader("Origin", "http://jiaowu.jvtc.jx.cn");
 
     public static final String LOGIN_TITLE_TEXT = "登录";
 
@@ -77,7 +61,7 @@ public class JvtcLoginUtils {
      * @return
      */
     public static JvtcUser getJvtcUser(HttpServletRequest request) {
-        return (JvtcUser) request.getSession().getAttribute("jvtc_user");
+        return (JvtcUser) request.getSession().getAttribute(SessionFields.JVTC_USER);
     }
 
     /**
@@ -88,7 +72,7 @@ public class JvtcLoginUtils {
     public static JvtcUser getJvtcUser() {
         HttpSession currentSession = SpringUtils.getCurrentSession();
         if (currentSession != null) {
-            return (JvtcUser) currentSession.getAttribute("jvtc_user");
+            return (JvtcUser) currentSession.getAttribute(SessionFields.JVTC_USER);
         }
         return null;
     }
@@ -105,19 +89,19 @@ public class JvtcLoginUtils {
     public static Html getTimeTable(Integer howWeeks, JvtcUser jvtcUser, int retryCount) {
 
         // 当前第几周
-        String url = kbPage + "?rq=" + LocalDate.now().plusWeeks(howWeeks == null ? 0 : howWeeks - howWeeks(LocalDate.now())).format(DateTimeFormatter.ISO_LOCAL_DATE);
+        String url = UrlFields.KB_PAGE + "?rq=" + LocalDate.now().plusWeeks(howWeeks == null ? 0 : howWeeks - nowWeek()).format(DateTimeFormatter.ISO_LOCAL_DATE);
         // 有缓存就根据缓存获取
         if (!StringUtils.isEmpty(jvtcUser.getCookie())) {
 
             // 根据班级获取该班级的课表（本周）
             RedisService<String> redisService = SpringUtils.getBean(RedisService.class);
             // 0表示当前周, 要进行设置
-            howWeeks = howWeeks == 0 ? howWeeks(LocalDate.now()) : howWeeks;
+            howWeeks = howWeeks == 0 ? nowWeek() : howWeeks;
             String table = redisService.get(String.format(RedisFields.TABLE, jvtcUser.getUsername(), howWeeks));
             if (!StringUtils.isEmpty(table)) {
                 return Html.create(table);
             }
-            request.header(COOKIE, jvtcUser.getCookie());
+            request.header(UrlFields.COOKIE, jvtcUser.getCookie());
             // 判断缓存是否过期
             ResponseVO kbPageResponse = HttpUtils.get(url, request);
             Html kbHtml = Html.create(kbPageResponse.getHtml());
@@ -130,7 +114,7 @@ public class JvtcLoginUtils {
         // 未登录则进行登录,根据缓存获取页面失败了，表示缓存过期了
         ResponseVO loginResult = loginByUserNameAndEncode(jvtcUser.getUsername(), jvtcUser.getPassword());
         if (loginResult != null && loginResult.getCode() == HttpStatus.FOUND.value()) {
-            request.header(COOKIE, loginResult.getHeaders().get(SET_COOKIE));
+            request.header(UrlFields.COOKIE, loginResult.getHeaders().get(UrlFields.SET_COOKIE));
         }
 
         // 获取课表
@@ -144,7 +128,7 @@ public class JvtcLoginUtils {
             return getTimeTable(howWeeks, jvtcUser, --retryCount);
         }
 
-        return Html.create("<div>获取失败,请刷新重试</div>");
+        return Html.create(HTMLFields.GET_TABLE_FAIL);
     }
 
     private static Html processAndSaveToRedis(String id, Integer weeks, Html html) {
@@ -219,8 +203,8 @@ public class JvtcLoginUtils {
         JvtcUserService jvtcUserService = SpringUtils.getBean(JvtcUserService.class);
 
         // 非缓存登录(设置禁用临时重定向后一次就行)
-        ResponseVO jvtcResponse = loginRequest(loginUrl, username, encoded);
-        String cookie = jvtcResponse.getHeaders().get(SET_COOKIE);
+        ResponseVO jvtcResponse = loginRequest(UrlFields.LOGIN_URL, username, encoded);
+        String cookie = jvtcResponse.getHeaders().get(UrlFields.SET_COOKIE);
         if (StringUtils.isEmpty(cookie)) {
             return null;
         }
@@ -258,9 +242,9 @@ public class JvtcLoginUtils {
                     JvtcUser juser = new JvtcUser();
                     juser.setId(jvtcUser.getId());
 
-                    Request.Builder builder = JvtcLoginUtils.initParam();
-                    builder.addHeader(COOKIE, cookie);
-                    ResponseVO userInfo = HttpUtils.get(infoPage, builder);
+                    Request.Builder builder = JvtcLoginUtils.request;
+                    builder.addHeader(UrlFields.COOKIE, cookie);
+                    ResponseVO userInfo = HttpUtils.get(UrlFields.INFO_PAGE, builder);
                     Html userInfoHtml = Html.create(userInfo.getHtml());
                     juser.setClazz(userInfoHtml.xpath("//div[@class='middletopttxlr']/div[6]/div[2]/text()").get());
                     jvtcUserService.update(juser);
@@ -299,9 +283,14 @@ public class JvtcLoginUtils {
      * @return
      */
     public static boolean isLogined(String cookie) {
-        Request.Builder builder = initParam().addHeader(COOKIE, cookie);
-        ResponseVO resp = HttpUtils.get(kbPage, builder);
-        return isLogined(Html.create(resp.getHtml()));
+        Request.Builder builder = request.addHeader(UrlFields.COOKIE, cookie);
+        ResponseVO resp = HttpUtils.get(UrlFields.KB_PAGE, builder);
+        if (isLogined(Html.create(resp.getHtml()))) {
+            // session加入登录状态
+            //SpringUtils.getCurrentSession().setAttribute(SessionFields.JVTC_COOKIE, cookie);
+            return true;
+        }
+        return false;
     }
 
     /**
@@ -312,7 +301,7 @@ public class JvtcLoginUtils {
      * @return
      */
     public static ResponseVO loginRequest(String username, String encoded) {
-        return loginRequest(loginUrl, username, encoded, null);
+        return loginRequest(UrlFields.LOGIN_URL, username, encoded, null);
     }
 
     /**
@@ -343,32 +332,13 @@ public class JvtcLoginUtils {
                 .add("userPassword", "")
                 .add("encoded", encoded)
                 .build();
-        Request.Builder builder = initParam();
+        Request.Builder builder = request;
         // 缓存存在则直接缓存登录
         if (!StringUtils.isEmpty(cookie)) {
-            builder.addHeader(COOKIE, cookie);
+            builder.addHeader(UrlFields.COOKIE, cookie);
         }
 
         return HttpUtils.post(url, builder, body);
-    }
-
-
-    /**
-     * 参数初始化
-     *
-     * @return
-     */
-    private static Request.Builder initParam() {
-        return new Request.Builder()
-                .addHeader("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8")
-                .addHeader("Accept-Language", "zh-CN,zh;q=0.9,en;q=0.8")
-                .addHeader("Connection", "keep-alive")
-                .addHeader("User-Agent", "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/71.0.3578.98 Safari/537.36")
-                .addHeader("Content-Type", "application/x-www-form-urlencoded")
-                .addHeader("Referer", "http://jiaowu.jvtc.jx.cn/jsxsd/")
-                .addHeader("Upgrade-Insecure-Requests", "1")
-                .addHeader("Host", "jiaowu.jvtc.jx.cn")
-                .addHeader("Origin", "http://jiaowu.jvtc.jx.cn");
     }
 
     /**
@@ -391,15 +361,31 @@ public class JvtcLoginUtils {
     }
 
     /**
+     * 获取当前周次
+     *
+     * @return
+     */
+    public static int nowWeek() {
+        // 周次存入redis
+        RedisService redisService = SpringUtils.getBean(RedisService.class);
+        try {
+            return Integer.parseInt((String) redisService.get(RedisFields.WEEK));
+        } catch (NumberFormatException e) {
+            LoggerUtils.getLogger().error("获取周次失败", e);
+        }
+        return -1;
+    }
+
+    /**
      * 开学多少周
      *
      * @return
      */
-    public static int howWeeks(LocalDate now) {
+    /*public static int howWeeks(LocalDate now) {
         int week = now.getDayOfWeek().getValue();
         // 计算开学到现在多少周（减掉开学之前的时间）
         return now.get(WeekFields.of(DayOfWeek.MONDAY, 1).weekOfYear()) - ((week == 6 || week == 7) ? 34 : 35);
-    }
+    }*/
 
     /**
      * 开学多少周
@@ -407,7 +393,7 @@ public class JvtcLoginUtils {
      * @param html
      * @return
      */
-    public static String howWeeks(Html html) {
+    /*public static String howWeeks(Html html) {
         List<String> timeTable = html.xpath("//p/@title").all();
         if (timeTable != null) {
             for (String table : timeTable) {
@@ -421,5 +407,5 @@ public class JvtcLoginUtils {
         }
         return "第 ? 周";
     }
-
+*/
 }

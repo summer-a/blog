@@ -53,7 +53,7 @@ public class RedisConfig extends CachingConfigurerSupport {
         template.setValueSerializer(serializer);
         template.setHashValueSerializer(serializer);
 
-        template.afterPropertiesSet();
+//        template.afterPropertiesSet();
 
         LoggerUtils.getLogger().info("redisTemplate 初始化配置完成 ");
         return template;

@@ -2,7 +2,7 @@ package com.hjb.blog.service.common.impl;
 
 import com.hjb.blog.entity.jvtc.JvtcCourse;
 import com.hjb.blog.entity.normal.JvtcUser;
-import com.hjb.blog.service.common.CourseService;
+import com.hjb.blog.service.common.SyllabusService;
 import com.hjb.blog.service.normal.JvtcUserService;
 import com.hjb.blog.util.JvtcAppApiUtils;
 import com.hjb.blog.util.LoggerUtils;
@@ -27,7 +27,7 @@ import java.util.Objects;
  * @date 2019/11/23 15:53
  */
 @Service
-public class CourseServiceImpl implements CourseService {
+public class SyllabusServiceImpl implements SyllabusService {
 
     @Resource
     private JvtcUserService jvtcUserService;

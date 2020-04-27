@@ -1,7 +1,5 @@
 package com.hjb.blog.controller.admin;
 
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONObject;
 import com.github.pagehelper.PageInfo;
 import com.hjb.blog.entity.enums.OrderField;
 import com.hjb.blog.entity.normal.Article;
@@ -13,6 +11,7 @@ import com.hjb.blog.service.normal.ArticleService;
 import com.hjb.blog.service.normal.CategoryService;
 import com.hjb.blog.service.normal.TagService;
 import com.hjb.blog.util.AdminUserUtils;
+import com.xiaoleilu.hutool.json.JSONArray;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -20,6 +19,7 @@ import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Objects;
 
@@ -156,7 +156,9 @@ public class BackArticleController {
         List<Tag> tagList = tagService.selectAll();
         List<Tag> tagSelecteds = article.getTagList();
         if (!CollectionUtils.isEmpty(tagList)) {
-            tagList = JSON.parseArray(JSONObject.toJSONString(tagList), Tag.class);
+            if ((Object) tagList.get(0) instanceof LinkedHashMap) {
+                tagList = new JSONArray(tagList).toList(Tag.class);
+            }
             for (Tag tag : tagList) {
                 for (Tag tagSelect : tagSelecteds) {
                     if (Objects.equals(tagSelect.getId(), tag.getId())) {

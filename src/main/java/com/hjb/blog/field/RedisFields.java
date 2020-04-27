@@ -17,6 +17,8 @@ public final class RedisFields {
      */
     public static final String TABLE = "table::%s::%s";
 
+    public static final String WEEK = "week";
+
     private RedisFields() {
 
     }

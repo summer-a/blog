@@ -6,7 +6,7 @@ import com.hjb.blog.entity.jvtc.JvtcCourse;
 import com.hjb.blog.entity.normal.JvtcUser;
 import com.hjb.blog.entity.normal.Robot;
 import com.hjb.blog.entity.timetable.MessageInfo;
-import com.hjb.blog.service.common.CourseService;
+import com.hjb.blog.service.common.SyllabusService;
 import com.hjb.blog.service.normal.JvtcUserService;
 import com.hjb.blog.util.TimeTableUtils;
 import com.xiaoleilu.hutool.util.CollectionUtil;
@@ -45,45 +45,59 @@ public class SendMessageFromAppJob {
     private JvtcUserService jvtcUserService;
 
     @Resource
-    private CourseService courseService;
+    private SyllabusService syllabusService;
 
     @Value("${host.tableUrl}")
     private String TABLE_URL;
 
+    /**
+     * 是否推送课表
+     */
+    @Value("${course.push}")
+    private Boolean COURSE_PUSH;
+
+
     @Scheduled(cron = "0 0 0 ? * MON-FRI")
     public void initCourse() {
-
         logger.info("初始化课表");
 
         List<UserRobotDTO> userRobots = jvtcUserService.selectUserRobotList();
         // 更新没存入redis的课表
         for (UserRobotDTO userRobot : userRobots) {
-            courseService.selectCourseIfSignedOrNot(userRobot.getJvtcUser(), LocalDate.now().format(DateTimeFormatter.ISO_DATE), 3);
+            syllabusService.selectCourseIfSignedOrNot(userRobot.getJvtcUser(), LocalDate.now().format(DateTimeFormatter.ISO_DATE), 3);
         }
     }
 
     @Scheduled(cron = "0 10 7 ? * MON-FRI")
     public void sendInTheMorning() {
-        logger.info("发送课表(上午)");
-        send(1, false);
+        if (COURSE_PUSH != null && COURSE_PUSH) {
+            logger.info("发送课表(上午)");
+            send(1, false);
+        }
     }
 
     @Scheduled(cron = "0 0 13 ? * MON-FRI")
     public void sendInTheNoon() {
-        logger.info("发送课表(中午)");
-        send(2, false);
+        if (COURSE_PUSH != null && COURSE_PUSH) {
+            logger.info("发送课表(中午)");
+            send(2, false);
+        }
     }
 
     @Scheduled(cron = "0 0 17 ? * MON-FRI")
     public void sendInTheAfterNoon() {
-        logger.info("发送课表(下午)");
-        send(3, true);
+        if (COURSE_PUSH != null && COURSE_PUSH) {
+            logger.info("发送课表(下午)");
+            send(3, true);
+        }
     }
 
     @Scheduled(cron = "0 20 18 ? * MON-FRI")
     public void sendInTheEvening() {
-        logger.info("发送课表(晚上)");
-        send(3, false);
+        if (COURSE_PUSH != null && COURSE_PUSH) {
+            logger.info("发送课表(晚上)");
+            send(3, false);
+        }
     }
 
     private void send(int interval, boolean isFifthLesson) {
@@ -91,7 +105,7 @@ public class SendMessageFromAppJob {
         List<MessageInfo> messageInfos = new ArrayList<>();
         for (UserRobotDTO userRobot : userRobots) {
             JvtcUser jvtcUser = userRobot.getJvtcUser();
-            List<JvtcCourse> courses = courseService.selectCourseIfSignedOrNot(jvtcUser, LocalDate.now().format(DateTimeFormatter.ISO_DATE), 3);
+            List<JvtcCourse> courses = syllabusService.selectCourseIfSignedOrNot(jvtcUser, LocalDate.now().format(DateTimeFormatter.ISO_DATE), 3);
 
             if (!CollectionUtil.isEmpty(courses)) {
                 // 过滤当天星期的课

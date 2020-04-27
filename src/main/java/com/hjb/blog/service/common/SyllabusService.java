@@ -6,6 +6,7 @@ import com.hjb.blog.entity.normal.JvtcUser;
 import java.util.List;
 
 /**
+ * 课程表服务
  * @author 胡江斌
  * @version 1.0
  * @title: CourseService
@@ -13,7 +14,7 @@ import java.util.List;
  * @description: TODO
  * @date 2019/11/23 15:50
  */
-public interface CourseService {
+public interface SyllabusService {
 
     /**
      * 获取课程表

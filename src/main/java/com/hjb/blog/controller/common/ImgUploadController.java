@@ -31,22 +31,25 @@ public class ImgUploadController {
     @Value("${host.imageUrl}")
     private String imageHost;
 
-    @PostMapping("/editor/upload")
-    public ResultVO upload(@RequestParam("file") MultipartFile file) {
+    /**
+     * 文件上传
+     *
+     * @param file
+     * @return
+     */
+    @PostMapping("/upload")
+    public ResultVO editorUpload(@RequestParam("file") MultipartFile file) {
         FTPUtils client = new FTPUtils();
-
         if (!file.isEmpty()) {
-            // 源文件名
-            String originalFilename = file.getOriginalFilename();
-            // 源文件后缀
-            String suffix = originalFilename.substring(originalFilename.lastIndexOf("."));
+            // 获取后缀
+            String suffix = getFileSuffix(file.getOriginalFilename());
             //
             String today = LocalDate.now().format(DateTimeFormatter.ofPattern("/yyyy/MM/dd/"));
             // 新图片名
             String newFileName = FTPUtils.createFileName(suffix);
             try {
                 // 上传返回服务器文件位置
-                String serverFilePath = client.uploadFile("/blog/editor", today, newFileName, file.getInputStream());
+                String serverFilePath = client.uploadFile("/blog", today, newFileName, file.getInputStream());
                 // 返回格式要求
                 Map<String, String> map = new HashMap<>(2);
                 map.put("src", imageHost + serverFilePath);
@@ -57,5 +60,15 @@ public class ImgUploadController {
             }
         }
         return ResultVO.build(1, "上传失败", null);
+    }
+
+    /**
+     * 获取文件后缀
+     *
+     * @param originalFilename 完整文件名
+     * @return
+     */
+    private String getFileSuffix(String originalFilename) {
+        return originalFilename.substring(originalFilename.lastIndexOf("."));
     }
 }

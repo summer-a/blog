@@ -47,8 +47,7 @@ public class ArticleController {
      * @return
      */
     @GetMapping(value = "/detail/{id}")
-    public String articleDetailPage(Model model,
-                                    @PathVariable(name = "id", required = true) Integer id) {
+    public String articleDetailPage(Model model, @PathVariable(name = "id", required = true) Integer id) {
 
         // 文章信息
         Article param = new Article();
@@ -71,7 +70,7 @@ public class ArticleController {
         model.addAttribute("hotCommentArticles", hotComments.getList());
 
         // 获取所有标签
-        List<Tag> tags = tagService.selectAll();
+        List<Tag> tags = tagService.selectAllAndArticleCount();
         model.addAttribute("tags", tags);
 
         return "Home/Page/articleDetail";

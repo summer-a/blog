@@ -6,7 +6,6 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
-import org.apache.log4j.Logger;
 import org.springframework.http.HttpStatus;
 
 import java.io.IOException;
@@ -21,12 +20,11 @@ import java.io.IOException;
  */
 public class HttpUtils {
 
-    private static Logger logger = Logger.getLogger(HttpUtils.class);
-
     /**
      * okhttp客户端
      */
     private static OkHttpClient client = new OkHttpClient();
+
 
     /**
      * get请求
@@ -42,7 +40,7 @@ public class HttpUtils {
         try (Response response = client.newCall(request).execute()) {
             return new ResponseVO(response.code(), response.body().string(), response.headers());
         } catch (IOException e) {
-            logger.error("请求异常", e);
+            LoggerUtils.getLogger().error("请求异常", e);
             return new ResponseVO(500, null, null);
         }
     }
@@ -61,7 +59,7 @@ public class HttpUtils {
         try (Response response = client.newBuilder().followRedirects(false).build().newCall(request).execute()) {
             return new ResponseVO(response.code(), response.body().string(), response.headers());
         } catch (IOException e) {
-            logger.error("请求异常", e);
+            LoggerUtils.getLogger().error("请求异常", e);
             return new ResponseVO(500, null, null);
         }
     }

@@ -73,37 +73,37 @@
 
             <table class="layui-table">
                 <colgroup>
+                    <col width="50">
                     <col width="300">
                     <col width="50">
                     <col width="100">
-                    <col width="50">
                 </colgroup>
                 <thead>
                 <tr>
+                    <th>ID</th>
                     <th>名称</th>
                     <th>文章数</th>
                     <th>操作</th>
-                    <th>ID</th>
                 </tr>
                 </thead>
                 <tbody>
                 <tr th:each="tag : ${tagList}">
-                        <td>
-                            <a th:href="@{'/tag/' + ${tag.id}}" target="_blank" th:text="${tag.tagName}">标签名</a>
-                        </td>
+                    <td th:text="${tag.id}">标签id</td>
+                    <td>
+                        <a th:href="@{'/tag/' + ${tag.id}}" target="_blank" th:text="${tag.tagName}">标签名</a>
+                    </td>
                     <td>
                         <a th:href="@{'/tag/' + ${tag.id}}" target="_blank" lay-data="{sort:true}"
                            th:text="${tag.articleCount}">文章数</a>
-                        </td>
-                        <td>
-                            <a th:href="@{'/admin/tag/edit/' + ${tag.id}}" class="layui-btn layui-btn-mini">编辑</a>
-                            <a th:href="@{'/admin/tag/delete/' + ${tag.id}}"
-                               class="layui-btn layui-btn-danger layui-btn-mini"
-                               th:if="${tag.articleCount == 0}"
-                               onclick="return confirmDelete()">删除</a>
-                        </td>
-                    <td>${c.tagId}</td>
-                    </tr>
+                    </td>
+                    <td>
+                        <a th:href="@{'/admin/tag/edit/' + ${tag.id}}" class="layui-btn layui-btn-mini">编辑</a>
+                        <a th:href="@{'/admin/tag/delete/' + ${tag.id}}"
+                           class="layui-btn layui-btn-danger layui-btn-mini"
+                           th:if="${tag.articleCount == 0}"
+                           onclick="return confirmDelete()">删除</a>
+                    </td>
+                </tr>
                 </tbody>
             </table>
             <blockquote class="layui-elem-quote layui-quote-nm">
